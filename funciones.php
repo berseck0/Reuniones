@@ -1,7 +1,8 @@
-<?php
+<?
 include 'acciones.php';
 header('Content-type: application/json');
 $server = array();
+
 $selec = $_POST['selec'];
 
 if ($selec == 1)
@@ -100,7 +101,7 @@ if ($selec == 12)
 
     $count = count($datos);
 
- for ($i=0; $i <$count; $i++) {
+    for ($i=0; $i <$count; $i++) {
 
       echo '  <div id="'.$datos[$i]['idre'].'" class="meeting_end">
             <img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">
@@ -169,14 +170,14 @@ if ($selec == 5) {
 ///busqueda de usuarios
 if($selec == 6)
 {
-    $plaza = $_GET['place'];
+    $plaza = $_POST['place'];
 
-    $dbsha = new Busquedasdb;
+    $dbsha = new Busquedasdb();
 
-     $list = $dbsha->usuariobusqueda($plaza);
-     var_dump($list);
-    $json = json_encode($list,JSON_UNESCAPED_UNICODE);
-    var_dump($json);
+     $server = $dbsha->usuariobusqueda($plaza);
+     echo json_encode($server);
+    //$json = json_encode($server,JSON_UNESCAPED_UNICODE);
+
 }
 
 //registro de tareas
@@ -295,4 +296,3 @@ if($selec == 11)
     }
 
 }
-?>

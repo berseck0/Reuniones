@@ -343,27 +343,24 @@ function cargareuniones(){
 }
 //generamos lal istas de las reuniones
 function reunionesnuevas(){
-    var idus = $("#idus").val().length;
-    if (idus!="") {
+    var idus = $("#idus").val();
     var tx = "selec=2&op=1&idusua="+idus;
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
-       if ($("#reunionesOk #showTopic .meeting_post").length) {
-        $("#reunionesOk #showTopic .meeting_post").remove();
-        $("#reunionesOk #showTopic ").append(data);
+       if ($("#reunionesOk .conten-reuniones .meeting_post").length) {
+        $("#reunionesOk .conten-reuniones .meeting_post").remove();
+        $("#reunionesOk .conten-reuniones ").append(data);
     
        }
 
     });
-}
     
 }
 
 
 //generamos la lista de reuniones pasadas
 function reunionespasadas(){
-    var idus = $("#idus").val().length;
-    if(idus!=""){
+    var idus = $("#idus").val();
     var tx = "selec=12&op=1&idusua="+idus;
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
@@ -376,7 +373,6 @@ function reunionespasadas(){
     
    //alert(data);
     });
-    }
 }
 
 //////////movemos la reunion como terminada o pasada
@@ -517,7 +513,9 @@ function buscUsuario()
      var ruta="funciones/funciones.php";
     var txt = "selec=6&op=3";
     $.post(ruta,txt,function(data){
-        
+        $.each(data, function(i, t) {
+            alert(server);
+        });
     });
 
 }
@@ -529,4 +527,40 @@ function showAddUserW()
     $("#w-adduser").removeAttr('style');
     $("#adduser-w").css({"display":'inline-block'});
 
+}
+
+function busquedaSimpleUsers(search)
+{
+  //console.log(search);
+
+      var elementopadre = $('[id^=jb_nombre_lista_user_]');
+      $.each(elementopadre,function(i,t)
+      {
+        search=search.toLowerCase();
+        search= sustituirAcentos(search);
+        var id = t.id;
+        var strSearched=$(this).text();
+        strSearched = strSearched.toLowerCase();
+        strSearched = sustituirAcentos(strSearched);
+        id = id.replace('jb_nombre_lista_user_-','');
+        if(strSearched.indexOf(search.trim()) !== -1)
+            console.log($("#"+id).text());
+
+      });
+
+}
+
+function sustituirAcentos(str)
+{
+var str = str.replace(/á/g,"a"); 
+str = str.replace(/é/g,"e");  
+str = str.replace(/í/g,"i");  
+str = str.replace(/ó/g,"o");  
+str = str.replace(/ú/g,"u"); 
+str = str.replace(/Á/g,"A"); 
+str = str.replace(/É/g,"E");  
+str = str.replace(/Í/g,"I");  
+str = str.replace(/Ó/g,"O");  
+str = str.replace(/Ú/g,"U"); 
+return str;
 }

@@ -1,9 +1,10 @@
-<?php
+<?
+//include_once('conexion.php');
 include 'conexion.php';
 header('Content-type: application/json');
 $server = array();
 
-$op = $_POST['op'];
+ $op = $_POST['op'];
 
 if ($op == 1) {
     
@@ -550,14 +551,15 @@ if($op == 3)
         }
 
         function conexion(){
-           $db= $this->conec;
-           $mysqli=$db->conect();
+            $mysqli = $this->conec->conect();
+           //$db= $this->conec;
+           //$mysqli=$db->conect();
            return $mysqli;
         }
 
         function usuariobusqueda($plaza)
         {
-
+           // $plaza = "valles";
             $mysqli = $this->conexion();
             $listado = array();
             $query = "SELECT jb_empleado.NOMBRES,jb_empleado.ID_EMPLEADO, jb_plaza.NOMBRE_PLAZA FROM jb_empleado, jb_plaza where jb_plaza.id=jb_empleado.ID_EMPLEADO and jb_plaza.NOMBRE_PLAZA=?";
@@ -600,5 +602,3 @@ if($op == 3)
     }  
 
 }
-
-?>
