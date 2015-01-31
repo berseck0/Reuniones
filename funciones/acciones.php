@@ -1,6 +1,6 @@
-<?php
+<?
 include 'conexion.php';
-header('Content-type: application/json');
+
 $server = array();
 
 $op = $_POST['op'];
@@ -23,13 +23,15 @@ if ($op == 1) {
         
         function chkreunion($iduser,$valor)
         {
+            header('Content-type: application/json');
+            
             $mysqli = $this->conexion();
             $sql = "SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.id_topic, reun.localizacion, emp.NOMBRES from jb_reunion_new reun, jb_fecha_reunion fecha,jb_empleado emp where reun.id_usuario=? and fecha.id_fecha_re=reun.id_fecha_re and emp.id_empleado=reun.id_usuario and reun.valor=? ORDER BY fecha.fecha_in ASC";
-            $lista=array();
+            $listados=array();
+            $datetime = date("Y-m-d");
                 if ($data=$mysqli->prepare($sql)) {
                      $data->bind_param("ii",$iduser,$valor);
                      if($data->execute())
-                     {
                         $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
 
                         while ($data->fetch()) {
@@ -41,16 +43,55 @@ if ($op == 1) {
                             $registro['localizacion']=$col6;
                             $registro['iduser']=$iduser;
                             $registro['usuario']=$col7;
-                            $lista[] = $registro;
-                        }
-
+                            $registro['lista']=$this->chktopic($registro['idre']);
+                            $registro['count_fecha']=$this->chkfechadif($registro['fecha'],$datetime);
+                            $listados[] = $registro;
+                        } 
+                    
                         $data->free_result();
                         $data->close();
-                        return $lista;
-                    }
+                        return $listados;
                 }
+                 return $listados;
         }
         
+        //funcion para reuniones activas y sus datos
+        function chkreunionactiva($iduser,$valor,$idre)
+        {
+            header('Content-type: application/json');
+            
+            $mysqli = $this->conexion();
+            $sql = "SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.id_topic, reun.localizacion, emp.NOMBRES from jb_reunion_new reun, jb_fecha_reunion fecha,jb_empleado emp where reun.id_usuario=? and fecha.id_fecha_re=reun.id_fecha_re and emp.id_empleado=reun.id_usuario and reun.valor=?  and reun.id_reunion=? ";
+            $listados=array();
+            $datetime = date("Y-m-d");
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("iii",$iduser,$valor,$idre);
+                     if($data->execute())
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
+
+                        while ($data->fetch()) {
+                            $registro['idre']=$col1;
+                            $registro['nombre']=$col2;
+                            $registro['fecha']=$col3;
+                            $registro['hora']=$col4;
+                            $registro['topic']=$col5;
+                            $registro['localizacion']=$col6;
+                            $registro['iduser']=$iduser;
+                            $registro['usuario']=$col7;
+                            $registro['lista']=$this->chktopic($registro['idre']);
+                            $registro['count_fecha']=$this->chkfechadif($registro['fecha'],$datetime);
+                            $listados[] = $registro;
+                        } 
+                    
+                        $data->free_result();
+                        $data->close();
+                        return $listados;
+                }
+                 return $listados;
+        }
+
+
+
             /* function chkusuariosreunion($idreunion,$idusuario)
         {
             $mysqli = $this->conexion();
@@ -78,8 +119,8 @@ if ($op == 1) {
                         $data->bind_result($col1,$col2);
 
                         while ($data->fetch()) {
-                            $registro['text']=$col1;
-                            $registro['id']=$col2;
+                            $registro['texts']=$col1;
+                            $registro['ids']=$col2;
                             $lista[] = $registro;
                         }
 
@@ -557,6 +598,7 @@ if($op == 3)
 
         function usuariobusqueda($plaza)
         {
+            header('Content-type: application/json');
 
             $mysqli = $this->conexion();
             $listado = array();
@@ -582,23 +624,7 @@ if($op == 3)
                 }
                 return $listado;
         }
-
-        function busque()
-        {
-            $mysqli = $this->conexion();
-            $sql = "SELECT NOMBRES,ID_EMPLEADO FROM jb_empleado";
-            
-            if ($data = $mysqli->query($sql)) {
-                $datos = $data->fetch_array();
-                return $datos;
-                mysqli_free_result($dato);
-
-            }
-        }
-
-
     }  
 
 }
 
-?>

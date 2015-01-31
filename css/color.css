@@ -176,9 +176,13 @@ hr
 .meeting_post img
 {
     border-radius: 8px;
-    margin-left: 5px;
+    margin-left: 3px;
     margin-top: 5px;
     display: inline-block;
+}
+.meeting_end img
+{
+    border-radius: 0px 0px 3px 0px;
 }
 
 .meeting_head
@@ -186,18 +190,23 @@ hr
     display: inline-block;
     vertical-align: top;
     width: 70%;
+    margin-left: 0.3em;
 }
 
 .meeting_head h4
 {
     margin-top: 5px;
 }
+.meeting_head h4:hover
+{
+    cursor:pointer;
+}
 
 .meeting_date, .meeting_user
 {
     display: inline-block;
-    font-size: 0.8em;
-    width: 35%;
+    font-size: 0.75em;
+    width: 33%;
     vertical-align: top;
 }
 
@@ -626,6 +635,32 @@ a {
     cursor: pointer;
     color:red;
 }
+/*seccion para la reunion activa*/
+.meeting_active
+{
+    background-color:  #C8C8C8;
+    border-radius: 10px;
+    box-shadow: 1px 1px 12px black;
+    padding: 0.3em;
+    overflow: hidden;
+}
+
+.meeting_time
+{
+    float: right;
+    margin-right: 1em;
+    width: 200px;
+    color: #0081FF;
+    font-weight: bold;
+}
+
+
+
+
+
+
+
+
 /* seccion de los div de tareas*/
 
 .tareasMenu

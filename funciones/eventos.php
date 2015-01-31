@@ -120,25 +120,16 @@ if($op == 3)
                         $data->close();
                         return $lista;
                     }
-                }
+                }return $lista;
             }     
     }
 
+    header('Content-type: application/json');
+   // $server = array();
+
     $lis = new Listadotag;
     $valor = $lis->listadostag($ideti,$tabla,$idcam);
-
-    $file= count($valor);
-    if ($file == 0) {
-        //echo "<br><span>No Tienes Etiquetas Registradas</span>";
-    }
-    else
-    {
-        echo '<ul class="listado sinborde">';
-        for ($i=0; $i <$file ; $i++) { 
-            echo '<li class="listadoli" ><a><p onclick="tagEditList('.$valor[$i]['id'].',\''.$valor[$i]["nombre"].'\');">'.$valor[$i]["nombre"].'</p></a></li>';
-        }
-         echo'</ul>';
-    }
+    echo json_encode($valor,JSON_UNESCAPED_UNICODE);
 }
 
 

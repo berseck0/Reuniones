@@ -64,31 +64,12 @@
         <div class="meeting_left" id="reunionesOk">
             <h3>Nuevas Reuniones</h3>
             <div  id="showTopic"  class="conten-reuniones">
-                <div class="meeting_post">
-                    
-                    
-                </div>
+
             </div>   
         </div>
         <div class="meeting_rigth" id="reunionespas">
           <h3>Antiguas Reuniones</h3>
             <div id="showlisendreuniones"class="conten-reuniones">
-                <div id="reuniones" class="meeting_post">
-                    <img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">
-                    <div class="meeting_head">
-                        <h4>Titulo de la Reunion</h4>
-                        <div class="meeting_date">fecha de la reunion</div>
-                        <div class="meeting_user">Quien la genero</div>
-                    </div>
-                    <div class="btn_down"><span class="icon">:</span></div>
-                    <div class="btn_del"><span class="icon">Â</span></div>
-                    <div class="meeting_topic">
-                        <ul>
-                            <li>primero</li>
-                            <li>segundo</li>
-                        </ul>
-                    </div>
-                </div>
             </div>  
         </div>
       </div>
@@ -116,7 +97,7 @@
                         </div>
                 <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
                 <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
-                        <div class="list-share list-meeting" style="display:none;">
+                        <div id="jb_list_user"class="list-share list-meeting" style="display:none;">
                             <ul>
                                 <li>as</li>
                             </ul>

@@ -1,15 +1,14 @@
-<?php
+<?
 include 'acciones.php';
-header('Content-type: application/json');
-$server = array();
+
+
 $selec = $_POST['selec'];
 
-if ($selec == 1)
-{
+if ($selec == 1){
      $id_reun    = $_POST['idre'];
-     $tituloRe   = $_POST['nom_reunion'];
+     $tituloRe   = utf8_encode($_POST['nom_reunion']);
      $etiqeuta   = $_POST['etiquetas'];
-     $lugar      = $_POST['lugar'];
+     $lugar      = utf8_encode($_POST['lugar']);
      $iduser     = $_POST['iduser'];
      $fechain    = str_replace("%2F","-" , $_POST['fecha_in']);  
      $dia1       = substr($fechain, 0, 2);  
@@ -47,82 +46,40 @@ if ($selec == 1)
 }
 
 //visualisamos la lista de reuniones
-if ($selec == 2)
- {
+if ($selec == 2) {
+    header('Content-type: application/json');
+    $server = array();
+
     $idusuario = $_POST['idusua'];
     $val = 1;
-   $dbchk = new Reunioneschk;
-    $datos = $dbchk->chkreunion($idusuario,$val);
+    $dbchk = new Reunioneschk;
+    $server = $dbchk->chkreunion($idusuario,$val);
 
-    $count = count($datos);
-    $datetime = date("Y-m-d");
+    //$server = utf8_decode($server);
+    $myjson =json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    $myjson = utf8_encode(stripslashes($myjson));
+    echo $myjson;
+    //echo json_decode($myjson,true);
+    //echo json_last_error_msg();
 
- for ($i=0; $i <$count; $i++) {
-    $fechadb =$datos[$i]['fecha'];
-    $diasdif=$dbchk->chkfechadif($fechadb,$datetime);
-    
-    if ($diasdif <= 0){$clase = 'class="meeting_post timedead"'; $h = '<span class="alertDia"><span class="icon">8</span>Reunion Del Dia</span>'; } elseif($diasdif<=3 && $diasdif >0) {  $clase = 'class="meeting_post timeout"'; $h = '<span class="alertDia"><span class="icon">4</span>Reunion Proxima</span>';} else{$clase = 'class="meeting_post"'; $h='<span class="alertDia"><span class="icon normal">K</span></span>';}
-
-
-
-      echo '  <div id="'.$datos[$i]['idre'].'" '.$clase.' >
-            <img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">
-            <div  class="meeting_head">
-                <h4>'.$datos[$i]['nombre'].'</h4>'.$h.'
-                <div class="meeting_date">'.$datos[$i]['fecha'].' '.utf8_decode($datos[$i]['hora']).'</div>
-                <div class="meeting_user">'.$datos[$i]['usuario'].'</div>
-            </div>
-            <div class="btn_down" onclick="showtemasreunion('.$datos[$i]['idre'].',0)"><span  class="icon">:</span></div>
-            <div class="btn_del" onclick="movListReunion('.$datos[$i]['idre'].','.$idusuario.')"><span class="icon">Â</span></div>
-            <div id="list-'.$datos[$i]['idre'].'"class="meeting_topic">
-                <ul>';
-                 $list=$dbchk->chktopic($datos[$i]['idre']);
-                 $con = count($list);
-                 for ($l=0; $l < $con; $l++) { 
-                            echo '<li id="topiclist"><span>'.$list[$l]["text"].'</span></li>';
-                        }       
-                echo'</ul>
-            </div>
-        </div> ';
-
-    }
-   
 }
 
 //visualisamos lista de reuniones pasadas o terminadas
 if ($selec == 12)
 {
+    header('Content-type: application/json');
+    $server = array();
 
     $idusuario = $_POST['idusua'];
     $val = 0;
     $dbchk = new Reunioneschk;
-    $datos = $dbchk->chkreunion($idusuario,$val);
+    $server = $dbchk->chkreunion($idusuario,$val);
 
-    $count = count($datos);
+    //$server = utf8_decode($server);
+    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    $myjson = utf8_encode(stripslashes($myjson));
+    echo $myjson;
 
- for ($i=0; $i <$count; $i++) {
-
-      echo '  <div id="'.$datos[$i]['idre'].'" class="meeting_end">
-            <img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">
-            <div  class="meeting_head">
-                <h4>'.$datos[$i]['nombre'].'</h4><span class="alertDia"><span class="icon normal">Ë</span></span>
-                <div class="meeting_date">'.$datos[$i]['fecha'].'  '.utf8_decode($datos[$i]['hora']).'</div>
-                <div class="meeting_user">'.$datos[$i]['usuario'].'</div>
-            </div>
-            <div class="btn_down" onclick="showtemasreunion('.$datos[$i]['idre'].',0)"><span  class="icon">:</span></div>
-            <div class="btn_del" onclick="movListReunion('.$datos[$i]['idre'].','.$idusuario.')"><span class="icon">Â</span></div>
-            <div id="list-'.$datos[$i]['idre'].'"class="meeting_topic">
-                <ul>';
-                 $list=$dbchk->chktopic($datos[$i]['idre']);
-                 $con = count($list);
-                 for ($l=0; $l < $con; $l++) { 
-                            echo '<li id="topiclist"><span>'.$list[$l]["text"].'</span></li>';
-                        }       
-                echo'</ul>
-            </div>
-        </div> ';
-
-    }
 }
 
 //registramos las etiquetas
@@ -169,14 +126,16 @@ if ($selec == 5) {
 ///busqueda de usuarios
 if($selec == 6)
 {
-    $plaza = $_GET['place'];
+    header('Content-type: application/json');
+    $server = array();
+    $plaza = $_POST['place'];
 
-    $dbsha = new Busquedasdb;
+    $dbsha = new Busquedasdb();
 
-     $list = $dbsha->usuariobusqueda($plaza);
-     var_dump($list);
-    $json = json_encode($list,JSON_UNESCAPED_UNICODE);
-    var_dump($json);
+     $server = $dbsha->usuariobusqueda($plaza);
+     echo json_encode($server);
+    //$json = json_encode($server,JSON_UNESCAPED_UNICODE);
+
 }
 
 //registro de tareas
@@ -223,11 +182,9 @@ if($selec == 9 )
     $datos = $dbchk->chklistarea($idusuario);
 
     $count = count($datos);
-
- for ($i=0; $i <$count; $i++) {
-
-
-   echo '<div class="post-w">
+    for ($i=0; $i <$count; $i++)
+      {
+           echo '<div class="post-w">
                     <img src="" alt="una imagen" height="50" width="80">
                     <div class="post-w-head">
                          <h4>'.$datos[$i]['titulo'].'</h4>
@@ -237,8 +194,8 @@ if($selec == 9 )
                     </div>
                         <div class="btn_down"><span class="icon">:</span></div>
                         <div class="btn_del"><span class="icon">Â</span></div>
-          </div>';
-    }
+              </div>';
+      }
 }
 
 //generamos la lista de actividades
@@ -251,7 +208,7 @@ if($selec == 10)
 
     $count = count($datos);
 
- for ($i=0; $i <$count; $i++) {
+    for ($i=0; $i <$count; $i++) {
 
      echo '<div class="post-w">
                     <img src="" alt="una imagen" height="50" width="80">
@@ -295,4 +252,22 @@ if($selec == 11)
     }
 
 }
-?>
+
+
+//visualisamos la reunion activa 
+if($selec == 13)
+{
+    header('Content-type: application/json');
+    $server = array();
+
+    $idusuario = $_POST['idusua'];
+    $idre = $_POST['id'];
+    $val = 1;
+    $dbchk = new Reunioneschk;
+    $server = $dbchk->chkreunionactiva($idusuario,$val,$idre);
+
+    //$server = utf8_decode($server);
+    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    $myjson = utf8_encode(stripslashes($myjson));
+    echo $myjson;
+}

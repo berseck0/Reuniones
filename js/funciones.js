@@ -227,6 +227,7 @@ function tag_sel(event)
 function savetag(e)
 {
     //e.preventDefault();
+    if($("#idus").length){
     var titulo = $("#nombreTag").val();
     var tipo   = $("#tipoEtiqueta").val();
     var iduser = $("#idus").val();
@@ -237,22 +238,32 @@ function savetag(e)
         listatagshow(iduser);
        }
     });
-  return false;
+  }
 }
 //muestra la lista de etiquetas dependiendo del usuario
 function listatagshow(iduser)
 {
     var t = "op=3&tab=1&idcam=1&id="+iduser;
     var ruta ="funciones/eventos.php";
-            
     $.post(ruta, t, function(datas){
+        var list = '<ul class="listado sinborde">';
+
+            $.each(datas, function(k,v)
+            {  
+              list+= '<li class="listadoli" ><a><p onclick="tagEditList('+v.id+',\''+v.nombre+'\');">'+v.nombre+'</p></a></li>'; 
+            });
+             list+="</ul>";
         if ($("#listEtiqueta ul").length) {
             $("#listEtiqueta ul").remove();
-        $("#listEtiqueta").append(datas);
-        }else
-        {
-            $("#listEtiqueta").append(datas);
+            $("#listEtiqueta").append(list);
         }
+        else
+        {
+            $("#listEtiqueta").append(list);
+        }
+
+    }).fail(function(){
+        alert("Fallo la Respuesta");
     });
 }
 
@@ -343,38 +354,97 @@ function cargareuniones(){
 }
 //generamos lal istas de las reuniones
 function reunionesnuevas(){
-    var idus = $("#idus").val().length;
-    if (idus!="") {
-    var tx = "selec=2&op=1&idusua="+idus;
+    if($("#idus").length){ 
+    var tx = "selec=2&op=1&idusua="+$("#idus").val();
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
-       if ($("#reunionesOk #showTopic .meeting_post").length) {
-        $("#reunionesOk #showTopic .meeting_post").remove();
-        $("#reunionesOk #showTopic ").append(data);
-    
-       }
+            //console.log(data);
+            
+        $.each(data, function(k, v)
+        {
+            var datahtml='<div id="'+v.idre+'" >';
+                datahtml+='<img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">';
+                datahtml+='<div  class="meeting_head">';
+                datahtml+='<h4  onclick="jb_reunion_upop('+v.idre+')"">'+v.nombre+'</h4><span class="alertDia"></span>';
+                datahtml+='<div class="meeting_date">'+v.fecha+' '+v.hora+'</div>';
+                datahtml+='<div class="meeting_user">'+v.usuario+'</div>';
+                datahtml+='</div>';
+                datahtml+='<div class="btn_down" onclick="showtemasreunion('+v.idre+',0)"><span  class="icon">:</span></div>';
+                datahtml+='<div class="btn_del" onclick="movListReunion('+v.idre+','+v.iduser+')"><span class="icon">Â</span></div>';
+                datahtml+='<div id="list-'+v.idre+'"class="meeting_topic">';
+                datahtml+='<ul>';
+                var lis=v.lista;
+                $.each(lis,function(i,t){
+                    datahtml+='<li id="topiclist"><span>'+t.texts+'</span></li>';    
+                });
+                //datahtml+='<li id="topiclist"><span>'+v.lista.text+'</span></li>';
+                datahtml+='</ul>';
+                datahtml+='</div>';
+                datahtml+='</div>';
 
+            $("#reunionesOk #showTopic").append(datahtml);
+           
+            if (v.count_fecha <=0) {
+               $("#"+v.idre).addClass('meeting_post timedead');
+               var h = '<span class="icon">8</span>Reunion Del Dia';
+               $(".timedead .meeting_head .alertDia").append(h);
+            }
+            if (v.count_fecha > 0 && v.count_fecha <=3) {
+              $("#"+v.idre).addClass('meeting_post timeout');
+              var h = '<span class="icon">4</span>Reunion Proxima';
+              $(".timeout .meeting_head .alertDia").append(h);
+            }
+            if (v.count_fecha >3) {
+                 $("#"+v.idre).addClass('meeting_post norma');
+               var h = '<span class="icon normal">K</span>';
+                    $(".norma .meeting_head .alertDia").append(h);
+            }
+             
+              //  $("#showTopic .meeting_post :first-child").remove();
+            
+        });
+
+    }).fail(function(){
+        alert("Error En El Servidor");
     });
-}
+    }
     
 }
 
 
 //generamos la lista de reuniones pasadas
 function reunionespasadas(){
-    var idus = $("#idus").val().length;
-    if(idus!=""){
-    var tx = "selec=12&op=1&idusua="+idus;
+    if($("#idus").length){
+    var tx = "selec=12&op=1&idusua="+$("#idus").val();
     var ruta = "funciones/funciones.php";
+        if ($("#reunionespas #showlisendreuniones .meeting_end").length) {
+            $("#reunionespas #showlisendreuniones .meeting_end").remove();}
     $.post(ruta,tx,function(data){
-       // alert(data);
-      if ($("#reunionespas #showlisendreuniones div").length) {
-        $("#reunionespas #showlisendreuniones div").remove();
-        $("#reunionespas #showlisendreuniones").append(data);
-        
-       }
-    
-   //alert(data);
+        $.each(data,function(k,v){
+
+            var datahtml='<div id="'+v.idre+'" class="meeting_end">';
+                datahtml+='<img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">';
+                datahtml+='<div  class="meeting_head">';
+                datahtml+='<h4>'+v.nombre+'</h4><span class="alertDia">Reunion Terminada<span class="icon normal">Ë</span></span>';
+                datahtml+='<div class="meeting_date">'+v.fecha+'  '+v.hora+'</div>';
+                datahtml+='<div class="meeting_user">'+v.usuario+'</div>';
+                datahtml+='</div>';
+                datahtml+='<div class="btn_down" onclick="showtemasreunion('+v.idre+',0)"><span  class="icon">:</span></div>';
+                datahtml+='<div class="btn_del" onclick="movListReunion('+v.idre+','+v.iduser+')"><span class="icon">Â</span></div>';
+                datahtml+='<div id="list-'+v.idre+'"class="meeting_topic">';
+                datahtml+='<ul>';
+                var lis=v.lista;
+                $.each(lis,function(i,t){
+                    datahtml+='<li id="topiclist"><span>'+t.texts+'</span></li>';    
+                });
+                datahtml+='</ul>';
+                datahtml+='</div>';
+                datahtml+='</div>';
+
+                $("#reunionespas #showlisendreuniones").append(datahtml);
+        });
+    }).fail(function(){
+        alert("Error En El Servidor");
     });
     }
 }
@@ -389,6 +459,91 @@ function movListReunion(id,iduser)
         reunionespasadas();
     });
 }
+//mostramos la reunion en accion
+function jb_reunion_upop(id)
+{
+        
+    $("#capatrans").css({'display':'block'});
+    $(".capaover #contenUpop").css({'height':'650','background-color':'transparent','border':'none','box-shadow':'none'});
+    $("#closeUpop").on("click",function(){
+        $("#capatrans").css('display','none');
+    });
+
+    $(".etiquetas").remove();
+    $(".meeting_active").remove();
+
+    var txt = "op=1&selec=13&id="+id+"&idusua="+$("#idus").val();
+    var ruta ="funciones/funciones.php";
+
+    $.post(ruta, txt, function(data) {
+        //console.log(data); 
+        $.each(data,function(k,v){
+
+           var  html='<div class="meeting_active" style="display:block">';
+           html+='<div class="form_reun">';
+           html+='<form action="index_submit" id="form_reunion_new" method="post" accept-charset="utf-8">';
+           html+='<input type="text" name="nom_reunion" class="meetingTitulo" value="'+v.nombre+'" placeholder="Escribe el nombre de la reunion">';
+           html+='<div class="meeting_time"><div>Fecha: '+v.fecha+'</div><div>Hora Inicio: '+v.hora+'</div></div>';
+           html+='<h4>Reunion</h4>';
+           html+='<label><p>Etiquetas:</p><input type="text" name="etiquetas" value="" placeholder="Escribe las etiquetas"></label><span id="tagNew" >Nueva Etiqueta</span>';
+           html+='<div class="list-share list-meeting" style="display:none;">';
+           html+='<ul>';
+           html+='<li>as</li>';
+           html+='</ul>';
+           html+='<div>';
+           html+='<label id="tagNew-n" >Crear Etiqueta</label><br />';
+           html+='<label for="">Admin. Etiqueta</label>';
+           html+='</div>';
+           html+='</div>';
+           html+='<label><p>Lugar:</p><input type="text" name="lugar" value="'+v.localizacion+'" placeholder="Escribe el lugar del evento"></label>';
+           html+='<label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="'+v.usuario+'" placeholder="Escribe el nombre de los participantes"></label>';
+           html+='<div class="list-share list-meeting" style="display:none;">';
+           html+='<ul>';
+           html+='<li>as</li>';
+           html+='</ul>';
+           html+='<div>';
+           html+='<label id="tagNew-n" >Crear Etiqueta</label><br />';
+           html+='<label for="">Admin. Etiqueta</label>';
+           html+='</div>';
+           html+='</div>';
+           // html+='<input type="button" value="Guardar" id="new_save_meeting">';
+            html+='</form>';
+            html+='<div id="newtopic" class="topicAgregar">';
+            html+='<div id="topiclayer" style="display:block">';
+            html+='<h3>Temas a tratar</h3>';
+            html+='<form action="">';
+            html+='<ul>';
+            html+='<li>';
+            html+='<textarea id="tiTuloTopic" name="tituloTopic" class="Titulo-topic" type="text" placeholder="Escriba el titulo de su tema" rows="1"></textarea>';
+            html+='</li>';
+            html+='</ul>';
+            html+='<input type="button" value="Guardar" id="SaveTopicNew">';
+            html+='</form>';
+            html+='</div>';
+            html+='</div>';
+            html+='</div>';
+            html+='</div>';
+
+
+            $("#contenUpop").append(html);
+        });
+
+
+    }).fail(function(){
+        alert("Error En El Servidor");
+    });
+
+  
+
+
+
+
+
+
+
+
+}
+
 
 //hacemos visible los temas a tratar de lareuniones
 
@@ -529,4 +684,41 @@ function showAddUserW()
     $("#w-adduser").removeAttr('style');
     $("#adduser-w").css({"display":'inline-block'});
 
+}
+
+
+function busquedaSimpleUsers(search)
+{
+  //console.log(search);
+
+      var elementopadre = $('[id^=jb_nombre_lista_user_]');
+      $.each(elementopadre,function(i,t)
+      {
+        search=search.toLowerCase();
+        search= sustituirAcentos(search);
+        var id = t.id;
+        var strSearched=$(this).text();
+        strSearched = strSearched.toLowerCase();
+        strSearched = sustituirAcentos(strSearched);
+        id = id.replace('jb_nombre_lista_user_-','');
+        if(strSearched.indexOf(search.trim()) !== -1)
+            console.log($("#"+id).text());
+
+      });
+
+}
+
+function sustituirAcentos(str)
+{
+var str = str.replace(/á/g,"a"); 
+str = str.replace(/é/g,"e");  
+str = str.replace(/í/g,"i");  
+str = str.replace(/ó/g,"o");  
+str = str.replace(/ú/g,"u"); 
+str = str.replace(/Á/g,"A"); 
+str = str.replace(/É/g,"E");  
+str = str.replace(/Í/g,"I");  
+str = str.replace(/Ó/g,"O");  
+str = str.replace(/Ú/g,"U"); 
+return str;
 }
