@@ -10,7 +10,6 @@
     <script src="js/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script> 
     
     <link rel="stylesheet" href="css/jquery-ui.css">
-    <!--<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>-->
     <script src="js/jquery-ui.js"></script>
     <script type="text/javascript" src="js/jquery.timepicker.js"></script>
     <link rel="stylesheet" type="text/css" href="css/jquery.timepicker.css" />
@@ -85,23 +84,21 @@
                 <input type="text" name="nom_reunion" class="meetingTitulo" value="" placeholder="Escribe el nombre de la reunion">
                 <div id="meetingShow"></div>
               <h4>Nueva Reunion</h4>
-                <label><p>Etiquetas:</p><input type="text" name="etiquetas" value="" placeholder="Escribe las etiquetas"></label><span id="tagNew" >Nueva Etiqueta</span>
-                        <div class="list-share list-meeting" style="display:none;">
-                            <ul>
-                                <li>as</li>
-                            </ul>
+                <label><p>Etiquetas:</p><input type="text" name="etiquetas" id="jb_etiqueta_reun" value="" placeholder="Escribe las etiquetas"></label><!--<span id="tagNew" >Nueva Etiqueta</span>-->
+                        <div id="jb_etiquetas"class="list-share list-meeting" style="display:none;">
+                           
                             <div>
                                 <label id="tagNew-n" >Crear Etiqueta</label><br />
                                 <label for="">Admin. Etiqueta</label>
                             </div>
                         </div>
+                        <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block;"></div>
                 <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
                 <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
                         <div id="jb_list_user"class="list-share list-meeting" style="display:none;">
-                            <ul>
-                                <li>as</li>
-                            </ul>
+  
                         </div>
+                        <div class="listaUsuarios" id="jb_lista_usuarios_click" style="display: block;"></div>
                 <div class="meeting_time">
                     <label><p>Fecha Inicio:</p><input type="text" id="datepicker" name="fecha_in" ></label>
                     <label><p>Hora:</p><input id="basicExample" type="text" name="horaint" class="time"></label><br>
@@ -190,12 +187,9 @@
     </div>
 <?php if ($_SESSION['logge'] == true){ ?>
 
+
 <div class="tareas" style="display: none;">
-    <div class="tareasMenu">
-        <div id="n-work"class="w-new"><label for=""><span class="icon">Û</span>Crear tarea</label></div>
-        <div class="w-act"><label for=""><span class="icon">o</span>Actividades</label></div>
-        <div class="w-share"><span class="icon">z</span> <input type="text" placeholder="Buscar tareas"></div>
-    </div>
+
     <div class="cuerpo-tareas" style="display:block">
         <div class="tareasIdeas">
             <div class="head-w"><h3><span class="icon">Û</span>Tareas(Ideas por Realizar)</h3></div>
@@ -289,6 +283,8 @@
     </div>
 
 </div>
+<div id="jb_result_tags" style="display:none;"></div>
+<div id="jb_result_users" style="display:none;"></div>
 
     
 <?php } ?>

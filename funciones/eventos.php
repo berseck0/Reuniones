@@ -1,4 +1,4 @@
-<?php
+<?
 include_once('conexion.php');
 
  $op = $_POST['op'];
@@ -6,8 +6,8 @@ include_once('conexion.php');
 //seccion para hacer login
 if ($op == 1) 
 {
-    $usuario = $_POST['use'];
-    $pass = md5($_POST['pas']);
+    $usuario = stripcslashes($_POST['use']);
+    $pass = md5(stripcslashes($_POST['pas'])); 
 
     class loger
         {  
@@ -246,4 +246,13 @@ if($op == 5)
     $lis = new Delltag;
     echo $valor = $lis->eliminatag($iduser,$tabla,$idcam,$id,$idcamp2);
 }
-?>
+
+if($op == 6)
+{  //se comprueba que una peticion ajax
+    if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])== 'xmlhttprequest')
+    {
+        $file = $_FILES['archivo']['name'];
+        //comprobamos si existe directorio
+        //if(!is_dir("archivos/file"))
+    }
+}

@@ -40,6 +40,7 @@ if ($selec == 1){
             echo $idreunion = $dbreg->regreunion($tituloRe,$lugar,$iduser);
             $idfech = $dbreg->regfechareu($idreunion,$fechain,$fechaout,$horain,$horaout);
             $dbreg->updatereunion($idreunion,"id_fecha_re",$idfech);
+            $dbreg->re_participantesRe($idreunion,$iduser);
             ///$idetiqueta = $dbreg->updatereunion($idreunion,"id_etiqueta",$idetiqueta);
         }
 
@@ -47,7 +48,7 @@ if ($selec == 1){
 
 //visualisamos la lista de reuniones
 if ($selec == 2) {
-    header('Content-type: application/json');
+    header('Content-type: application/json harset=utf-8');
     $server = array();
 
     $idusuario = $_POST['idusua'];
@@ -99,7 +100,7 @@ if ($selec == 3) {
     echo $dato;    
     }
 }
-
+///se mueve la reunion a la seccion de finalizadas
 if ($selec == 4) {
     
     $idusua = $_POST['idus'];
@@ -126,13 +127,13 @@ if ($selec == 5) {
 ///busqueda de usuarios
 if($selec == 6)
 {
-    header('Content-type: application/json');
+    header('Content-type: application/json charset=utf-8');
     $server = array();
-    $plaza = $_POST['place'];
+    //$plaza = $_POST['place'];
 
     $dbsha = new Busquedasdb();
 
-     $server = $dbsha->usuariobusqueda($plaza);
+     $server = $dbsha->usuariobusqueda();
      echo json_encode($server);
     //$json = json_encode($server,JSON_UNESCAPED_UNICODE);
 
@@ -141,7 +142,7 @@ if($selec == 6)
 //registro de tareas
 if($selec == 7)
 {
-   $titulo = $_POST['titulo-w'];
+    $titulo = $_POST['titulo-w'];
     $propietario = $_POST['propietario'];
     $mail   = $_POST['mailsend'];
     if($mail != 1){$mail = 0;}
@@ -150,15 +151,17 @@ if($selec == 7)
     $etiquetas = $_POST['etiqutas'];
     $notas = $_POST['notas'];
     $iduser = $_POST['id'];
-    $archivoup = $_POST[''];
+   // $archivoup = $_POST[''];
 
     $addusertarea = $_POST['tareausuarios'];
 
     $regW= new Registros;
     $reg1= $regW->regtareasActv($titulo,$fecha,$notas,$mail,$archivoup);
-    //echo $reg1;
-    $reg_act_asing= $regW->regactasignada($reg1,$iduser,$addusertarea);
+
+    $reg_act_asing= $regW->regactasignada($reg1,$iduser);
+    $regW->reg_usrasing($reg1,$iduser);
     echo $reg_act_asing;
+
     //seccion para registrar a los usuarios asignados a las actividades y tareas
     //
     /*
@@ -176,80 +179,40 @@ if($selec == 8)
 //generamos la lista de tareas
 if($selec == 9 )
 {
+    header('Content-type: application/json charset=utf-8');
+    //$server = array();
     $idusuario = $_POST['idusua'];
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistarea($idusuario);
+    echo json_encode($datos);
 
-    $count = count($datos);
-    for ($i=0; $i <$count; $i++)
-      {
-           echo '<div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>'.$datos[$i]['titulo'].'</h4>
-                        <div class="post-w-date">'.$datos[$i]['fecha'].'</div>
-                        <div class="post-w-user">'.$datos[$i]['usuario'].'</div>
-                        <div class="notas-w">'.$datos[$i]['notas'].'</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
-              </div>';
-      }
 }
 
 //generamos la lista de actividades
 if($selec == 10)
 {
+    header('Content-type: application/json charset=utf-8');
+    //$server = array();
     $idusuario = $_POST['idusua'];
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistactividades($idusuario);
+    echo json_encode($datos);
 
-    $count = count($datos);
-
-    for ($i=0; $i <$count; $i++) {
-
-     echo '<div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>'.$datos[$i]['titulo'].'</h4>
-                        <div class="post-w-date">'.$datos[$i]['fecha'].'</div>
-                        <div class="post-w-user">'.$datos[$i]['usuario'].'</div>
-                        <div class="notas-w">'.$datos[$i]['notas'].'</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
-          </div>';
-
-    }
 }
 //generamos las listas de actividades terminadas
 
 if($selec == 11)
 {
+   header('Content-type: application/json charset=utf-8');
+    //$server = array();
     $idusuario = $_POST['idusua'];
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistend($idusuario);
+    echo json_encode($datos);
 
-    $count = count($datos);
-
-     for ($i=0; $i <$count; $i++) {
-
-      echo '<div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>'.$datos[$i]['titulo'].'</h4>
-                        <div class="post-w-date">'.$datos[$i]['fecha'].'</div>
-                        <div class="post-w-user">'.$datos[$i]['usuario'].'</div>
-                        <div class="notas-w">'.$datos[$i]['notas'].'</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
-          </div>';
-
-    }
 
 }
 
@@ -257,7 +220,7 @@ if($selec == 11)
 //visualisamos la reunion activa 
 if($selec == 13)
 {
-    header('Content-type: application/json');
+    header('Content-type: application/json charset=utf-8');
     $server = array();
 
     $idusuario = $_POST['idusua'];
@@ -270,4 +233,54 @@ if($selec == 13)
     $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
     $myjson = utf8_encode(stripslashes($myjson));
     echo $myjson;
+}
+
+
+//registramos las notas o comentarios en la reunion activa 
+if($selec == 14)
+{
+
+     $id=$_POST['id'];
+     $tipo=utf8_encode($_POST['tipo']);
+     $texto=utf8_encode($_POST['text']);
+
+    $dbreg = new Registros;
+    $dato  = $dbreg->regNotasLitsReuniones($id,$texto,$tipo);
+    if($dato != 0)
+    {
+
+      header('Content-type: application/json charset=utf-8');
+      $server = array();
+      $server = $dbreg->chknotaListReuniones($id);
+
+    //$server = utf8_decode($server);
+    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    $myjson = utf8_encode(stripslashes($myjson));
+    echo $myjson;
+
+    }
+}
+
+//generamos la busqueda de etiquetas
+if ($selec == 15) {
+    header('Content-type: application/json charset=utf-8');
+    $server = array();
+    
+    $idus= $_POST['id'];
+    $dbshar= new Busquedasdb;
+    $server = $dbshar->busEtique($idus);
+    echo json_encode($server);
+    
+}
+/////damos de baja una tarea o actividad
+
+if($selec == 16)
+{
+  $idactv   = $_POST['idw'];
+  $idusr    = $_POST['id'];
+  $valor    = 0;
+
+    $dbreg = new Registros;
+    $dato  = $dbreg->workfin($valor,$idactv,$idusr);
+    echo $dato;
 }

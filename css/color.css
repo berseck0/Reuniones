@@ -344,7 +344,7 @@ hr
 .list-meeting
 {
     position: absolute !important;
-    left: 28.6em;
+    left: 29em;
     width: 250px;
     margin-top: -0.1em;
 }
@@ -643,9 +643,10 @@ a {
     box-shadow: 1px 1px 12px black;
     padding: 0.3em;
     overflow: hidden;
+    text-transform: capitalize; 
 }
 
-.meeting_time
+.meeting_active .meeting_time
 {
     float: right;
     margin-right: 1em;
@@ -654,12 +655,85 @@ a {
     font-weight: bold;
 }
 
+.list_meeting_active
+{
+     color: #1676BD;
+    text-shadow: none;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-transform: capitalize;   
+}
 
+#form_reunion_act .icon
+{
+    position: absolute;
+    float: left;
+    top: 0.2em;
+    left: 1.7em;
+    font-size: 8em;
+    opacity: 0.5;
+    color: rgba(16, 147, 36, 0.55);
+}
+#form_reunion_act h4
+{
+    font-size: 2em;
+    color: green;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    padding-bottom: 0px;
+}
 
+.bar_menu_list
+{
+    font-size: 0.7em;
+    width: 100%;
+    text-align: right;
+}
+.menu_list_active
+{
+    border: 1px solid;
+     width: 85%; 
+     margin-bottom: 0.6em;
+}
 
+.txtlist_activ
+{
+    height: 27px !important;
+}
 
+.list_meeting_active .notas
+{
+    list-style-type: none !important;
+}
 
-
+.list_decision, .list_tarea, .list_nota
+{
+    background-color: rgba(128, 186, 128, 0.44);
+    width: 70%;
+    padding-left: 1em;  
+    margin-bottom: 3px;
+    list-style-type: none !important;
+}
+.list_decision:before
+{
+    content: "Decision: ";
+}
+.list_tarea
+{
+    background-color: rgba(52, 164, 164, 0.45);
+}
+.list_tarea:before
+{
+    content: "Tarea: ";
+}
+.list_nota
+{
+    background-color: transparent;
+}
+.list_nota:before
+{
+    content: "Nota: ";
+}
 
 /* seccion de los div de tareas*/
 
@@ -715,10 +789,18 @@ a {
     height: 450px;
 }
 
+ .tareasIdeas #incl_list_tareas,.tareasPend #incl_list_act,.tareasCompletas #incl_list_Wcomplet
+ {
+    overflow-x: hidden;
+    height: 415px !important;
+    margin-top: -6px;
+ }
+
 .cuerpo-tareas
 {
     text-align: center;
     margin:0 auto;
+    margin-top: 1em;
     width: 100%;
 }
 .new-w
