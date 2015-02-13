@@ -5,7 +5,7 @@ class Conexion
     private $conn;
 
      function conect(){
-        $this->conn = new mysqli("localhost","root","mahoromatic","jarbossdb");
+        $this->conn = new mysqli("chat.jarboss.com","root","@Syst3mOp3nf1r3","jarbossdb");
         if ($this->conn->connect_errno)
         {
             $this->conn->autocommit(FALSE);

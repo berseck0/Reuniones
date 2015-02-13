@@ -129,7 +129,7 @@ if($op == 3)
 
     $lis = new Listadotag;
     $valor = $lis->listadostag($ideti,$tabla,$idcam);
-    echo json_encode($valor,JSON_UNESCAPED_UNICODE);
+    echo json_encode($valor);
 }
 
 
@@ -245,14 +245,4 @@ if($op == 5)
 
     $lis = new Delltag;
     echo $valor = $lis->eliminatag($iduser,$tabla,$idcam,$id,$idcamp2);
-}
-
-if($op == 6)
-{  //se comprueba que una peticion ajax
-    if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])== 'xmlhttprequest')
-    {
-        $file = $_FILES['archivo']['name'];
-        //comprobamos si existe directorio
-        //if(!is_dir("archivos/file"))
-    }
 }

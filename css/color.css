@@ -8,7 +8,7 @@
     font-style: normal;
 }
 
-.icon {
+.icon, .menu_list_active .icon{
     font-weight: normal;
     font-style: normal;
     line-height: normal;
@@ -376,7 +376,7 @@ text-shadow: 2px 1px rgba(63, 56, 17, 0.66);
     padding: 0px;
     resize: none;
     margin: 0px;
-    margin-left: 1em;
+    margin-left: 0.1em;
     line-height: 147%;
     font-family: "Open Sans",Helvetica,Arial,sans-serif;
     font-size: 20px;
@@ -734,7 +734,24 @@ a {
 {
     content: "Nota: ";
 }
+.form_usr_w_asing
+{
+    font-size: 0.80em;
+    padding: 0.8em 
+}
+.menu_list_active .form_usr_w_asing label
+{
+    display: inline-block;
+    vertical-align: top;
+    width: 30%;
+}
 
+.menu_list_active .form_usr_w_asing input
+{
+    display: inline-block;
+    vertical-align: top;
+    width: 40%;
+}
 /* seccion de los div de tareas*/
 
 .tareasMenu
@@ -829,27 +846,40 @@ a {
 }
 .post-w img
 {
-    float:left;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: -20px;
+    margin-right: 10px;
+    border:1px solid #fff;
+    border-radius: 5px
 }
 
 .post-w
 {
     background-color: rgba(0, 150, 97, 0.71);
     border: 1px solid green;
-    height: 80px;
     overflow: hidden;
     padding-top: 3px;
 }
 
 .post-w .post-w-head
 {
-    float: left;
+    display: inline-block;
+    text-align: left;
     width: 65%;
 }
 
 .post-w .post-w-head h4
 {
     margin:0px;
+}
+.post-w-date,.post-w-user
+{
+    font-size: 0.8em;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
 
 .w-cuerpo-main label
@@ -868,6 +898,71 @@ a {
     color: rgba(7, 80, 7, 0.92);
 }
 
+.w-segundo-main
+{
+    font-size: 0.9em;
+    margin-top: 10px;
+    width: 100%;
+    text-align: left;
+    padding-left: 5px;
+    display: none;
+}
+.listUserw,.listTagw, .listarchw, .listacoment
+{
+    border-bottom: 1px solid green;
+    overflow: hidden;
+    display: block;
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+}
+.listUserw ul,.listTagw ul, .listacoment ul
+{
+    margin: 0px;
+    list-style:none !important;
+    padding: 0px;
+}
+.listUserw ul li, .listTagw ul li
+{
+    display: inline;
+}
+.listacoment ul li
+{
+    width: 100%;
+    display: block;
+}
+.coment_w
+{
+    width: 100%;
+    text-align: left;
+    padding-left: 5px;
+    margin-bottom: 5px;
+    display: none;
+}
+.uparch_w
+{
+    display: inline-block;
+    width: 40%;
+    overflow: hidden;
+    position: relative;
+}
+.uparch_w label
+{
+   left: 0em;
+}
+
+.post-w:hover .coment_w
+{
+    display: block;
+}
+.coment_w input[type="text"]
+{
+    border: medium none;
+    border-radius: 3px;
+    margin-left: 5px;
+    padding: 5px;
+    width: 70%;
+}
 .chkmail-w
 {   
     display:inline-block;
@@ -877,8 +972,8 @@ a {
 
 .chkmail-w label
 {
-    width: 50px;
-    display: inline-block;
+    width: 50px !important;
+    display: inline-block !important;
     vertical-align: top;
 }
 
@@ -906,7 +1001,7 @@ a {
 }
 
 .slideThree:after {
-    content: 'OFF';
+    content: 'NO';
     font: 12px/20px Arial, sans-serif;
     color: #000;
     position: absolute;
@@ -917,7 +1012,7 @@ a {
 }
 
 .slideThree:before {
-    content: 'ON';
+    content: 'SI';
     font: 12px/20px Arial, sans-serif;
     color: #00bf00;
     position: absolute;
@@ -928,7 +1023,7 @@ a {
 
 .slideThree label {
     display: block;
-    width: 30px;
+    width: 30px !important;
     height: 15px;
 
     -webkit-border-radius: 15px;
@@ -936,10 +1031,10 @@ a {
     border-radius: 15px;
 
     -webkit-transition: all .4s ease;
-    -moz-transition: all .4s ease;
+    -moz-transition: all .4s ease !important;
     -o-transition: all .4s ease;
     -ms-transition: all .4s ease;
-    transition: all .4s ease;
+    transition: all .4s ease !important;
     cursor: pointer;
     position: absolute;
     top: 2px;
@@ -1001,8 +1096,8 @@ a {
 
 .list-share ul
 {
-      border-bottom: 1px solid #00B3AC;
-    list-style: outside none none;
+    border-bottom: 1px solid #00B3AC;
+    list-style: outside none none !important;
     padding: 0px;
     padding-bottom: 0.5em;
     margin-bottom: 5px;
@@ -1015,6 +1110,7 @@ a {
     color: #1F2933;
     padding: 0.1em;
     cursor: pointer;
+    list-style: outside none none !important;
 }
 
 .list-share label
@@ -1072,4 +1168,63 @@ a {
 .alertDia .normal
 {
     color: rgba(219, 219, 219, 0.53);
+}
+
+.list_asociada
+{
+    background-color: rgba(38, 161, 240, 0.89);
+    border-radius: 3px;
+    color: rgb(255, 253, 253);
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 0.3em;
+    padding: 0 2px;
+}
+.cont_listado,.listaUsuarios
+{
+    display: block;
+    border: 0px solid gray;
+    position: absolute;
+    width: 30%;
+}
+
+.listusract
+{
+    float: right;
+    position: relative !important;
+    width: none;
+    right: 5em;
+    top: -1.7em;
+}
+
+.up_acrh
+{
+    bottom: 1px;
+    cursor: inherit;
+    height: 47px;
+    margin: 0px;
+    opacity: 0;
+    padding: 0px;
+    position: absolute;
+    right: 0px;
+    width: 100%;
+}
+
+.showImage{
+    display: inline-block;
+    float: right;
+    border-radius: 2px;
+    width: 39%;
+    vertical-align: top;
+    height: 74px;
+    top: -2em;
+    position: relative;
+}
+
+.mensaje
+{
+    display: inline-block;
+    font-size: 0.6em;
+    width: 49%;
+    color: #017101;
 }

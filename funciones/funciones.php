@@ -3,12 +3,12 @@ include 'acciones.php';
 
 
 $selec = $_POST['selec'];
-
+///guardamos la primer reunnion
 if ($selec == 1){
      $id_reun    = $_POST['idre'];
-     $tituloRe   = utf8_encode($_POST['nom_reunion']);
+     $tituloRe   = stripslashes($_POST['nom_reunion']);
      $etiqeuta   = $_POST['etiquetas'];
-     $lugar      = utf8_encode($_POST['lugar']);
+     $lugar      = stripslashes($_POST['lugar']);
      $iduser     = $_POST['iduser'];
      $fechain    = str_replace("%2F","-" , $_POST['fecha_in']);  
      $dia1       = substr($fechain, 0, 2);  
@@ -22,8 +22,8 @@ if ($selec == 1){
      $fechaout    = $year2.'-'.$mes2.'-'.$dia2;
      $horain     = str_replace("%3A",":" , $_POST['horaint']);    
      $horaout    = str_replace("%3A",":" , $_POST['horaout']); 
-     //$idetiqueta =$_POST['idetiquetas'];
-     //$idparticipante = $_POST['participantes'];
+     $idetag =$_POST['idt'];
+     $ideusuarios = $_POST['usrdi'];
 
         $dbreg = new Registros;
 
@@ -41,6 +41,21 @@ if ($selec == 1){
             $idfech = $dbreg->regfechareu($idreunion,$fechain,$fechaout,$horain,$horaout);
             $dbreg->updatereunion($idreunion,"id_fecha_re",$idfech);
             $dbreg->re_participantesRe($idreunion,$iduser);
+            
+            $numtag = explode(",",$idetag);
+            for ($i=0; $i < count($numtag) ; $i++) { 
+                if ($numtag[$i]!=0) {
+                $dbreg->re_etiquetasRe($idreunion,$numtag[$i]);
+                }
+            }
+
+
+            $numuser = explode(",",$ideusuarios);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+                  $dbreg->re_participantesRe($idreunion,$numuser[$i]);
+                }
+            }
             ///$idetiqueta = $dbreg->updatereunion($idreunion,"id_etiqueta",$idetiqueta);
         }
 
@@ -56,9 +71,9 @@ if ($selec == 2) {
     $dbchk = new Reunioneschk;
     $server = $dbchk->chkreunion($idusuario,$val);
 
-    //$server = utf8_decode($server);
-    $myjson =json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-    $myjson = utf8_encode(stripslashes($myjson));
+   
+    $myjson =json_encode($server);
+    $myjson = stripslashes($myjson);
     echo $myjson;
     //echo json_decode($myjson,true);
     //echo json_last_error_msg();
@@ -77,8 +92,8 @@ if ($selec == 12)
     $server = $dbchk->chkreunion($idusuario,$val);
 
     //$server = utf8_decode($server);
-    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-    $myjson = utf8_encode(stripslashes($myjson));
+    $myjson = json_encode($server);
+    $myjson = stripslashes($myjson);
     echo $myjson;
 
 }
@@ -138,36 +153,50 @@ if($selec == 6)
     //$json = json_encode($server,JSON_UNESCAPED_UNICODE);
 
 }
-
+//$selec = $_GET['selec'];
 //registro de tareas
 if($selec == 7)
 {
     $titulo = $_POST['titulo-w'];
-    $propietario = $_POST['propietario'];
+    //$propietario = $_POST['propietario'];
     $mail   = $_POST['mailsend'];
     if($mail != 1){$mail = 0;}
     $fecha  = str_replace("%2F","-" , $_POST['fecha_limite']);  
     $fecha  = date("Y-m-d",strtotime($fecha));  
-    $etiquetas = $_POST['etiqutas'];
+    $etiquetas = $_POST['idt'];
+    $participant = $_POST['idp'];
     $notas = $_POST['notas'];
     $iduser = $_POST['id'];
-   // $archivoup = $_POST[''];
+    $files = $_POST['files'];
+    $extension = $_POST['extension'];
+    $idcom = 0;
+
 
     $addusertarea = $_POST['tareausuarios'];
 
     $regW= new Registros;
-    $reg1= $regW->regtareasActv($titulo,$fecha,$notas,$mail,$archivoup);
+    $reg1= $regW->regtareasActv($titulo,$fecha,$notas,$mail,$iduser);///registramos los datos de la actividad
+    $regW->reg_usrasing($reg1,$iduser);//registramos los usuarios asignados
+   $arch= $regW->regarch_actividares($extension,$files,$iduser,$reg1,$idcom);
 
-    $reg_act_asing= $regW->regactasignada($reg1,$iduser);
-    $regW->reg_usrasing($reg1,$iduser);
-    echo $reg_act_asing;
+    ///registramos los tag
+    if ($etiquetas!="") {  
+        $numtag = explode(",",$etiquetas);
+            for ($i=0; $i < count($numtag) ; $i++) { 
+                if ($numtag[$i]!=0) {
+                $regW->reg_tagW($reg1,$numtag[$i]);
+                }
+            }
+    }
+      $numuser = explode(",",$participant);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+                $regW->reg_usrasing($reg1,$numuser[$i]);
+                }
+            }
 
-    //seccion para registrar a los usuarios asignados a las actividades y tareas
-    //
-    /*
-    for ($i=0; $i < ; $i++) { 
-        $reguseradd = $regW->reguseradd($reg1,$addusertarea[$i]);
-    }*/
+    echo $arch;
+
 }
 
 //registro de comentarios en las tareas
@@ -230,8 +259,8 @@ if($selec == 13)
     $server = $dbchk->chkreunionactiva($idusuario,$val,$idre);
 
     //$server = utf8_decode($server);
-    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-    $myjson = utf8_encode(stripslashes($myjson));
+    $myjson = json_encode($server);
+    $myjson = stripslashes($myjson);
     echo $myjson;
 }
 
@@ -254,8 +283,8 @@ if($selec == 14)
       $server = $dbreg->chknotaListReuniones($id);
 
     //$server = utf8_decode($server);
-    $myjson = json_encode($server, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-    $myjson = utf8_encode(stripslashes($myjson));
+    $myjson = json_encode($server);
+    $myjson = stripslashes($myjson);
     echo $myjson;
 
     }
@@ -283,4 +312,86 @@ if($selec == 16)
     $dbreg = new Registros;
     $dato  = $dbreg->workfin($valor,$idactv,$idusr);
     echo $dato;
+}
+//$selec=$_POST['selec'];
+///eliminamos los participantes de la reunion guardada
+if ($selec == 17) 
+{
+  $idre = $_POST['idre'];
+  $idpart = $_POST['idp'];
+
+  $dbDell = new Jbdelldb;
+  $res = $dbDell->eliminaparticipante($idpart,$idre);
+  echo $res;
+}
+///eliminamos las etiqeutas de la reunion guardada
+if ($selec == 18) 
+{
+  $idre = $_POST['idre'];
+  $idtag = $_POST['idt'];
+
+  $dbDell = new Jbdelldb;
+  $res = $dbDell->eliminatagreun($idtag,$idre);
+  echo $res;
+}
+
+
+if($selec == 19)
+{
+   header('Content-type: application/json charset=utf-8');
+    $server = array();
+  $id= $_POST['id'];
+  $dbchk= new Reunioneschk;
+  $server=$dbchk->chklistactividades($id);
+  echo json_encode($server);
+}
+//guardamos la ruata del archivo en la base dedatos
+if ($selec == 20) {
+  header('Content-type: application/json charset=utf-8');
+  $server = array();
+  
+  $idtop= $_POST['id'];
+  $idre= $_POST['idre'];
+  $idus= $_POST['idus'];
+  $dir= $_POST['dir'];
+  $tipo= $_POST['tipo'];
+
+  $dbregarch= new Registros;
+  $server=$dbregarch->regArchReuniones($idtop,$idre,$idus,$dir,$tipo);
+  echo json_encode($server);
+}
+
+/// funcion que muestra los comentarios y archivos de la reunion en un tema 
+
+if ($selec == 21) {
+  header('Content-type: application/json charset=utf-8');
+      $server = array();
+      $id= $_POST['id'];
+
+      $dbchk = new Reunioneschk;
+      $server = $dbchk->chknotaListReuniones($id);
+
+    //$server = utf8_decode($server);
+    $myjson = json_encode($server);
+   // $myjson = stripslashes($myjson);
+    echo $myjson;
+}
+
+if($selec == 22)
+{
+  $comen = $_POST['comen'];
+  $mail = $_POST['mail'];
+  $idus = $_POST['idus'];
+  $idw = $_POST['idw'];
+
+  if ($mail =="") {
+    $mail=0;
+  }
+
+
+  $dbregcomen = new Registros;
+  $res=$dbregcomen->regcoment_w($comen,$mail,$idus,$idw);
+  echo $res;
+
+  
 }

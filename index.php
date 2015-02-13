@@ -95,7 +95,7 @@
                         <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block;"></div>
                 <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
                 <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
-                        <div id="jb_list_user"class="list-share list-meeting" style="display:none;">
+                        <div id="jb_list_user" class="list-share list-meeting" style="display:none;">
   
                         </div>
                         <div class="listaUsuarios" id="jb_lista_usuarios_click" style="display: block;"></div>
@@ -162,7 +162,7 @@
                                         <option value="Proyecto">Proyecto</option>
                                     </select>
                                  </div>
-                                <input type="button" value="Guardar" id="saveEtiqueta">
+                                <input type="button" value="Guardar" onclick="savetag();" id="saveEtiqueta">
                              </form>
                          </div>
                          <div id="tag_departamentos" style="display:none" >
@@ -195,14 +195,7 @@
             <div class="head-w"><h3><span class="icon">Û</span>Tareas(Ideas por Realizar)</h3></div>
             <div id="incl_list_tareas"> 
                <div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>Titulo de la Tarea</h4>
-                        <div class="post-w-date">fecha de la reunion</div>
-                        <div class="post-w-user">Quien la genero</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
+               
                 </div>
                
             </div>
@@ -211,29 +204,15 @@
             <div class="head-w"><h3><span class="icon">Ñ</span>Actividades por Realizar</h3></div>
             <div id="incl_list_act"> 
                  <div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>Titulo de la Tarea</h4>
-                        <div class="post-w-date">fecha de la reunion</div>
-                        <div class="post-w-user">Quien la genero</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
+                    
                 </div>
             </div>
         </div>
         <div class="tareasCompletas">         
             <div class="head-w"><h3><span class="icon">x</span>Tareas Completadas</h3></div>
             <div id="incl_list_Wcomplet"> 
-                     <div class="post-w">
-                    <img src="" alt="una imagen" height="50" width="80">
-                    <div class="post-w-head">
-                         <h4>Titulo de la Tarea</h4>
-                        <div class="post-w-date">fecha de la reunion</div>
-                        <div class="post-w-user">Quien la genero</div>
-                    </div>
-                        <div class="btn_down"><span class="icon">:</span></div>
-                        <div class="btn_del"><span class="icon">Â</span></div>
+                <div class="post-w">
+                  
                 </div>
             </div>
         </div>
@@ -247,7 +226,7 @@
                 <textarea name="titulo-w" class="Titulo-topic titulo-w" placeholder="Titulo de la Tarea"></textarea>
                 <div class="w-cuerpo-main">
                     <label for="">Propietario:</label>
-                    <input type="text" name="propietario" placeholder="El propietario">
+                    <input type="text" name="propietario" value="<? echo $_SESSION['nombre']?>"placeholder="El propietario">
                     <div class="chkmail-w">
                         <label for="">mail:</label>  
                         <div class="slideThree">  
@@ -256,26 +235,35 @@
                          </div>
                     </div><br>
                     <label id="w-adduser" class="up-archivo" style="cursor:pointer">Asignar Tarea</label>
-                    <input type="text" id="adduser-w" name="tareausuarios" placeholder="Agrega el Usuario" style="display:none;transition: all 0.4s ease;"><br>
+                    <input type="text" id="adduser-w" name="tareausuarios" placeholder="Agrega el Usuario" style="display:none;transition: all 0.4s ease;">
+                    <div id="jb_list_user"class="list-share list-meeting" style="display:none;">
+  
+                    </div>
+                    <div class="listaUsuarios" id="jb_lista_usuarios_click" style="display: block;"></div>
+                    <br>
                     <label for="">Fecha limite:</label>
-                    <input type="text" id="datepicker3" name="fecha_limite" placelholder="fecha limite"><br>
+                    <input type="text" id="datepicker3" name="fecha_limite" placeholder="fecha limite"><br>
                     <label for="">Proyectos / Etiquetas:</label>
-                    <input name="etiquetas"type="text" placelholder="">    
-                        <div class="list-share list-w" style="display:none;">
-                            <ul>
-                                <li>uno</li>
-                                <li>dos</li>
-                                <li>tres</li>
-                            </ul>
+                    <input name="etiquetas" id="w-addtag"type="text" placeholder="Agrega las etiquetas">    
+                        <div id="jb_etiquetas" class="list-share list-w" style="display:none;">
                             <div>
-                                <label for="">Crear Etiqueta</label><br />
+                                <label id="tagNew" for="">Crear Etiqueta</label><br />
                                 <label for="">Admin. Etiqueta</label>
                             </div>
                         </div>
+                    
+                    <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block;"></div>
+
                     <br>
                     <label for="">Notas:</label>
-                    <input name="notas" type="text" placelholder=""><br>
-                    <label class="up-archivo">Agregar archivo </label><span class="icon">n</span><br>
+                    <input name="notas" id="notas-w" type="text" placeholder="Escribir alguna nota sobre la actividad"><br>
+                    <form  enctype="multipart/form-data" id="arch_upw" action="" method="post" accept-charset="utf-8">
+                        
+                    <label class="up-archivo">Agregar archivo<input name="archivo" type="file" id="archivo_meeting_act" class="up_acrh"/></label><span id="arch_reunAct" class="icon" onclick="uparchivo(2);">n</span>
+                    
+                    </form>
+                    <div class="mensaje" style="position: relative; font-size: 0.81em; top: 2em; margin-top: 1em;"></div>
+                    <div class="showImage" style="width: 31%; height: 150px; top: -3em;"></div>
                     <input type="button" name="guardar" id="save-w" value="Guardar">
                 </div>
             </form>
