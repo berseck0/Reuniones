@@ -660,7 +660,6 @@ function jb_reunion_upop(id)
                 html+='</li>';
             });
             html+='</ul>';
-            //html+='<input type="button" value="Guardar" id="SaveTopicNew">';
             html+='</form>';
             html+='</div>';
             html+='</div><form action="#" method="post"><label for="">Nuevo Tema:</label><input type="text"  id="nue_tema_'+v.idre+'"placeholder="Escribe El tema a tratar" /><input type="button" value="agregar" onclick="saveTemaActivre('+v.idre+');"/></form>';
@@ -1296,8 +1295,8 @@ function SaveTopicNew(){
         var ruta ="funciones/eventos.php";
          $.post(ruta,datos, function(datas){
            
-                 $("#topiclayer_"+id+" #topiclist").remove();
-                 $("#topiclayer_"+id+" form ul").prepend(datas);
+                 $("#topiclayer #topiclist").remove();
+                 $("#topiclayer form ul").prepend(datas);
                  $("#tiTuloTopic").val("");
              
             // alert(datas);
