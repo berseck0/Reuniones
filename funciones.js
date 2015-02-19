@@ -102,7 +102,7 @@ function loger()
     var usuario = $("#logform #usuario").val();
     var pass = $("#logform #pass").val();
     var ruta = "funciones/eventos.php";
-    var txt = "op=1&use="+usuario+"&pas="+pass;
+    var txt = "use="+usuario+"&pas="+pass+"&op=1";
 
     if (usuario == "" || pass == "") {
         alert("llenar todos los campos");
@@ -159,7 +159,7 @@ function save_meting()
 
 
             var idus = $(".session #idus").val();
-            var f = form+"&selec=1&iduser="+idus+"&idt="+idtag+"&usrdi="+usrid;
+            var f = form+"&op=2&selec=1&iduser="+idus+"&idt="+idtag+"&usrdi="+usrid;
             var ruta = "funciones/funciones.php";
             $.post(ruta, f, function(data) {
                 if (data != 0) {
@@ -197,7 +197,7 @@ function save_meting()
             var idre = $("#idreunion").val();
             var form = $("#form_reunion_new").serialize();
             var idus = $(".session #idus").val();
-            var f = form+"&selec=1&iduser="+idus+"&idre="+idre+"&idt="+idtag+"&usrdi="+usrid;
+            var f = form+"&op=2&selec=1&iduser="+idus+"&idre="+idre+"&idt="+idtag+"&usrdi="+usrid;
             var ruta = "funciones/funciones.php";
             $.post(ruta, f, function(data) {
                 var span ="<span>"+data+"</span>";
@@ -216,7 +216,7 @@ function dellParticipanteReunion(id)
 {
     //"&id="+$(".session #idus").val()+
         if ($("#idreunion").length!==0) {
-            var f = "selec=17&idp="+id+"&idre="+$("#idreunion").val();
+            var f = "op=4&selec=17&idp="+id+"&idre="+$("#idreunion").val();
             var ruta = "funciones/funciones.php";
             $.post(ruta, f, function(data) {
                 $("#meetingShow").css('display', 'block');
@@ -236,7 +236,7 @@ function delltagTarea(id)
 {
     //"&id="+$(".session #idus").val()+
         if ($("#idreunion").length!==0) {
-            var f = "selec=18&idt="+id+"&idre="+$("#idreunion").val();
+            var f = "op=4&selec=18&idt="+id+"&idre="+$("#idreunion").val();
             var ruta = "funciones/funciones.php";
             //alert(f);
             $.post(ruta, f, function(data) {
@@ -319,7 +319,7 @@ function new_meeting()
     $("#topiclayer").css('display', 'none');
     $("#jb_lista_tag_click_re div").remove()
     $("#jb_lista_tag_click div").remove()
-    $("#meeting-user-share").click();
+
 }
 
 function tag_sel(event)
@@ -362,7 +362,7 @@ function savetag()
         var titulo = $("#nombreTag").val();
         var tipo   = $("#tipoEtiqueta").val();
         var iduser = $("#idus").val();
-        var txt = "selec=3&ti="+titulo+"&tipo="+tipo+"&idus="+iduser;
+        var txt = "op=2&selec=3&ti="+titulo+"&tipo="+tipo+"&idus="+iduser;
         var ruta ="funciones/funciones.php";
         $.post(ruta,txt, function(data){
            //alert(data);
@@ -376,7 +376,7 @@ function savetag()
 //muestra la lista de etiquetas dependiendo del usuario
 function listatagshow(iduser)
 {
-    var t = "tab=1&idcam=1&id="+iduser;
+    var t = "op=3&tab=1&idcam=1&id="+iduser;
     var ruta ="funciones/eventos.php";
     $.post(ruta, t, function(datas){
         var list = '<ul class="listado sinborde">';
@@ -466,7 +466,7 @@ function saveproy()
 function dellTag(datos)
 {
     var id = $("#idus").val();
-     var t = "tab=2&idcam=2&id="+id+"&ids="+datos;
+     var t = "op=5&tab=2&idcam=2&id="+id+"&ids="+datos;
     var ruta ="funciones/eventos.php";
     $.post(ruta,t, function(data){
         if(data==1){
@@ -488,7 +488,7 @@ function cargareuniones(){
 //generamos lal istas de las reuniones
 function reunionesnuevas(){
     if($("#idus").length){ 
-    var tx = "selec=2&idusua="+$("#idus").val();
+    var tx = "selec=2&op=1&idusua="+$("#idus").val();
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
             //console.log(data);
@@ -536,7 +536,7 @@ function reunionesnuevas(){
         });
 
     }).fail(function(){
-        alert("Error En El Servidor. 01");
+        alert("Error En El Servidor.");
     });
     }
     
@@ -546,7 +546,7 @@ function reunionesnuevas(){
 //generamos la lista de reuniones pasadas
 function reunionespasadas(){
     if($("#idus").length){
-    var tx = "selec=12&idusua="+$("#idus").val();
+    var tx = "selec=12&op=1&idusua="+$("#idus").val();
     var ruta = "funciones/funciones.php";
         if ($("#reunionespas #showlisendreuniones .meeting_end").length) {
             $("#reunionespas #showlisendreuniones .meeting_end").remove();}
@@ -583,7 +583,7 @@ function reunionespasadas(){
 //////////movemos la reunion como terminada o pasada
 function movListReunion(id,iduser)
 {
-    var txt = "selec=4&val=0&id="+id+"&idus="+iduser;
+    var txt = "op=2&selec=4&val=0&id="+id+"&idus="+iduser;
     var ruta= "funciones/funciones.php";
     $.post(ruta,txt, function(data){
         $("#"+id).remove();
@@ -603,7 +603,7 @@ function jb_reunion_upop(id)
     $(".etiquetas").css({"display":"none"});
     $(".meeting_active").remove();
 
-    var txt = "selec=13&id="+id+"&idusua="+$("#idus").val();
+    var txt = "op=1&selec=13&id="+id+"&idusua="+$("#idus").val();
     var ruta ="funciones/funciones.php";
 
     $.post(ruta, txt, function(data) {
@@ -639,10 +639,7 @@ function jb_reunion_upop(id)
             html+='<h3>Temas a tratar</h3>';
             html+='<form action="">';
             html+='<ul>';
-
-
-
-            var list = v.lista;/*
+            var list = v.lista;
             $.each(list, function(i, t) {
                 html+='<li id="list_'+t.ids+'" class="list_meeting_active">';
                 html+='<label>'+t.texts+'</label>';
@@ -673,59 +670,6 @@ function jb_reunion_upop(id)
                 });
                 html+="</ul></div>";
 
-                            */
-        $.each(list,function(k,v){
-            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
-            html+='<ul class="notas">';
-
-                var list = v.resoluciones;
-                $.each(list, function(i, r) {
-                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                });
-                        
-                var tar= v.tareas;
-                $.each(tar, function(p,ac){
-                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                });
-                html+="</ul>";
-                            
-                var arch = v.archivos;
-                html+="<div class='archivos'><ul>";
-                $.each(arch, function(k,a){
-                var img = isImage(a.tipo);
-                    if(img){
-                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                    }else{
-                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                    }
-                });
-                html+="</ul></div>";
-                html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
-
-            var sublis= v.sublist;
-            $.each(sublis, function(k,l){
-                html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-
-                html+='<ul class="notas">';
-                var subnot= l.subresoluciones;
-                $.each(subnot, function(ls, sb) {
-                         html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                });
-                html+="</ul>";
-                html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
-            });
-            html+='</ul></li>';
-    
-
-
-
-
-
-
-
-
-/*
                 html+='</div>';
                 html+='<div id="txt_'+t.ids+'" class="menu_list_active">';
                 html+='<textarea id="textolist_activ_'+t.ids+'" onclick="block_oplits('+t.ids+')" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
@@ -736,7 +680,7 @@ function jb_reunion_upop(id)
                 html+='<div class="bar_menu_list"><div><label>Guardar Como: </label><input type="button" value="Nota" onclick="save_accionlist('+t.ids+',\'nota\')"/><input type="button" value="Decision" onclick="save_accionlist('+t.ids+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_display('+t.ids+',\'tarea\')" /></div></div></div>';
                 html+='</div>';
                // html+='<ul><li>alguna nota</li></ul>';
-                html+='</li>';*/
+                html+='</li>';
             });
             html+='</ul>';
             html+='</form>';
@@ -761,7 +705,7 @@ function jb_reunion_upop(id)
 //agregamos nuevos temas ala reunion activa
 function saveTemaActivre(idre)
 {
-    var txt="selec=27&ti="+$("#nue_tema_"+idre).val()+"&id="+idre;
+    var txt="op=2&selec=27&ti="+$("#nue_tema_"+idre).val()+"&id="+idre;
     //alert(txt);
     var ruta="funciones/funciones.php";
     $.post(ruta,txt, function(data){
@@ -774,7 +718,7 @@ function saveTemaActivre(idre)
 
 function genListReunActv(idre)
 {
-    var txt = "selec=13&id="+idre+"&idusua="+$("#idus").val();
+    var txt = "op=1&selec=13&id="+idre+"&idusua="+$("#idus").val();
     var ruta ="funciones/funciones.php";
     if($("#topiclayer_"+idre).length){
         $("#topiclayer_"+idre).remove();
@@ -859,7 +803,7 @@ function save_accionlist(id,txt)
 {
     if($("#textolist_activ_"+id).val()!=""){
         var idre= $("#idReunAct").val();
-        var txto="selec=14&id="+id+"&tipo="+txt+"&text="+$("#textolist_activ_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
+        var txto="op=2&selec=14&id="+id+"&tipo="+txt+"&text="+$("#textolist_activ_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
             if($("#list_"+id+" #tomas"+id).length > 0){
@@ -904,7 +848,7 @@ function save_accionlist(id,txt)
 function show_listreunion(id)
 {
     var idre= $("#idReunAct").val();
-    var txto="selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val()+"&op=1";      
+    var txto="op=2&selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val();      
     //var txto="op=1&selec=21&id="+id+"&idre="+$("#idReunAct").val();
     var ruta = "funciones/funciones.php";
     $.post(ruta, txto, function(data){
@@ -943,95 +887,11 @@ function show_listreunion(id)
     }).fail(function(){ alert("Fallo Servidor");});
 }
 
-//////funcion para visualisas las notas en la reunion de los temas
-function show_listreunion_new(id)
-{
-    var idre= $("#idreunion").val();
-    var txto="selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val()+"&op=1";      
-    var ruta = "funciones/funciones.php";
-    $.post(ruta, txto, function(data){
-            if($("#topiclist_"+id+" #listanotas_"+id+" #notas").length > 0){
-                $("#topiclist_"+id+" #listanotas_"+id+" #notas").empty();
-               // $("#list_"+id+" #tomas"+id+" div").remove();
-            }
-
-            $.each(data, function(k,v){
-                    var html='<ul class="notas">';
-
-                    var list = v.resoluciones;
-                        $.each(list, function(i, r) {
-                                html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                        });
-                        
-                    var tar= v.tareas;
-                           $.each(tar, function(p,ac){
-                                html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                           });
-                         html+="</ul>";
-                            
-                    var arch = v.archivos;
-                    html+="<div class='archivos'><ul>";
-                            $.each(arch, function(k,a){
-                               var img = isImage(a.tipo);
-                                if(img){
-                                        html+="<li style='list-style: outside none none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                                    }else{
-                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                                    }
-                            });
-                    html+="</ul></div>";
-                $("#topiclist_"+id+" #listanotas_"+id+" #notas").append(html);
-            });
-    }).fail(function(){ alert("Fallo Servidor");});
-}
-
-//////funcion para visualisas las notas en la reunion de los temas
-function show_listreunion_newsubtema(id)
-{
-    var idre= $("#idreunion").val();
-    var txto="selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val()+"&op=2";      
-    var ruta = "funciones/funciones.php";
-    $.post(ruta, txto, function(data){
-            if($("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").length > 0){
-                $("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").empty();
-               // $("#list_"+id+" #tomas"+id+" div").remove();
-               
-            }
-            
-            $.each(data,function(k,v){
-                    var html='<ul class="notas">';
-
-                    var list = v.subresoluciones;
-                        $.each(list, function(i, r) {
-                                html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                        });
-                        
-                    var tar= v.subtareas;
-                           $.each(tar, function(p,ac){
-                                html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                           });
-                         html+="</ul>";
-                            
-                    var arch = v.subarchivos;
-                    html+="<div class='archivos'><ul>";
-                            $.each(arch, function(k,a){
-                               var img = isImage(a.tipo);
-                                if(img){
-                                        html+="<li style='list-style: outside none none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                                    }else{
-                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                                    }
-                            });
-                    html+="</ul></div>";
-                $("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").append(html);
-            });
-    }).fail(function(){ alert("Fallo Servidor");});
-}
 
 //function guardamos la accion de la lista 
 function list_tareasAct(id)
 {
-    var txto="selec=19&id="+$("#idus").val();
+    var txto="op=1&selec=19&id="+$("#idus").val();
     var ruta = "funciones/funciones.php";
     $.post(ruta, txto, function(data){
        
@@ -1080,7 +940,7 @@ function showtemasreunion(id,pam)
 function genlistactv()
 {
     var idus = $("#idus").val();
-    var tx = "selec=9&idusua="+idus;
+    var tx = "selec=9&op=1&idusua="+idus;
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
          if ($("#incl_list_tareas .post-w").length) {
@@ -1153,7 +1013,7 @@ function genlistactv()
 function genlistfull()
 {
     var idus = $("#idus").val();
-    var tx = "selec=10&idusua="+idus;
+    var tx = "selec=10&op=1&idusua="+idus;
     var ruta = "funciones/funciones.php";
         $.post(ruta,tx,function(data){
             if ($("#incl_list_act .post-w").length) {
@@ -1229,7 +1089,7 @@ function genlistfull()
 function genlistend()
 {
     var idus = $("#idus").val();
-    var tx = "selec=11&idusua="+idus;
+    var tx = "selec=11&op=1&idusua="+idus;
     var ruta = "funciones/funciones.php";
         $.post(ruta,tx,function(data3){
             if ($("#incl_list_Wcomplet .post-w").length) {
@@ -1237,7 +1097,7 @@ function genlistend()
             }
 
             $.each(data3,function(k,v){
-            var html='<div class="post-w jb_tareas_terminadas">';
+            var html='<div id="'+v.idw+'" class="post-w jb_tareas_terminadas">';
                html+='<img src="" alt="una imagen" height="50" width="80">';
                html+='<div class="post-w-head">';
                html+='<h4>'+v.titulo+'</h4>';
@@ -1313,7 +1173,7 @@ function save_w_form()
 
         var form = $("#form-w").serialize();
         var id = $("#idus").val();
-        var txt= form+"&selec=7&id="+id+"&idt="+idtag+"&idp="+usrid;
+        var txt= form+"&op=2&selec=7&id="+id+"&idt="+idtag+"&idp="+usrid;
          var ruta="funciones/funciones.php";
         $.post(ruta,txt, function(data){
         if(data!=""){
@@ -1327,7 +1187,7 @@ function save_w_form()
 
 function w_fin(idw,idus)
 {
-  var txt = "selec=16&idw="+idw+"&id="+idus;
+  var txt = "selec=16&op=2&idw="+idw+"&id="+idus;
   var ruta = "funciones/funciones.php"
   $.post(ruta, txt, function(data) {
     if(data==1){
@@ -1363,7 +1223,7 @@ function save_asing_wActv(idtop)
         var idre=$("#idReunAct").val();
         var form = $("#form_tarea_tema form").serialize();
         var id = $("#idus").val();
-        var txt= form+"&selec=23&id="+id+"&idp="+usrid+"&idtop="+idtop+"&idre="+idre;
+        var txt= form+"&op=2&selec=23&id="+id+"&idp="+usrid+"&idtop="+idtop+"&idre="+idre;
          var ruta="funciones/funciones.php";
         $.post(ruta,txt, function(data){
                if(data!=''){
@@ -1431,7 +1291,7 @@ function savecomen_actw(id,op)
     };
     var comn= $(l+" :text").val();
     var mail =$(l+" #mail-w").val();
-    var txt = "selec=22&comen="+comn+"&mail="+mail+"&idus="+$("#idus").val()+"&idw="+id;
+    var txt = "op=2&selec=22&comen="+comn+"&mail="+mail+"&idus="+$("#idus").val()+"&idw="+id;
     var ruta = "funciones/funciones.php";
     $.post(ruta,txt, function(data){
         if(data!=""){
@@ -1452,7 +1312,7 @@ function savecomen_actw(id,op)
 function genLisTarea(idw)
 {
     var idus = $("#idus").val();
-    var tx = "selec=24&idusua="+idus+"&idw="+idw;
+    var tx = "selec=24&op=1&idusua="+idus+"&idw="+idw;
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
          if ($('.tareasIdeas #'+idw+' #segmain_'+idw+'').length > 0) {
@@ -1511,7 +1371,7 @@ function genLisTarea(idw)
 function genLitsAct(idw)
 {
     var idus = $("#idus").val();
-    var tx = "selec=25&idusua="+idus+"&idw="+idw;
+    var tx = "selec=25&op=1&idusua="+idus+"&idw="+idw;
     var ruta = "funciones/funciones.php";
     $.post(ruta,tx,function(data){
             if ($('.tareasPend #'+idw+' #seg_main_'+idw).length > 0) {
@@ -1575,93 +1435,55 @@ $("#closeUpop").click(function(){
 //guardamos el tema de la reunion
 ////// generamos la lisat de los temas atratar 
 function SaveTopicNew(){
-  var titulo = $("#topiclayer #tiTuloTopic").val();
+  var titulo = $("#tiTuloTopic").val();
   var id = $("#idreunion").val();
-  var txt = "selec=5&ti="+titulo+"&id="+id+"&idus="+$("#idus").val();
+  var txt = "selec=5&op=2&ti="+titulo+"&id="+id+"&idus="+$("#idus").val();
   var ruta = "funciones/funciones.php";
-  if(titulo != "")
-  {
+  
+  $.post(ruta,txt,function(data){
+        //console.log(data);
+        var html="";
+        $.each(data,function(k,v){
+            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'></div></div><div id='sublistaction_"+v.id+"'></div><ul>";
+            html+='<ul class="notas">';
 
-
-          $.post(ruta,txt,function(data){
-                //console.log(data);
-                var html="";
-                $.each(data,function(k,v){
-                    html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
-                    html+='<ul class="notas">';
-
-                        var list = v.resoluciones;
-                        $.each(list, function(i, r) {
-                                html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                        });
-                                
-                        var tar= v.tareas;
-                        $.each(tar, function(p,ac){
-                                html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                        });
-                        html+="</ul>";
-                                    
-                        var arch = v.archivos;
-                        html+="<div class='archivos'><ul>";
-                        $.each(arch, function(k,a){
-                        var img = isImage(a.tipo);
-                            if(img){
-                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                            }else{
-                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                            }
-                        });
-                        html+="</ul></div>";
-
-
-                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
-                   
-
-                    var sublis= v.sublist;
-                    $.each(sublis, function(k,l){
-                        html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                        html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-                        
-                        html+='<ul class="notas">';
-                        var subnot= l.subresoluciones;
-                        $.each(subnot, function(ls, sb) {
-                                 html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                        });
-
-                        var subtar= v.subtareas;
-                        $.each(subtar, function(p,st){
-                                html+='<li class="list_tarea"><span>'+st.actividad+'</span><label for=""> '+st.nombreus+'</label><span> '+st.fecha+'</span></li>';
-                        });
-                        html+="</ul>";
-                                    
-                      /*  var subarch = v.subarchivos;
-                        html+="<div class='subarchivos'><ul>";
-                        $.each(subarch, function(k,sa){
-                        var img = isImage(sa.tipo);
-                            if(img){
-                                    html+="<li style='list-style: none; display: inline;' ><img src='"+sa.liga+"' alt='70' width='80' /></li>";    
-                            }else{
-                                    html+="<li style='list-style: none; display: inline;'><a href='"+sa.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                            }
-                        });
-                        html+="</ul></div>";
-                    */
-
-
-
-                        html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
-                    });
-                    html+='</ul></li>';
+                var list = v.resoluciones;
+                $.each(list, function(i, r) {
+                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
                 });
-                    $("#topiclayer [id^=topiclist_]").remove();
-                    $("#topiclayer form ul").prepend(html);
-                    $("#topiclayer #tiTuloTopic").val("");
-                
-          }).fail(function(){ alert("Error servidor. 02");});
-    }else
-    {
-        alert("No Has Escrito Ningun Titulo De Tema.");
-    }
+                        
+                var tar= v.tareas;
+                $.each(tar, function(p,ac){
+                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                });
+                html+="</ul>";
+                            
+                var arch = v.archivos;
+                html+="<div class='archivos'><ul>";
+                $.each(arch, function(k,a){
+                var img = isImage(a.tipo);
+                    if(img){
+                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                    }else{
+                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                    }
+                });
+                html+="</ul></div>";
+
+
+
+            var sublis= v.sublist;
+            $.each(sublis, function(k,l){
+                html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
+                html+="<div id='listanotas_"+l.idsub+"'><div id='notas'></div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+            });
+            html+='</ul></li>';
+        });
+            $("#topiclayer .topiclist").remove();
+            $("#topiclayer form ul").prepend(html);
+            $("#tiTuloTopic").val("");
+         
+  });
 }
 
 ////mostramos el sub menu en la reunion al momento de generarlad
@@ -1674,7 +1496,6 @@ $(document).on("ready",function(){
             //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
             if (!$("#topiclist_"+id+" #txts_"+id).is(":visible")) {
                 $("[id^=topiclist_] [id^=sublistaction_]").empty();
-                $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
                 html="";
                 html+='<div id="seccion_'+id+'">';
                 html+='<div id="txts_'+id+'" class="menu_list_active">';
@@ -1682,10 +1503,10 @@ $(document).on("ready",function(){
                 html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
                 html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
                 html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
-                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+id+');"value="Agregar" />';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo(1,'+id+');"value="Agregar" />';
                 html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
                 html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_listreunion('+id+',\'nota\')"/>';
-                html+='<input type="button" value="Decision" onclick="save_listreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+id+',\'tarea\')" />';
+                html+='<input type="button" value="Decision" onclick="save_listreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="_save_tarea_display('+id+',\'tarea\')" />';
                 html+='</div></div>';
                 html+='</div></div>';
                 html+='</div>';
@@ -1701,7 +1522,7 @@ function save_listreunion(id,txt)
 {
     if($("#textoreunion_"+id).val()!=""){
         var idre= $("#idreunion").val();
-        var txto="selec=14&id="+id+"&tipo="+txt+"&text="+$("#textoreunion_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
+        var txto="op=2&selec=14&id="+id+"&tipo="+txt+"&text="+$("#textoreunion_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
             if($("#listanotas_"+id+" #notas").length > 0){
@@ -1750,16 +1571,17 @@ function subtopic(id)
     $("#topiclist_"+id+" #sublistaction_"+id).append(html);
 }
 
+
+
 function savesubtop(id)
 {
-    var txt = "selec=28&tes="+$("#texto_"+id).val()+"&topic="+id+"&idre="+$("#idreunion").val()+"&idus="+$("#idus").val();
+    var txt = "op=2&selec=28&tes="+$("#texto_"+id).val()+"&topic="+id+"&idre="+$("#idreunion").val()+"&idus="+$("#idus").val();
     var ruta = "funciones/funciones.php";
 
     $.post(ruta, txt, function(data) {
-         var html="";
-         //console.log(data);
+        var html="";
         $.each(data,function(k,v){
-            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
+            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'></div></div><div id='sublistaction_"+v.id+"'></div><ul>";
             html+='<ul class="notas">';
 
                 var list = v.resoluciones;
@@ -1784,24 +1606,17 @@ function savesubtop(id)
                     }
                 });
                 html+="</ul></div>";
-                html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
+
+
 
             var sublis= v.sublist;
             $.each(sublis, function(k,l){
                 html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-
-                html+='<ul class="notas">';
-                var subnot= l.subresoluciones;
-                $.each(subnot, function(ls, sb) {
-                         html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                });
-                html+="</ul>";
-                html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                html+="<div id='listanotas_"+l.idsub+"'><div id='notas'></div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
             });
             html+='</ul></li>';
         });
-            $("#topiclayer [id^=topiclist_]").remove();
+            $("#topiclayer .topiclist").remove();
             $("#topiclayer form ul").prepend(html);
             $("#tiTuloTopic").val("");
 
@@ -1814,14 +1629,13 @@ function savesubtop(id)
 $(document).on("ready",function(){
     $("#topiclayer").on('click','[id^=subtopiclist_]', function(){
         var id = $(this).attr("id").replace("subtopiclist_",'');
-      
+        console.log(id);
         $("#subtopiclist_"+id+" #tema_sub_"+id).click(function() {
-            
+            console.log("Click");
             //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
             if ($("#sub_listaction_"+id).length) {
-               
+                console.log("Adentro");
                 $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
-                $("[id^=topiclist_] [id^=sublistaction_]").empty();
                 html="";
                 html+='<div id="seccion_'+id+'">';
                 html+='<div id="txts_'+id+'" class="menu_list_active">';
@@ -1829,14 +1643,14 @@ $(document).on("ready",function(){
                 html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
                 html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
                 html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
-                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+id+');"value="Agregar" />';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo(1,'+id+');"value="Agregar" />';
                 html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
                 html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+id+',\'nota\')"/>';
-                html+='<input type="button" value="Decision" onclick="save_sublistreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+id+',\'tarea\')" />';
+                html+='<input type="button" value="Decision" onclick="save_sublistreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="_save_tarea_display('+id+',\'tarea\')" />';
                 html+='</div></div>';
                 html+='</div></div>';
                 html+='</div>';
-                
+                console.log($("#subtopiclist_"+id+" #sub_listaction_"+id).length);
                 $("#subtopiclist_"+id+" #sub_listaction_"+id).append(html);
             }
         });
@@ -1847,32 +1661,31 @@ $(document).on("ready",function(){
 //function guardamos la accion de la lista 
 function save_sublistreunion(id,txt)
 {
-    if($("#sub_listaction_"+id+" #textoreunion_"+id).val()!=""){
-        var texto= $("#sub_listaction_"+id+" #textoreunion_"+id).val();
+    if($("#textoreunion_"+id).val()!=""){
         var idre= $("#idreunion").val();
-        var txto="selec=29&id="+id+"&tipo="+txt+"&text="+texto+"&idre="+idre+"&idus="+$("#idus").val();
+        var txto="op=2&selec=29&id="+id+"&tipo="+txt+"&text="+$("#textoreunion_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
-            if($("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").length > 0){
-                $("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").empty();
+            if($("#listanotas_"+id+" #notas").length > 0){
+                $("#listanotas_"+id+" #notas").empty();
                // $("#listanotas_"+id+" #notas div").remove();
             }
 
             $.each(data, function(k,v){
                     var html='<ul class="notas">';
 
-                    var list = v.subresoluciones;
+                    var list = v.resoluciones;
                         $.each(list, function(i, r) {
                                 html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
                         });
                         
-                    var tar= v.subtareas;
+                    var tar= v.tareas;
                            $.each(tar, function(p,ac){
                                 html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
                            });
                          html+="</ul>";
                             
-                    var arch = v.subarchivos;
+                    var arch = v.archivos;
                     html+="<div class='archivos'><ul>";
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
@@ -1883,65 +1696,13 @@ function save_sublistreunion(id,txt)
                                     }
                             });
                     html+="</ul></div>";
-                $("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").append(html);
+                $("#listanotas_"+id+" #notas").append(html);
             });
         }).fail(function(){ alert("Fallo Servidor");});
     }else{
         alert("No has escrito nada");
     }
 }
-
-
-//funcionas para asignar la tarea en la lista de la reunion recien generadad
-function save_tarea_tema(id,txt){
-    var txto = $("#textoreunion_"+id).val();
-    $("#txts_"+id+" div").hide();
-    $("#txts_"+id+" textarea").hide();
-        var htmlp='<div id="form_tarea_tema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
-            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_tema" onkeyup="share_usuarios(this.value);" />';
-            htmlp+='<div id="jb_list_user_tema" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
-            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div><input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_tema();" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
-            
-    $("#txts_"+id).append(htmlp);
-    $("body #datepicker4").click();
-}
-
-
-
-function cancel_w_tema(){
-
-                var id = $("[id^=txts_]").attr('id').replace("txts_","");
-                $("#form_tarea_tema_"+id).remove();
-                $("#txts_"+id+" div").show();
-                $("#txts_"+id+" textarea").show();
-
-}
-
-//funcionas para asignar la tarea en la lista de la reunion nueva
-function save_tarea_subtema(id,txt){
-    var txto = $("#textoreunion_"+id).val();
-    $("#txts_"+id+" div").hide();
-    $("#txts_"+id+" textarea").hide();
-        var htmlp='<div id="form_tarea_subtema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
-            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_tema" onkeyup="share_usuarios(this.value);" />';
-            htmlp+='<div id="jb_list_user_tema" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
-            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div><input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_subtema();" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
-            
-    $("#txts_"+id).append(htmlp);
-    $("body #datepicker4").click();
-}
-
-
-
-function cancel_w_subtema(){
-
-                var id = $("[id^=txts_]").attr('id').replace("txts_","");
-                $("#txts_"+id+" #form_tarea_subtema_"+id).remove();
-                $("#txts_"+id+" div").show();
-                $("#txts_"+id+" textarea").show();
-
-}
-
 
 //// seccion de busqueda 
 //usuarios
@@ -1962,7 +1723,6 @@ function showAddUserW()
     }
 }
 
-////buscamos las tareas y las reuniones en lista
 function busquedaSimpleSearch(search)
 {
     var elementopadre = $('.list_primero_tareas');
@@ -2069,9 +1829,6 @@ function busquedaSimpleSearch(search)
 
 }
 
-
-
-///buscamos los usaurios
 function busquedaSimpleUsers(search,section)
 {
   //console.log(search);
@@ -2207,6 +1964,10 @@ function sustituirAcentos(str)
 
 ///hacemos un document ready con el post para etiquetas y para los usuarios
 $(document).on('ready', function(){
+
+    setTimeout(function(){
+//        $("#show_act").click();
+    },100);
     //Resou
     $('.showImage').remove();
 
@@ -2231,7 +1992,7 @@ $(document).on('ready', function(){
                 type: "POST",
                 dataType : "json",
                 url: "funciones/funciones.php",
-                data:"selec=15&id="+$("#idus").val(),
+                data:"op=3&selec=15&id="+$("#idus").val(),
                 beforeSend: function()
                 {
                     $("#jb_etiquetas").css({"display":"block"});
@@ -2258,7 +2019,7 @@ $(document).on('ready', function(){
                 type: "POST",
                 dataType : "json",
                 url: "funciones/funciones.php",
-                data:"selec=6",
+                data:"selec=6&op=3",
                 beforeSend: function()
                 {
                     $("#jb_list_user").css({"display":"block"});
@@ -2482,7 +2243,7 @@ $(document).on("ready",function(){
                 type: "POST",
                 dataType : "json",
                 url: "funciones/funciones.php",
-                data:"selec=6",
+                data:"selec=6&op=3",
                 beforeSend: function()
                 {
                     $("#jb_list_user").css({"display":"block"});
@@ -2536,7 +2297,7 @@ $(document).on("ready",function(){
                 type: "POST",
                 dataType : "json",
                 url: "funciones/funciones.php",
-                data:"selec=15&id="+$("#idus").val(),
+                data:"op=3&selec=15&id="+$("#idus").val(),
                 beforeSend: function()
                 {
                     $("#jb_etiquetas").css({"display":"block"});
@@ -2661,7 +2422,7 @@ $(document).on("ready",function()
                 type: "POST",
                 dataType : "json",
                 url: "funciones/funciones.php",
-                data:"selec=6",
+                data:"selec=6&op=3",
                 beforeSend: function()
                 {
                     $("#jb_list_user").css({"display":"block"});
@@ -2968,93 +2729,6 @@ function selectarchwact(idw){
     });
 }
 
-function uparchivo_reunion(op,id){
- //al enviar el formulario
-        //información del formulario
-        var idre = $("#idreunion").val();
-       var camp="";
-    if (op ==1) {
-        camp = "archivo_reunion_"+id;
-     }
-    if(op == 2)
-     {
-        camp = "archivo_reunion_"+id;
-     }  
-        var inputFile = document.getElementById(camp);
-        if(inputFile !=="")
-        {
-                var file = inputFile.files[0];
-                var fileName = file.name;
-                fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                var data = new FormData();
-                data.append('archivo',file);
-
-                var mensaje = ""; 
-                //hacemos la petición ajax 
-                var datosful = data;
-                $.ajax({
-                    url: 'funciones/uparchivos.php',  
-                    type: 'POST',
-                    contentType: false,
-                    data: datosful,
-                    // Form data//datos del formulario
-                    //necesario para subir archivos via ajax
-                    processData: false,
-                    cache: false,
-                    //mientras enviamos el archivo
-                    beforeSend: function(){
-                        mensaje = $("<span class='before'>Subiendo el archivo, por favor espere...</span>");
-                    
-                        if (op==1) {
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                        }
-                        if(op==2)
-                        {
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                        }
-                        // $("#save-w").val("")       
-                    },
-                    //una vez finalizado correctamente
-                    success: function(data){
-                        mensaje = $("<span class='success'>El archivo se ha subido correctamente.</span>");
-                        if( op == 1 ){
-                            savedbarch(id,idre,data,fileExtension,op);
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                        }
-                        if( op == 2 ){
-                            //console.log(op);
-                           savedbarch_subtema(id,idre,data,fileExtension);
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                        }
-                    },
-                    //si ha ocurrido un error
-                    error: function(){
-                        mensaje = $("<span class='error'>Ha ocurrido un error.</span>");
-                        showMessage(mensaje);
-                    }
-                });
-        }else{
-            mensaje = $("<span class='erro'>Seleccione un archivo</span>");
-            if (op==1) {
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-
-            }
-            if (op==2) {
-                showMessage(mensaje);
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-           }
-            
-        }
-}
-
-
-/////opcion de subida de archivos  barias secciones
 function uparchivo(op,id,idre){
  //al enviar el formulario
         //información del formulario
@@ -3198,7 +2872,7 @@ function isImage(extension)
 }
 
 //guardamos el arch en la bd
-function savedbarch(id,idre,data,tipo,op)
+function savedbarch(id,idre,data,tipo)
 {
     var liga="";
     $.each(data,function(k,v){
@@ -3206,46 +2880,14 @@ function savedbarch(id,idre,data,tipo,op)
     });
     liga=liga.substring(0, liga.length-1);
     liga=liga.substring(3, liga.length);
-    var txt = "selec=20&id="+id+"&idre="+idre+"&dir="+liga+"&tipo="+tipo+"&idus="+$("#idus").val();
-   // console.log(txt);
+    var txt = "op=2&selec=20&id="+id+"&idre="+idre+"&dir="+liga+"&tipo="+tipo+"&idus="+$("#idus").val();
     var ruta= "funciones/funciones.php";
     $.post(ruta,txt,function(data){
        if (data!="") {
-            if(op == 1){
-                show_listreunion_new(id);
-                
-            }
-            if(op ==""){
-                show_listreunion(id);
-                
-            }
-        }
-    });
-}
-
-
-//guardamos el arch en la bd del subtema
-function savedbarch_subtema(id,idre,data,tipo)
-{
-    var liga="";
-    $.each(data,function(k,v){
-        liga+=v+"/";
-    });
-    liga=liga.substring(0, liga.length-1);
-    liga=liga.substring(3, liga.length);
-    var txt = "selec=30&id="+id+"&idre="+idre+"&dir="+liga+"&tipo="+tipo+"&idus="+$("#idus").val();
-    var ruta= "funciones/funciones.php";
-    $.post(ruta,txt,function(data){
-       if (data!="") {
-          show_listreunion_newsubtema(id);
-         // console.log(data);
+            show_listreunion(id);
        };
     });
 }
-
-
-
-
 ///generamso unos input con la ruta del archivo para posterior guardarlos en la bd seccion tareas actividades
 function preparesave(data,filextension)
 {
@@ -3270,7 +2912,7 @@ function savearchw(data,id,op,tipo)
     liga=liga.substring(0, liga.length-1);
     liga=liga.substring(3, liga.length);
     var idus=$("#idus").val();
-    var txt = " selec=26&id="+idus+"&idw="+id+"&file="+liga+"&extension="+tipo;  
+    var txt = "op=2&selec=26&id="+idus+"&idw="+id+"&file="+liga+"&extension="+tipo;  
     var ruta ="funciones/funciones.php";
 
     $.post(ruta,txt,function(data){

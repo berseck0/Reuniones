@@ -384,7 +384,13 @@ text-shadow: 2px 1px rgba(63, 56, 17, 0.66);
     word-wrap: break-word;
     width: 80%;
 }
-
+.subtopic
+{
+    height: 35px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    padding-left: 5px;
+}
 #meetingShow span
 {
     background-color: rgba(241, 246, 26, 0.57);
@@ -931,13 +937,16 @@ a {
     width: 100%;
     display: block;
 }
+.listTagw ul li
+{
+    list-style: none !important;
+}
 .coment_w
 {
     width: 100%;
     text-align: left;
     padding-left: 5px;
     margin-bottom: 5px;
-    display: none;
 }
 .uparch_w
 {
@@ -949,6 +958,7 @@ a {
 .uparch_w label
 {
    left: 0em;
+   cursor: pointer;
 }
 
 .post-w:hover .coment_w

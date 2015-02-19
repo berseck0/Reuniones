@@ -44,6 +44,7 @@ if ($op == 1)
                         $data->close();
                         return $lista;
                     }
+                    return $lista;
                 } 
             }
         }
@@ -137,60 +138,7 @@ if($op == 3)
 
 if($op == 4)
 {
-
-    $id= $_POST['id'];
-   class Listopico
-   {
-         var $conec;
-            function __construct()
-            {
-                $this->conec = new Conexion();
-            }
-
-            function conexion(){
-               $db= $this->conec;
-               $mysqli=$db->conect();
-               return $mysqli;
-            }
-
-            function listadotopic($id)
-            {
-                $mysqli=$this->conexion();
-
-                $sql = "SELECT texto,id_topic FROM jb_topic_reunion where id_reunion=?";
-                $lista=array();
-              
-                if ($data=$mysqli->prepare($sql)) {
-                     $data->bind_param("i",$id);
-                     if($data->execute())
-                     {
-                        $data->bind_result($col1,$col2);
-
-                        while ($data->fetch()) {
-                            $registro['text']=$col1;
-                            $registro['id']=$col2;
-                            $lista[] = $registro;
-                        }
-
-                        $data->free_result();
-                        $data->close();
-                        return $lista;
-                    }
-                }
-
-
-            } 
-   }
-    
-    $lis = new Listopico;
-    $valor = $lis->listadotopic($id);
-    $file= count($valor);
-
-    for ($i=0; $i <$file ; $i++) { 
-       // $l= $i+1;
-        echo '<li id="topiclist"><span>'.$valor[$i]["text"].'</span></li>';
-    }
-
+ /// espacio libre 
 
 }
 

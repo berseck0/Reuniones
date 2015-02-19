@@ -53,7 +53,7 @@
         <div class="new_meeting" >
             <div id="N_meeting" class="N-Reu"><span class="icon ">]</span>Nueva Reunion</div>
             <div id="Nw_tareas"class="N-Tar"><span class="icon ">Ü</span>Nueva Tarea</div>
-            <div class="share"><span class="icon">z</span><input type="text" name="" value="" placeholder="Escribe aqui"></div>
+            <div class="share"><span class="icon">z</span><input type="text" onkeyup="busquedaSimpleSearch(this.value);" name="" value="" placeholder="Escribe aqui"></div>
         </div>
         <?php }?>
     </div> 
@@ -92,13 +92,13 @@
                                 <label for="">Admin. Etiqueta</label>
                             </div>
                         </div>
-                        <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block;"></div>
+                        <div class="listaUsuarios" id="jb_lista_tag_click_re" style="display: block;"></div>
                 <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
                 <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
                         <div id="jb_list_user" class="list-share list-meeting" style="display:none;">
   
                         </div>
-                        <div class="listaUsuarios" id="jb_lista_usuarios_click" style="display: block;"></div>
+                        <div class="listaUsuarios" id="jb_lista_usuarios_click_re" style="display: block;"></div>
                 <div class="meeting_time">
                     <label><p>Fecha Inicio:</p><input type="text" id="datepicker" name="fecha_in" ></label>
                     <label><p>Hora:</p><input id="basicExample" type="text" name="horaint" class="time"></label><br>
@@ -116,7 +116,7 @@
                                 <textarea id="tiTuloTopic" name="tituloTopic" class="Titulo-topic" type="text" placeholder="Escriba el titulo de su tema" rows="1"></textarea>
                             </li>
                         </ul>
-                        <input type="button" value="Guardar" id="SaveTopicNew">
+                        <input type="button" value="Guardar"  id="SaveTopicNew">
                     </form>
                 </div>
             </div>

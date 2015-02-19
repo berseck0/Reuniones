@@ -5,7 +5,7 @@ session_start();
        $id = $_SESSION['iduser'];
         // obtenemos los datos del archivo
        $archivo = $_FILES["archivo"]['name'];
-       //$tipo = $_FILES["archivo"]['type'];
+       $tipo = $_FILES["archivo"]['type'];
         if ($archivo != "")
         {
             $ds="../archivos/".$id;
@@ -13,7 +13,7 @@ session_start();
          
                 @mkdir($ds, 0777);
             
-           $archivo = $archivo."_".$id."_".$f;
+           $archivo = $id."_".$f."_".$archivo;
            $destino = "../archivos/".$id."/".$archivo."";
             $temp_file = $_FILES['archivo']['tmp_name'];
          

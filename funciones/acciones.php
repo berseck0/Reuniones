@@ -3,10 +3,7 @@ include 'conexion.php';
 
 $server = array();
 
-$op = $_POST['op'];
-
-if ($op == 1) {
-    
+//// seccion para hacer  verificaciones 
     class Reunioneschk
     {  
         var $conec;
@@ -26,24 +23,24 @@ if ($op == 1) {
             header('Content-type: application/json');
             
             $mysqli = $this->conexion();
-            $sql = "SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.id_topic, reun.localizacion, emp.NOMBRES from jb_reunion_new reun, jb_fecha_reunion fecha,jb_empleado emp where reun.id_usuario=? and fecha.id_fecha_re=reun.id_fecha_re and emp.id_empleado=reun.id_usuario and reun.valor=? ORDER BY fecha.fecha_in ASC";
+
+            $sql="SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.localizacion, emp.NOMBRES FROM jb_reunion_new reun, jb_fecha_reunion fecha, jb_empleado emp, jb_participantes_reunion pr WHERE pr.id_usuario =? AND pr.id_reunion = reun.id_reunion AND fecha.id_fecha_re = reun.id_fecha_re AND emp.id_empleado = reun.id_usuario AND reun.valor =? ORDER BY fecha.fecha_in ASC ";
             $listados=array();
             $datetime = date("Y-m-d");
                 if ($data=$mysqli->prepare($sql)) {
                      $data->bind_param("ii",$iduser,$valor);
                      if($data->execute())
-                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6);
 
                         while ($data->fetch()) {
                             $registro['idre']=$col1;
                             $registro['nombre']=$col2;
                             $registro['fecha']=$col3;
                             $registro['hora']=$col4;
-                            $registro['topic']=$col5;
-                            $registro['localizacion']=$col6;
+                            $registro['localizacion']=$col5;
                             $registro['iduser']=$iduser;
-                            $registro['usuario']=$col7;
-                            $registro['lista']=$this->chktopic($registro['idre']);
+                            $registro['usuario']=$col6;
+                            $registro['lista']=$this->chktopicprim($registro['idre'],$iduser);
                             $registro['count_fecha']=$this->chkfechadif($registro['fecha'],$datetime);
                             $listados[] = $registro;
                         } 
@@ -53,31 +50,30 @@ if ($op == 1) {
                 }
                  return $listados;
         }
-        
+
         //funcion para reuniones activas y sus datos
         function chkreunionactiva($iduser,$valor,$idre)
         {
             header('Content-type: application/json');
             
             $mysqli = $this->conexion();
-            $sql = "SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.id_topic, reun.localizacion, emp.NOMBRES from jb_reunion_new reun, jb_fecha_reunion fecha,jb_empleado emp where reun.id_usuario=? and fecha.id_fecha_re=reun.id_fecha_re and emp.id_empleado=reun.id_usuario and reun.valor=?  and reun.id_reunion=? ";
+            $sql="SELECT reun.id_reunion, reun.nombre_reunion, fecha.fecha_in, fecha.hora_in, reun.localizacion, emp.NOMBRES FROM jb_reunion_new reun, jb_fecha_reunion fecha, jb_empleado emp, jb_participantes_reunion pr WHERE pr.id_usuario =? AND pr.id_reunion = reun.id_reunion  AND fecha.id_fecha_re = reun.id_fecha_re AND emp.id_empleado = reun.id_usuario AND reun.valor =? AND reun.id_reunion=?";
             $listados=array();
             $datetime = date("Y-m-d");
                 if ($data=$mysqli->prepare($sql)) {
                      $data->bind_param("iii",$iduser,$valor,$idre);
                      if($data->execute())
-                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6);
 
                         while ($data->fetch()) {
                             $registro['idre']=$col1;
                             $registro['nombre']=$col2;
                             $registro['fecha']=$col3;
                             $registro['hora']=$col4;
-                            $registro['topic']=$col5;
-                            $registro['localizacion']=$col6;
+                            $registro['localizacion']=$col5;
                             $registro['iduser']=$iduser;
-                            $registro['usuario']=$col7;
-                            $registro['lista']=$this->chktopic($registro['idre']);
+                            $registro['usuario']=$col6;
+                            $registro['lista']=$this->listadotopic($registro['idre'],$registro['topic']);
                             $registro['count_fecha']=$this->chkfechadif($registro['fecha'],$datetime);
                             $registro['etiquetas']=$this->chketiquetasreunion($registro['idre']);
                             $registro['participantes']=$this->chkusuariosreunion($registro['idre']);
@@ -144,9 +140,70 @@ if ($op == 1) {
             }
             return $lista;
         }
- ///////////////extraemos los temas de la reunion          
-        function chktopic($id)
-            {
+
+
+        
+        //// buscamos los subtemas de la reunion recion guardada 
+        function listadotopic($id,$idtop)
+        {
+                $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_topic FROM jb_topic_reunion where id_reunion=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("i",$id);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['text']=$col1;
+                            $registro['id']=$col2;
+                            $registro['sublist']=$this->sublistadotopic($id,$registro['id']);
+                            $registro['resoluciones']=$this->chknotaListReuniones($registro['id']);
+                            $registro['archivos']=$this->chkarchListReuniones($registro['id']);
+                            $registro['tareas']=$this->chkasingactividad($registro['id'],$id);
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                }
+        } 
+       
+       ///////////////extraemos los temas de la reunion          
+        function chktopicprim($id,$idus)
+        {
+                $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_topic FROM jb_topic_reunion where id_reunion=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("i",$id);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['texts']=$col1;
+                            $registro['ids']=$col2;
+                            $lista[] = $registro;
+                        }
+                    }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                }
+                  return $lista;
+        } 
+
+        ///////////////extraemos los temas de la reunion          
+        function chktopic($id,$idus)
+        {
                 $mysqli=$this->conexion();
 
                 $sql = "SELECT texto,id_topic FROM jb_topic_reunion where id_reunion=?";
@@ -163,6 +220,7 @@ if ($op == 1) {
                             $registro['ids']=$col2;
                             $registro['resoluciones']=$this->chknotaListReuniones($registro['ids']);
                             $registro['archivos']=$this->chkarchListReuniones($registro['ids']);
+                            $registro['tareas']=$this->chkasingactividad($registro['ids'],$id);
                             $lista[] = $registro;
                         }
                     }
@@ -171,10 +229,11 @@ if ($op == 1) {
                         return $lista;
                 }
                   return $lista;
-            } 
-            //extraemos los datos de las respuesta alos temas y archivos
-            function chknotaListReuniones($idtopic)
-            {
+        } 
+        
+        //extraemos los datos de las respuesta alos temas y archivos
+        function chknotaListReuniones($idtopic,$idre)
+        {
                 $mysqli=$this->conexion();
                 $sql="SELECT id_notas_topic,texto,tipo,archivo from jb_notas_topic where id_topic=?";
                 $lista=array();
@@ -190,6 +249,7 @@ if ($op == 1) {
                             $registro['idnota']=$col1;
                             $registro['texto']=$col2;
                             $registro['tipo']=$col3;
+                            $registro['tareas']=$this->chkasingactividad($idtopic,$idre);
                             $lista[]=$registro;
                         }
                     }
@@ -198,7 +258,8 @@ if ($op == 1) {
                         return $lista;
                 }
                 return $lista;
-            }
+        }
+        
         function chkarchListReuniones($idtopic)
         {
             $mysqli=$this->conexion();
@@ -226,20 +287,278 @@ if ($op == 1) {
             return $lista;
         }
 
-
-        function chksubtopic($idtopic)
+        ////////buscamos la lista de usuarios asignados a tareas  en una reunion y la mostramos
+        function chkasingactividad($idtop,$idre)
         {
-            $mysqli = $this->conexion();
-            $sql = "SELECT texto FROM jb_sub_topic WHERE id_topic='$idtopic';";
-
-            if ($dato = $mysqli->query($sql)) 
+            $mysqli=$this->conexion();
+            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.idtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario";
+            $lista=array();
+            if($data=$mysqli->prepare($sql))
             {
-                $datos = $dato->fetch_array();
-                return $datos['texto'];
-                mysqli_free_result($dato);
+                $data->bind_param("ii",$idtop,$idre);
+                if($data->execute())
+                {
+                    $data->bind_result($col1,$col2,$col3);
+
+                    while ($data->fetch())
+                    {
+                        $registro['actividad']=$col1;
+                        $registro['nombreus']=$col2;
+                        $registro['fecha']=$col3;
+                        $lista[]=$registro;
+                    }
+                }
+                    $data->free_result();
+                    $data->close();
+                    return $lista;
             }
+            return $lista;
+
         }
 
+     ///////////////extraemos los temas de la reunion          
+        function chktopic_espe($id,$idus,$idtop)
+            {
+                $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_topic FROM jb_topic_reunion where id_reunion=? and id_topic=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$id,$idtop);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['texts']=$col1;
+                            $registro['ids']=$col2;
+                            $registro['resoluciones']=$this->chknotaListReuniones($registro['ids']);
+                            $registro['archivos']=$this->chkarchListReuniones($registro['ids']);
+                            $registro['tareas']=$this->chkasingactividad($registro['ids'],$id);
+                            $lista[] = $registro;
+                        }
+                    }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                }
+                  return $lista;
+            } 
+
+
+
+
+
+
+
+        //// buscamos los subtemas de la reunion recion guardada 
+        function sublistadotopic($id,$idtop)
+        {
+                $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_sub_topic FROM jb_sub_topic where id_reunion=? and id_topic=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$id,$idtop);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['subtema']=$col1;
+                            $registro['idsub']=$col2;
+                            $registro['subresoluciones']=$this->chksubnotaListReuniones($registro['idsub']);
+                            $registro['subarchivos']=$this->chksubarchListReuniones($id,$registro['idsub']);
+                            $registro['subtareas']=$this->chksubasingactividad($registro['idsub'],$id);
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                }
+        } 
+
+        //// buscamos los subtemas de la reunion recion guardada 
+        function sublistadotopicesp($id,$idtop)
+        {
+               $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_sub_topic FROM jb_sub_topic where id_reunion=? and id_sub_topic=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$id,$idtop);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['texts']=$col1;
+                            $registro['ids']=$col2;
+                            $registro['subresoluciones']=$this->chksubnotaListReuniones($registro['ids']);
+                            $registro['subarchivos']=$this->chksubarchListReuniones($id,$registro['ids']);
+                            $registro['subtareas']=$this->chksubasingactividad($registro['ids'],$id);
+                            $lista[] = $registro;
+                        }
+                    }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                }
+                  return $lista;
+        } 
+
+      
+         
+        //busqueda de archivos en los subtemas 
+        function chksubarchListReuniones($idre,$idsubtop)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT archivo,tipo from jb_arch_reunion where id_reunion=? and id_subtopic=?";
+            $lista=array();
+            if($data=$mysqli->prepare($sql))
+            {
+                $data->bind_param("ii",$idre,$idsubtop);
+                if($data->execute())
+                {
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch())
+                    {
+                        $registro['liga']=$col1;
+                        $registro['tipo']=$col2;
+                        $lista[]=$registro;
+                    }
+                    
+                }
+                    $data->free_result();
+                    $data->close();
+                    return $lista;
+            }
+            return $lista;
+        }
+
+
+
+
+
+        ///////////////extraemos los temas de la reunion          
+        function chksubtopic($id,$idus,$idtop)
+            {
+                $mysqli=$this->conexion();
+
+                $sql = "SELECT texto,id_topic FROM jb_sub_topic where id_reunion=? and id_topic=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$id,$idtop);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['texts']=$col1;
+                            $registro['ids']=$col2;
+                           // $registro['resoluciones']=$this->chknotaListReuniones($registro['ids']);
+                            //$registro['archivos']=$this->chkarchListReuniones($registro['ids']);
+                            $registro['tareas']=$this->chksubasingactividad($registro['ids'],$id);
+                            $lista[] = $registro;
+                        }
+                    }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                }
+                  return $lista;
+                            //$registro['resoluciones']=$this->chksubnotaListReuniones($registro['ids'],$id);
+                            //$registro['archivos']=$this->chksubarchListReuniones($registro['ids']);
+                            //$registro['tareas']=$this->chksubasingactividad($registro['ids'],$id);
+            } 
+
+           //extraemos los datos de las respuesta alos temas y archivos
+        function chksubnotaListReuniones($idtopic,$idre)
+            {
+                $mysqli=$this->conexion();
+                $sql="SELECT id_notas_topic,texto,tipo from jb_notas_subtopic where id_topic=?";
+                $lista=array();
+                if($data=$mysqli->prepare($sql))
+                {
+                    $data->bind_param("i",$idtopic);
+                    if($data->execute())
+                    {
+                        $data->bind_result($col1,$col2,$col3);
+
+                        while ($data->fetch())
+                        {
+                            $registro['idnota']=$col1;
+                            $registro['texto']=$col2;
+                            $registro['tipo']=$col3;
+                           // $registro['tareas']=$this->chksubasingactividad($idtopic,$idre);
+                            $lista[]=$registro;
+                        }
+                    }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                }
+                return $lista;
+            }
+        
+         ////////buscamos la lista de usuarios asignados 
+       function chksubasingactividad($idtop,$idre)
+        {
+
+            $mysqli=$this->conexion();
+            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.idtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario";
+            $lista=array();
+            if($data=$mysqli->prepare($sql))
+            {
+                $data->bind_param("ii",$idtop,$idre);
+                if($data->execute())
+                {
+                    $data->bind_result($col1,$col2,$col3);
+
+                    while ($data->fetch())
+                    {
+                        $registro['actividad']=$col1;
+                        $registro['nombreus']=$col2;
+                        $registro['fecha']=$col3;
+                        $lista[]=$registro;
+                    }
+                }
+                    $data->free_result();
+                    $data->close();
+                    return $lista;
+            }
+            return $lista;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ///// fecha de la reunion???
         function chkfechare($idfecha)
         {
             $mysqli = $this->conexion();
@@ -253,32 +572,31 @@ if ($op == 1) {
             }
         }   
 
-        //verifica que la etiqueta ya se encunetre
-        function chketiqueta($etiqueta,$idusuario)
-        {
-            $mysqli =$this->conexion();
-            $sql = "SELECT count(id_etiqueta) FROM jb_etiquetas where nombre=? and id_usuario=?;";
-            $lista=array();
-              
 
+        ///verificamos que las etiqeutas se encunetre para evitar sobre escribir
+        function chketiqueta_espe($etiqueta,$idusuario,$tipo)
+        {
+            $mysqli = $this->conexion();
+            $sql = "SELECT count(id_etiqueta) FROM jb_etiquetas where nombre=? and id_usuario=? AND tipo=?;";
+              
             if ($data=$mysqli->prepare($sql)) {
-                     $data->bind_param("si",$etiqueta,$idusuario);
+                     $data->bind_param("sis",$etiqueta,$idusuario,$tipo);
                      if($data->execute())
                      {
                         $data->bind_result($col1);
-                        while ($data->fetch()) {
-                            $registro['id']=$col1;
-                            $lista[] = $registro;
+
+                        if($data->fetch()) {
+                            $registro=$col1;
                         }
                         $data->free_result();
                         $data->close();
-                        return $lista;
-
+                        return $registro;
                      }
              }
         }
 
 
+    
         ////genera la busqueda para la lista de tareas
         function chklistarea($iduser)
         {
@@ -319,7 +637,7 @@ if ($op == 1) {
         {
             $mysqli=$this->conexion();
 
-                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES ,tarActv.id_actividades,tarActv.id_propietario  FROM jb_tareas_actividades tarActv, jb_empleado jbemp, jb_user_asignadosw userasign WHERE userasign.id_useradd =? AND userasign.id_tarea = tarActv.id_actividades AND tarActv.flag =1 AND jbemp.ID_EMPLEADO = tarActv.id_propietario";
+                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES ,tarActv.id_actividades,tarActv.id_propietario  FROM jb_tareas_actividades tarActv, jb_empleado jbemp, jb_user_asignadosw userasign WHERE userasign.id_useradd =? AND userasign.id_tarea = tarActv.id_actividades AND tarActv.flag =1 AND jbemp.ID_EMPLEADO = tarActv.id_propietario ORDER BY tarActv.fecha ASC";
                 $lista=array();
               
                 if ($data=$mysqli->prepare($sql)) {
@@ -387,6 +705,8 @@ if ($op == 1) {
                     return $lista;
                 }
         } 
+
+        //hacemos la relacion de etiquetas con las tareas
         function rel_tag_tareas($idWork,$idusr)
         {
             $mysqli=$this->conexion();
@@ -468,6 +788,7 @@ if ($op == 1) {
                     return $lista;
                 }
         }
+
         /// buscamos los comentarios 
         function comentarios_tareas($idactw){
                 $mysqli=$this->conexion();
@@ -496,6 +817,7 @@ if ($op == 1) {
                 }
         }
 
+        ///verificamos la diferencia en fecha al dia actual
         function chkfechadif($fecha1,$fecha2)
         {
             //defino fecha 1
@@ -531,11 +853,155 @@ if ($op == 1) {
         }   
 
 
+        ////genera la busqueda para la lista de tareas
+        function chklistareaesp($iduser,$idw)
+        {
+            $mysqli=$this->conexion();
+
+                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES, tarActv.id_actividades FROM jb_tareas_actividades tarActv, jb_empleado jbemp WHERE tarActv.id_propietario =?  AND tarActv.flag=1   AND jbemp.ID_EMPLEADO = tarActv.id_propietario AND tarActv.id_actividades=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$iduser,$idw);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6);
+
+                        while ($data->fetch()) {
+                            $registro['titulo']=$col1;
+                            $registro['fecha']=$col2;
+                            $registro['nota']=$col3;
+                            $registro['mail']=$col4;
+                            $registro['usuario']=$col5;
+                            $registro['idactw']=$col6;
+                            $registro['tagW']=$this->rel_tag_tareas($registro['idactw'],$iduser);
+                            $registro['usrAsing']=$this->rel_usr_tarea($registro['idactw']);
+                            $registro['archivos']=$this->chkarchivos_tareas($registro['idactw']);
+                            $registro['comentarios']=$this->comentarios_tareas($registro['idactw']);
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                }
+
+        }
+        //genera lalista de las actividades asignadas por otros usuarios
+        function chklistactividadesp($iduser,$idw)
+        {
+            $mysqli=$this->conexion();
+
+                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES ,tarActv.id_actividades,tarActv.id_propietario  FROM jb_tareas_actividades tarActv, jb_empleado jbemp, jb_user_asignadosw userasign WHERE userasign.id_useradd =? AND userasign.id_tarea = tarActv.id_actividades AND tarActv.flag =1 AND jbemp.ID_EMPLEADO = tarActv.id_propietario and tarActv.id_actividades=?";
+                $lista=array();
+              
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("ii",$iduser,$idw);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
+
+                        while ($data->fetch()) {
+                            $registro['titulo']=$col1;
+                            $registro['fecha']=$col2;
+                            $registro['nota']=$col3;
+                            $registro['mail']=$col4;
+                            $registro['usuario']=$col5;
+                            $registro['idw']=$col6;
+                            $registro['idprop']=$col7;
+                            $registro['tagW']=$this->rel_tag_tareas($registro['idw'],$iduser);
+                            $registro['usrAsing']=$this->rel_usr_tarea($registro['idw']);
+                            $registro['archivos']=$this->chkarchivos_tareas($registro['idw']);
+                            $registro['comentarios']=$this->comentarios_tareas($registro['idw']);
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                    return $lista;
+                }
+
+        }
+
+          /*
+        
+         ///verifica que la etiqueta ya se encunetre
+        function chketiqueta($etiqueta,$idusuario)
+        {
+            $mysqli =$this->conexion();
+            $sql = "SELECT count(id_etiqueta) FROM jb_etiquetas where nombre=? and id_usuario=?;";
+            $lista=array();
+              
+
+            if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("si",$etiqueta,$idusuario);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1);
+                        while ($data->fetch()) {
+                            $registro['id']=$col1;
+                            $lista[] = $registro;
+                        }
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+
+                     }
+             }
+        }
+                */
+               /*  ////busqueda de archivos de las reuniones ne los toemas 
+        function chksubarchListReuniones($idtopic)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT archivo,tipo from jb_arch_reunion where id_subtopic=?";
+            $lista=array();
+            if($data=$mysqli->prepare($sql))
+            {
+                $data->bind_param("i",$idtopic);
+                if($data->execute())
+                {
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch())
+                    {
+                        $registro['liga']=$col1;
+                        $registro['tipo']=$col2;
+                        $lista[]=$registro;
+                    }
+                    
+                }
+                    $data->free_result();
+                    $data->close();
+                    return $lista;
+            }
+            return $lista;
+        }
+        
+
+            /*
+        ///// buscamos los subtemas de una reunio
+        function chksubtopic($idtopic)
+        {
+            $mysqli = $this->conexion();
+            $sql = "SELECT texto FROM jb_sub_topic WHERE id_topic='$idtopic';";
+
+            if ($dato = $mysqli->query($sql)) 
+            {
+                $datos = $dato->fetch_array();
+                return $datos['texto'];
+                mysqli_free_result($dato);
+            }
+        }
+        */
+              
 
     }
-}
+
 // seccion para hacer registros o actualizaciones  
-if ($op  == 2) {
 
     class Registros
     {
@@ -594,7 +1060,8 @@ if ($op  == 2) {
             }
         }
 
-        function re_participantesRe($idreun,$iduser){
+        function re_participantesRe($idreun,$iduser)
+        {
 
             $mysqli = $this->conexion();
             $sql = "INSERT INTO jb_participantes_reunion(id_reunion,id_usuario) VALUES(?,?);";
@@ -614,9 +1081,10 @@ if ($op  == 2) {
                     return false;
                 }   
             }
-
         }
-          function re_etiquetasRe($idreun,$idtag){
+
+        //registramos las etiquetas de la reunion
+        function re_etiquetasRe($idreun,$idtag){
 
             $mysqli = $this->conexion();
             $sql = "INSERT INTO jb_rel_tag_reunion(id_reunion,id_etiqueta) VALUES(?,?);";
@@ -638,6 +1106,7 @@ if ($op  == 2) {
             }
 
         }
+
         // actualiza la fecha con el id de la reunion regresa 1
         function re_update_fecha($idreunion,$fechain,$fechaout,$horain,$horaout)
         {
@@ -658,6 +1127,7 @@ if ($op  == 2) {
                 $data->close();
             }
         }
+
         // registra la fecha con el id re lareunion nos regresa el id
        function regfechareu($idreunion,$fechain,$fechaout,$horain,$horaout)
         {
@@ -684,6 +1154,7 @@ if ($op  == 2) {
             }
         }
 
+        //actualizamos datos de la reunion
         function updatereunion($idreunion,$campoup,$valor)
         {
             $mysqli = $this->conexion();
@@ -736,26 +1207,6 @@ if ($op  == 2) {
 
         }
 
-        function chketiqueta($etiqueta,$idusuario,$tipo)
-        {
-            $mysqli = $this->conexion();
-            $sql = "SELECT count(id_etiqueta) FROM jb_etiquetas where nombre=? and id_usuario=? AND tipo=?;";
-              
-            if ($data=$mysqli->prepare($sql)) {
-                     $data->bind_param("sis",$etiqueta,$idusuario,$tipo);
-                     if($data->execute())
-                     {
-                        $data->bind_result($col1);
-
-                        if($data->fetch()) {
-                            $registro=$col1;
-                        }
-                        $data->free_result();
-                        $data->close();
-                        return $registro;
-                     }
-             }
-        }
         //registro de temas en la reunion
         function regtopico($titulo,$id)
         {
@@ -778,6 +1229,29 @@ if ($op  == 2) {
              } 
         }
 
+        //registro de temas en la reunion
+        function regsubtopico($titulo,$id,$idtop)
+        {
+            $mysqli = $this->conexion();
+
+            $sql = "INSERT INTO jb_sub_topic(id_topic,id_reunion,texto) VALUES(?,?,?)";
+            if ($data = $mysqli->prepare($sql))
+            {
+                $data->bind_param("iis",$idtop,$id,$titulo);
+                 if ($data->execute()) 
+                 {
+                    return $data->insert_id;
+                    return true;
+                 }
+                 else
+                 {
+                    $data->close();
+                    return false;
+                 }
+             } 
+        }
+
+        
         //// registramos las actividades para el usuario
         function regtareasActv($titulo,$fecha,$nota,$mail,$idus)
         {
@@ -820,8 +1294,9 @@ if ($op  == 2) {
                 }
             }
         }
-         function regcoment_w($comen,$mail,$idus,$idw)
-         {
+        
+        function regcoment_w($comen,$mail,$idus,$idw)
+        {
             $mysqli = $this->conexion();
             $sql = "INSERT INTO jb_comentarios_w(texto,mail,id_usuario,id_tarea) VALUES(?,?,?,?)";
 
@@ -839,9 +1314,10 @@ if ($op  == 2) {
                     return false;
                 }
             }
-         }
+        }
         //// tarea o actividad finalizada
-        function workfin($valor,$iadctw,$idusr){
+        function workfin($valor,$iadctw,$idusr)
+        {
 
             $mysqli = $this->conexion();
             $sql = "UPDATE jb_tareas_actividades SET flag=?  where id_actividades=? and id_propietario=?;";
@@ -860,7 +1336,7 @@ if ($op  == 2) {
                 $data->close();
             }
         }
-    /// registramos  los uusarioas asigandos 
+        /// registramos  los uusarioas asigandos 
         function reg_usrasing($idtarea,$iduse)
         {
             $mysqli = $this->conexion();
@@ -880,7 +1356,6 @@ if ($op  == 2) {
                     return false;
                 }
             }
-
         }
         ////reg de etiquetas en las tareas
             /// registramos  los uusarioas asigandos 
@@ -906,9 +1381,30 @@ if ($op  == 2) {
 
         }
 
+        function regreltareasreunion($idre,$idtop,$reg1)
+        {
+            $mysqli = $this->conexion();
+            $sql = "INSERT INTO jb_rel_reun_tarea(idreun,idtopic,id_tarea) VALUES(?,?,?)";
+
+            if($data = $mysqli->prepare($sql))
+            {
+                $data->bind_param("iii",$idre,$idtop,$reg1);
+                if($data->execute())
+                {
+                    return $data->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $data->close();
+                    return false;
+                }
+            }
+        }
         
         ///////////////seccion de las notas en el listados de as tareas
-        function  regNotasLitsReuniones($id,$texto,$tipo){
+        function  regNotasLitsReuniones($id,$texto,$tipo)
+        {
             $mysqli= $this->conexion();
             $sql="INSERT into jb_notas_topic(id_topic,texto,tipo) VALUES(?,?,?)";
 
@@ -930,61 +1426,31 @@ if ($op  == 2) {
 
         }
 
-
-
-       function chknotaListReuniones($idtopic)
+         ///////////////seccion de las notas en el listados de as tareas
+        function  regsubNotasLitsReuniones($id,$texto,$tipo)
         {
-            $mysqli=$this->conexion();
-            $sql="SELECT id_notas_topic,texto,tipo from jb_notas_topic where id_topic=?";
-            $lista=array();
-            if($data=$mysqli->prepare($sql))
-            {
-                $data->bind_param("i",$idtopic);
-                if($data->execute())
-                {
-                    $data->bind_result($col1,$col2,$col3);
+            $mysqli= $this->conexion();
+            $sql="INSERT into jb_notas_subtopic(id_topic,texto,tipo) VALUES(?,?,?)";
 
-                    while ($data->fetch())
-                    {
-                        $registro['idnota']=$col1;
-                        $registro['texto']=$col2;
-                        $registro['tipo']=$col3;
-                        $lista[]=$registro;
-                    }
-                    
-                }
-                    $data->free_result();
-                    $data->close();
-                    return $lista;
-            }
-            return $lista;
-        }
-        function chkarchListReuniones($idtopic)
-        {
-            $mysqli=$this->conexion();
-            $sql="SELECT archivo from jb_arch_reunion where id_topico_reunion=?";
-            $lista=array();
-            if($data=$mysqli->prepare($sql))
+            if($datos = $mysqli->prepare($sql))
             {
-                $data->bind_param("i",$idtopic);
-                if($data->execute())
+                $datos->bind_param("iss",$id,$texto,$tipo);
+                if($datos->execute())
                 {
-                    $data->bind_result($col1);
-
-                    while ($data->fetch())
-                    {
-                        $registro['liga']=$col1;
-                        $lista[]=$registro;
-                    }
-                    
+                    return $datos->insert_id;
+                    return true;
                 }
-                    $data->free_result();
-                    $data->close();
-                    return $lista;
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
             }
-            return $lista;
+
         }
 
+   
         function regArchReuniones($idtop,$idre,$idus,$dir,$tipo)
         {
             $mysqli= $this->conexion();
@@ -1006,14 +1472,35 @@ if ($op  == 2) {
 
             }
         }
+          
+          function regArchReunionessub($idtop,$idre,$idus,$dir,$tipo)
+        {
+            $mysqli= $this->conexion();
+            $sql="INSERT into jb_arch_reunion(id_subtopic,id_reunion,id_usuario,archivo,tipo) VALUES(?,?,?,?,?)";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("iiiss",$idtop,$idre,$idus,$dir,$tipo);
+                if($datos->execute())
+                {
+                    return $datos->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
+            }
+        }
 
     }
-}
+
 
 
 // busqueda de usuarios y etiquetas
-if($op == 3)
-{
+
     class Busquedasdb
     {  
         var $conec;
@@ -1034,19 +1521,18 @@ if($op == 3)
 
             $mysqli = $this->conexion();
             $listado = array();
-            $query = "SELECT jb_empleado.NOMBRES,jb_empleado.ID_EMPLEADO, jb_plaza.NOMBRE_PLAZA FROM jb_empleado, jb_plaza where jb_plaza.id=jb_empleado.ID_EMPLEADO ";
+            $query = "SELECT NOMBRES, ID_EMPLEADO  FROM jb_empleado; ";
               
                 if ($stmt=$mysqli->prepare($query))
                 {
                     //$stmt->bind_param('s',$plaza);
                      if($stmt->execute())
-                        $stmt->bind_result($col1,$col2,$col3);
+                        $stmt->bind_result($col1,$col2);
                         
                         while ($stmt->fetch()) {
 
                             $registro['nombre']=$col1;
                             $registro['id']=$col2;
-                            $registro['plaza']=$col3;
                             $listado[] = $registro;
                         }
 
@@ -1082,11 +1568,11 @@ if($op == 3)
         }
     }  
 
-}
+
 
 //eliminamos usuarios y tag de reuniones y actividades 
-if ($op ==4)
-{
+
+
     class Jbdelldb
     {  
         var $conec;
@@ -1150,4 +1636,4 @@ if ($op ==4)
                 }
         }
     }  
-}
+
