@@ -78,11 +78,16 @@ if ( $op == 2) {
 //seccion de listas de etiquetas 
 if($op == 3)
 {
-    $ideti = $_POST['id'];
-    $tabla = $_POST['tab'];
+    $ideti = trim($_POST['id']);
+    $tabla = trim($_POST['tab']);
+    $op = trim($_POST['tab']);
     if($tabla ==1){$tabla="jb_etiquetas";}
-    $idcam = $_POST['idcam'];
+    if($tabla ==2){$tabla="jb_departamento_re";}
+    if($tabla ==3){$tabla="jb_proyectos";}
+    $idcam = trim($_POST['idcam']);
     if($idcam ==1){$idcam="id_usuario";}
+    if($idcam ==2){$idcam="iduser";}
+    if($idcam ==3){$idcam="iduser";}
 
     class Listadotag
     {
@@ -122,14 +127,74 @@ if($op == 3)
                         return $lista;
                     }
                 }return $lista;
-            }     
+            }    
+
+            function listadosdep($id,$tab,$idcam)
+            {
+                $mysqli=$this->conexion();
+                $sql="SELECT nombre,id_departamentos FROM $tab where $idcam=?";
+                $lista=array();
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("i",$id);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['nombre']=$col1;
+                            $registro['id']=$col2;
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                }return $lista;
+            }
+
+            function listadosproy($id,$tab,$idcam)
+            {
+                $mysqli=$this->conexion();
+                $sql="SELECT nombre,id_proyecto FROM $tab where $idcam=?";
+                $lista=array();
+                if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("i",$id);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1,$col2);
+
+                        while ($data->fetch()) {
+                            $registro['nombre']=$col1;
+                            $registro['id']=$col2;
+                            $lista[] = $registro;
+                        }
+
+                        $data->free_result();
+                        $data->close();
+                        return $lista;
+                    }
+                }return $lista;
+            }
+
     }
 
     header('Content-type: application/json');
    // $server = array();
 
     $lis = new Listadotag;
-    $valor = $lis->listadostag($ideti,$tabla,$idcam);
+    if ($op == 1) {
+        $valor = $lis->listadostag($ideti,$tabla,$idcam);
+    
+    }
+    if ($op== 2) {
+        $valor = $lis->listadosdep($ideti,$tabla,$idcam);
+    
+    }
+    if ($op == 3) {
+        $valor = $lis->listadosproy($ideti,$tabla,$idcam);
+    
+    }
     echo json_encode($valor);
 }
 
@@ -145,12 +210,12 @@ if($op == 4)
 //eliminamos las etiquetas
 if($op == 5)
 {
-    $iduser = $_POST['id'];
-    $tabla = $_POST['tab'];
+    $iduser = trim($_POST['id']);
+    $tabla = trim($_POST['tab']);
     if($tabla ==2){$tabla="jb_etiquetas";}
-    $idcam = $_POST['idcam'];
+    $idcam = trim($_POST['idcam']);
     if($idcam ==2){$idcam="id_usuario";$idcamp2="id_etiqueta";}
-    $id = $_POST['ids'];
+    $id = trim($_POST['ids']);
 
     class Delltag
     {

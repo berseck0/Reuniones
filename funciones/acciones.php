@@ -513,7 +513,7 @@ $server = array();
         {
 
             $mysqli=$this->conexion();
-            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.idtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario";
+            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.id_subtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario";
             $lista=array();
             if($data=$mysqli->prepare($sql))
             {
@@ -997,6 +997,49 @@ $server = array();
             }
         }
         */
+       
+
+       function chkdepa($idus,$titulo,$flag)
+        {
+            $mysqli = $this->conexion();
+            $sql = "SELECT count(id_departamentos) FROM jb_departamento_re where nombre=? and id_usuario=? AND flag=?;";
+              
+            if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("sii",$titulo,$idus,$flag);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1);
+
+                        if($data->fetch()) {
+                            $registro=$col1;
+                        }
+                        $data->free_result();
+                        $data->close();
+                        return $registro;
+                     }
+             }
+        }   
+
+         function chkproy($titulo,$idus,$flag)
+        {
+            $mysqli = $this->conexion();
+            $sql = "SELECT count(id_proyecto) FROM jb_proyectos where nombre=? and iduser=? AND flag=?;";
+              
+            if ($data=$mysqli->prepare($sql)) {
+                     $data->bind_param("sii",$titulo,$idus,$flag);
+                     if($data->execute())
+                     {
+                        $data->bind_result($col1);
+
+                        if($data->fetch()) {
+                            $registro=$col1;
+                        }
+                        $data->free_result();
+                        $data->close();
+                        return $registro;
+                     }
+             }
+        }    
               
 
     }
@@ -1401,6 +1444,27 @@ $server = array();
                 }
             }
         }
+
+        function regreltareasreunionsub($idre,$idtop,$reg1,$idsub)
+        {
+            $mysqli = $this->conexion();
+            $sql = "INSERT INTO jb_rel_reun_tarea(idreun,idtopic,id_tarea,id_subtopic) VALUES(?,?,?,?)";
+
+            if($data = $mysqli->prepare($sql))
+            {
+                $data->bind_param("iiii",$idre,$idtop,$reg1,$idsub);
+                if($data->execute())
+                {
+                    return $data->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $data->close();
+                    return false;
+                }
+            }
+        }
         
         ///////////////seccion de las notas en el listados de as tareas
         function  regNotasLitsReuniones($id,$texto,$tipo)
@@ -1495,6 +1559,104 @@ $server = array();
             }
         }
 
+
+        //////////////////////////registramos el nombre del departamento
+        function regdepartamento($idus,$ti)
+        {
+            $mysqli= $this->conexion();
+            $sql="INSERT into jb_departamento_re(iduser,nombre) VALUES(?,?)";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("is",$idus,$ti);
+                if($datos->execute())
+                {
+                    return $datos->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
+            }  
+        }
+
+        /////////////////////////////registramos el departamento con los id de usuarios asiganos a el
+        function regdepa_miembros($iddep,$idmiem)
+        {
+            $mysqli = $this->conexion();
+            $sql="INSERT into jb_miembros_depa(id_departamentos,id_usuario) VALUES(?,?)";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("ii",$iddep,$idmiem);
+                if($datos->execute())
+                {
+                    return $datos->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
+            }  
+        }  
+    
+
+        //////////////////////////registramos el nombre del proyecto
+        function regproyecto($idus,$ti)
+        {
+            $mysqli= $this->conexion();
+            $sql="INSERT into jb_proyectos(iduser,nombre) VALUES(?,?)";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("is",$idus,$ti);
+                if($datos->execute())
+                {
+                    return $datos->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
+            }  
+        }
+    
+        /////////////////////////////registramos el departamento con los id de usuarios asiganos a el
+        function regproy_miembros($idproy,$idmiem)
+        {
+            $mysqli= $this->conexion();
+            $sql="INSERT into jb_miembros_pro(id_proyecto,id_usuario) VALUES(?,?)";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("ii",$idproy,$idmiem);
+                if($datos->execute())
+                {
+                    return $datos->insert_id;
+                    return true;
+                }
+                else
+                {
+                    $datos->close();
+                    return false;
+                }
+
+            }  
+        }  
+
+        
+
+
+
     }
 
 
@@ -1548,6 +1710,7 @@ $server = array();
             $mysqli=$this->conexion();
             $sql="SELECT id_etiqueta,nombre,tipo FROM jb_etiquetas WHERE id_usuario=?";
             $listado = array();
+            
             if ($data = $mysqli->prepare($sql)) {
                 $data->bind_param("i",$idus);
 
@@ -1560,12 +1723,133 @@ $server = array();
                         $registro['tipo']=$col3;
                         $listado[]=$registro;
                     }
+                    //$reg['depa']=$this->busqdepa($idus,1);
+                   // array_push($listado,$reg['depa']);
                 $data->free_result();
                 $data->close();
                 return $listado;
             }
             return $listado;
         }
+
+         function busqdepa($idus,$flag)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT id_departamentos,nombre FROM jb_departamento_re WHERE iduser=? and flag=?";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("ii",$idus,$flag);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch()){
+                        $registro['iddep']=$col1;
+                        $registro['nombre']=$col2;
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+         function busqproy($idus,$flag)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT id_proyecto,nombre FROM jb_proyectos WHERE iduser=? and flag=?";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("ii",$idus,$flag);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch()){
+                        $registro['idproy']=$col1;
+                        $registro['nombre']=$col2;
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+         function busqdepaesp($idus,$flag,$iddep)
+        {
+            $mysqli=$this->conexion();
+            return $sql="SELECT id_departamentos,nombre FROM jb_departamento_re WHERE iduser=? and flag=? and id_departamentos=?";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("iii",$idus,$flag,$iddep);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch()){
+                        $registro['iddep']=$col1;
+                        $registro['nombre']=$col2;
+                        $registro['usuarios']=$this->usuarios_depa($registro['iddep']);
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+        function usuarios_depa($iddep)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT emp.ID_EMPLEADO, emp.NOMBRES FROM jb_miembros_depa md, jb_empleado emp WHERE md.id_departamentos=? and md.id_usuario=em.IDEMPLEADO";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("i",$iddep);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch()){
+                        $registro['idemp']=$col1;
+                        $registro['nombre']=$col2;
+                       // $registro['usuarios']=$this->bususuarios_depa($registro['iddep']);
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+         function busqproyesp($idus,$flag,$idpro)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT id_proyecto,nombre FROM jb_proyectos WHERE iduser=? and flag=? and id_proyecto=?";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("iii",$idus,$flag,$idpro);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2);
+
+                    while ($data->fetch()){
+                        $registro['idproy']=$col1;
+                        $registro['nombre']=$col2;
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+
     }  
 
 

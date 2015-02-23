@@ -85,19 +85,17 @@
                 <div id="meetingShow"></div>
               <h4>Nueva Reunion</h4>
                 <label><p>Etiquetas:</p><input type="text" name="etiquetas" id="jb_etiqueta_reun" value="" placeholder="Escribe las etiquetas"></label><!--<span id="tagNew" >Nueva Etiqueta</span>-->
-                        <div id="jb_etiquetas"class="list-share list-meeting" style="display:none;">
+                        <div id="jb_etiquetas"class="list-share list-meeting" style="display: none; z-index: 2;">
                            
                             <div>
                                 <label id="tagNew-n" >Crear Etiqueta</label><br />
                                 <label for="">Admin. Etiqueta</label>
                             </div>
                         </div>
-                        <div class="listaUsuarios" id="jb_lista_tag_click_re" style="display: block;"></div>
-                <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
-                <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
-                        <div id="jb_list_user" class="list-share list-meeting" style="display:none;">
-  
-                        </div>
+                        <div class="listaUsuarios" id="jb_lista_tag_click_re" style="display: none;"></div>
+                        <label><p>Lugar:</p><input type="text" name="lugar" value="" placeholder="Escribe el lugar del evento"></label>
+                        <label><p>Participantes:</p><input type="text" id="meeting-user-share" name="participantes" value="" placeholder="Escribe el nombre de los participantes"></label>
+                        <div id="jb_list_user" class="list-share list-meeting" style="display: block; z-index: 1;"></div>
                         <div class="listaUsuarios" id="jb_lista_usuarios_click_re" style="display: block;"></div>
                 <div class="meeting_time">
                     <label><p>Fecha Inicio:</p><input type="text" id="datepicker" name="fecha_in" ></label>
@@ -138,13 +136,13 @@
                     </div>
                      <div class="tag_izq">
                         <div class="tag_new_tag" >
-                            <label for=""><a onclick="tagNewclik();">Nueva Etiqueta</a></label>
+                            <label for=""><a id="tagselec" onclick="tagNewclik();">Nueva Etiqueta</a></label>
                         </div>
-                        <div class="tag_izq_depa" style="display: none">
-                            <label for="">Nueva +++</label>
+                        <div class="tag_izq_depa"  id="listEtiqueta_depa" style="display: none">
+                            <label for="">Departamentos</label>
                         </div>
-                        <div class="tag_izq_proy" style="display: none">
-                            <label for="">Nueva +++</label>
+                        <div class="tag_izq_proy"  id="listEtiqueta_proy" style="display: none">
+                            <label for="">Proyectos</label>
                         </div>
                         <div class="tag_izq_tag" id="listEtiqueta" style="display: block">
                             <label for="">Etiquetas</label>
@@ -167,16 +165,21 @@
                          </div>
                          <div id="tag_departamentos" style="display:none" >
                              <form action="#" method="post" id="formdepa">
-                                 <div><label for="">Titulo:</label> <input type="text" name="nombreDepa" id="nombreDepa"></div>
-                                 <div><label for="">Miembros:</label> <input type="text" name="miembros" id="miembros"></div>
-                                <input type="button" value="Guardar" id="saveDepa">
+                                 <div><label for="">Titulo:</label> <input type="text" name="nombreDepa" id="nombreDepa" style="width: 45%;"></div>
+                                 <div><label for="">Miembros:</label> <input type="text" name="miembros" id="miembros" style="width: 45%;" onkeyup="busqueda_usuarios_depyproy(this.value,1);"></div>
+
+                        <div id="jb_list_user_departamentos" class="list-share list-usr-depa" style="display: block; z-index: 2;"></div>
+                        <div class="listaUsuarios" id="jb_lista_usuarios_click_depa" style="display: block;"></div>
+                                <input type="button" onclick="savedepa();" value="Guardar" id="saveDepa">
                              </form>
                          </div>
                          <div id="tag_proyectos" style="display:none">
                              <form action="#" method="post" id="formproy" >
-                                 <div><label for="">Titulo:</label> <input type="text" name="nombreProy" id="nombreProy"></div>
-                                 <div><label for="">Miembros:</label> <input type="text" name="miembros"></div>
-                                <input type="button" value="Guardar" id="saveProy">
+                                 <div><label for="">Titulo:</label> <input type="text" name="nombreProy" id="nombreProy"  style="width: 45%;"></div>
+                                 <div><label for="">Miembros:</label> <input type="text" name="miembros" id="miembrosproy"onkeyup="busqueda_usuarios_depyproy(this.value,2);"  style="width: 45%;" ></div>
+                                 <div id="jb_list_user_proyect" class="list-share list-usr-depa" style="display: block; z-index: 1;"></div>
+                                <div class="listaUsuarios" id="jb_lista_usuarios_click_proyect" style="display: block;"></div>
+                                <input type="button" onclick="saveproy();" value="Guardar" id="saveProy">
                              </form>
                          </div>
                      </div>
@@ -245,14 +248,14 @@
                     <input type="text" id="datepicker3" name="fecha_limite" placeholder="fecha limite"><br>
                     <label for="">Proyectos / Etiquetas:</label>
                     <input name="etiquetas" id="w-addtag"type="text" placeholder="Agrega las etiquetas">    
-                        <div id="jb_etiquetas" class="list-share list-w" style="display:none;">
+                        <div id="jb_etiquetas" class="list-share list-w" style="display: block; z-index: 2;">
                             <div>
                                 <label id="tagNew" for="">Crear Etiqueta</label><br />
                                 <label for="">Admin. Etiqueta</label>
                             </div>
                         </div>
                     
-                    <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block;"></div>
+                    <div class="listaUsuarios" id="jb_lista_tag_click" style="display: block; z-index: 1;"></div>
 
                     <br>
                     <label for="">Notas:</label>

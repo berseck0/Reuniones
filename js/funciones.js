@@ -64,14 +64,6 @@ function funciones()
     $("#meeting-user-share").attr("onkeyup","busquedaSimpleUsers(this.value,2);");
     $("#w-addtag").attr("onkeyup","busquedaSimpleUsersW(this.value,1);");
     $("#adduser-w").attr("onkeyup","busquedaSimpleUsersW(this.value,2);");
-   // $("#form_tarea_tema #sav_asing_w").on("click",save_asing_wActv);
-
-    //$("#n-work").on("click",show_w);
-
-    //$("#logint").on("click",loger);
-    //$("#logend").on("click",logend);
-    //$("#saveDepa").on("click",savedepa);
-     /*$("#saveProy").on("click",saveproy);*/
 
 }
 
@@ -296,6 +288,7 @@ function tagNew()
         $("#capatrans").css('display','none');
     });
     listatagshow($("#idus").val());
+    $(".cuerpo_tag .tag_der :text").val("");
 }
 
 
@@ -320,39 +313,60 @@ function new_meeting()
     $("#jb_lista_tag_click_re div").remove()
     $("#jb_lista_tag_click div").remove()
     $("#meeting-user-share").click();
+    $("#jb_etiqueta_reun").click();
+    $("#form_reunion_new #jb_etiquetas").hide();
+
 }
 
 function tag_sel(event)
 {   //muestra la etiquetas
     if (event == 1) 
     {
-        $("#tag_etiqueta").css({display: 'block'});
-        $(".tag_izq_tag").css({display: 'block'});
+        $("#tag_etiqueta").show();
+        $(".tag_izq_tag").show();
         listatagshow($("#idus").val());
         tagNewclik();
-        $("#tag_departamentos").css({display: 'none'});
-        $(".tag_izq_depa").css({display: 'none'});
-        $("#tag_proyectos").css({display: 'none'});
-        $(".tag_izq_proy").css({display: 'none'});
+        $("#tag_departamentos").hide();
+        $(".tag_izq_depa").hide();
+        $("#tag_proyectos").hide();
+        $(".tag_izq_proy").hide();
+        $("#jb_lista_usuarios_click_proyect").empty();
+        $("#jb_list_user_proyect").empty();
+        $("#jb_lista_usuarios_click_depa").empty();
+        $("#jb_list_user_departamentos").empty();
+        //$("#jb_lista_usuarios_click_re").empty();
     }//muestra los deparatamentos
     if (event == 2) 
     {
-      $("#tag_etiqueta").css({display: 'none'});
-      $(".tag_izq_tag").css({display: 'none'});
-      $("#tag_departamentos").css({display: 'block'});
-      $(".tag_izq_depa").css({display: 'block'});
-      $("#tag_proyectos").css({display: 'none'});
-      $(".tag_izq_proy").css({display: 'none'});
+      $("#tag_etiqueta").hide();
+      $(".tag_izq_tag").hide();
+      $("#tag_departamentos").show();
+      $(".tag_izq_depa").show()
+      listadepashow($("#idus").val());
+      $("#tag_proyectos").hide();;
+      $(".tag_izq_proy").hide();
+        $("#jb_lista_usuarios_click_proyect").empty();
+        $("#jb_list_user_proyect").empty();
+        $("#jb_lista_usuarios_click_depa").empty();
+        $("#jb_list_user_departamentos").empty();
+       // $("#jb_lista_usuarios_click_re").empty();
     }// muestra los proyectos
     if (event == 3)
     {
-      $("#tag_etiqueta").css({display: 'none'});
-      $(".tag_izq_tag").css({display: 'none'});
-      $("#tag_departamentos").css({display: 'none'});
-      $(".tag_izq_depa").css({display: 'none'});
-      $("#tag_proyectos").css({display: 'block'});
-      $(".tag_izq_proy").css({display: 'block'});
+      $("#tag_etiqueta").hide();
+      $(".tag_izq_tag").hide();
+      $("#tag_departamentos").hide();
+      $(".tag_izq_depa").hide();
+      $("#tag_proyectos").show();
+      $(".tag_izq_proy").show();
+        listaproyshow($("#idus").val());
+        //$("#jb_lista_usuarios_click_re").empty();
+        $("#jb_lista_usuarios_click_proyect").empty();
+        $("#jb_list_user_proyect").empty();
+        $("#jb_lista_usuarios_click_depa").empty();
+        $("#jb_list_user_departamentos").empty();
     }     
+    
 }
 //guarda la etiqeuta cuando dan click en guardar del form
 function savetag()
@@ -362,22 +376,40 @@ function savetag()
         var titulo = $("#nombreTag").val();
         var tipo   = $("#tipoEtiqueta").val();
         var iduser = $("#idus").val();
-        var txt = "selec=3&ti="+titulo+"&tipo="+tipo+"&idus="+iduser;
-        var ruta ="funciones/funciones.php";
-        $.post(ruta,txt, function(data){
-           //alert(data);
-           if(data!=""){
-                listatagshow(iduser);
-           }
-        });
-  }
+        if(titulo !=""){
+            var txt = "selec=3&ti="+titulo+"&tipo="+tipo+"&idus="+iduser;
+            var ruta ="funciones/funciones.php";
+            $.post(ruta,txt, function(data){
+
+               if(data!="ok"){
+                    listatagshow(iduser);
+               }
+               if(data == "ok")
+               {
+                    var html ='<label class="alerta"for="">La Etiqueta  Ya Esta Registrada.</label>';
+                    $("#tag_etiqueta").append(html);
+                    setTimeout(function(){
+                        $("#tag_etiqueta .alerta").hide();
+                    },1500);
+               }
+            });
+        }
+        else{
+            var html ='<label class="alerta"for="">Escriba una etiqueta.</label>';
+            $("#tag_etiqueta").append(html);
+            setTimeout(function(){
+                $("#tag_etiqueta .alerta").hide();
+            },1500);
+        }
+    }
 }
 
 //muestra la lista de etiquetas dependiendo del usuario
 function listatagshow(iduser)
 {
-    var t = "tab=1&idcam=1&id="+iduser;
+    var t = "op=3&tab=1&idcam=1&id="+iduser;
     var ruta ="funciones/eventos.php";
+
     $.post(ruta, t, function(datas){
         var list = '<ul class="listado sinborde">';
 
@@ -400,8 +432,46 @@ function listatagshow(iduser)
     });
 }
 
+
+
 //genera un formulario para editar la etiqueta
 function tagEditList(id,nom)
+{
+  var form ='<form action="#" >';
+      form+='<div><label>Titulo:</label> <input type="text" name="tituloTag" id="nombreTag" value="'+nom+'"></div>';
+      form+='<div><label>Tipo de Etiqueta:</label><select id="tipoEtiqueta">';
+      form+='<option value="Normal">Normal</option><option value="Departamento">Departamento</option><option value="Proyecto">Proyecto</option>';
+      form+='</select></div><span onclick="dellTag('+id+');"><a>Eliminar</a></span><input type="button" value="Actualizar" id="upEtiqueta">';
+      form+='</form>';
+
+    if ($("#tag_etiqueta form").length) {
+        $("#tag_etiqueta form").remove();
+        $("#tag_etiqueta").append(form);
+    }
+}
+//genera un formulario para editar la etiqueta
+function tagEditListdep(id,nom)
+{
+    var txt = "selec=33&dep="+id+"&us="+$("#idus").val();
+    var ruta = "funciones/funciones.php";
+    $.post(ruta,txt,function(data){
+        console.log(data);
+    });
+
+  var form ='<form action="#" >';
+      form+='<div><label>Titulo:</label> <input type="text" name="tituloTag" id="nombreTag" value="'+nom+'"></div>';
+      form+='<div><label>Tipo de Etiqueta:</label><select id="tipoEtiqueta">';
+      form+='<option value="Normal">Normal</option><option value="Departamento">Departamento</option><option value="Proyecto">Proyecto</option>';
+      form+='</select></div><span onclick="dellTag('+id+');"><a>Eliminar</a></span><input type="button" value="Actualizar" id="upEtiqueta">';
+      form+='</form>';
+
+    if ($("#tag_etiqueta form").length) {
+        $("#tag_etiqueta form").remove();
+        $("#tag_etiqueta").append(form);
+    }
+}
+//genera un formulario para editar la etiqueta
+function tagEditListproy(id,nom)
 {
   var form ='<form action="#" >';
       form+='<div><label>Titulo:</label> <input type="text" name="tituloTag" id="nombreTag" value="'+nom+'"></div>';
@@ -428,38 +498,182 @@ function tagNewclik()
       form+='</form>';
 
     if ($("#tag_etiqueta form").length) {
-        $("#tag_etiqueta form").remove();
+        $("#tag_etiqueta").empty();
         $("#tag_etiqueta").append(form);
     }
 }
-//guarda el departamento generado
-/*function savedepa()
-{
-    var titulo = $("#nombreDepa").val();
-    var miembros   = $("#miembros").val();
-    var txt = "op=&selec=&ti="+titulo+"&tipo="+miembros;
-    var ruta ="funciones/funciones.php";
 
-    $.post(ruta, txt , function(data){
+//genera un nuevo formulario para registrar nueva etiqueta
+function tag_new_depa()
+{
+    if ($("#tag_departamentos form").length) {
+        $("#tag_departamentos form :text").val("");
         
+    }
+
+        $("#jb_lista_usuarios_click_depa").empty();
+        $("#jb_list_user_departamentos").empty();
+}
+
+//genera un nuevo formulario para registrar nueva etiqueta
+function tag_new_proy()
+{
+    if ($("#tag_proyectos form").length) {
+        $("#tag_proyectos form :text").val("");
         
-    $("#tag_departamentos :text").val("");
+    }
+
+        $("#jb_lista_usuarios_click_proyect").empty();
+        $("#jb_list_user_proyect").empty();
+}
+
+//// en listamos los departamentos de lado izquierdo
+function listadepashow(iduser)
+{
+    var t = "op=3&tab=2&idcam=2&id="+iduser;
+    var ruta ="funciones/eventos.php";
+    $("#tagselec").attr("onclick","tag_new_depa();");
+    $.post(ruta, t, function(datas){
+        var list = '<ul class="listado sinborde">';
+
+            $.each(datas, function(k,v)
+            {  
+              list+= '<li class="listadoli" ><a><p onclick="tagEditListdep('+v.id+',\''+v.nombre+'\');">'+v.nombre+'</p></a></li>'; 
+            });
+             list+="</ul>";
+        if ($("#listEtiqueta_depa ul").length) {
+            $("#listEtiqueta_depa ul").remove();
+            $("#listEtiqueta_depa").append(list);
+        }
+        else
+        {
+            $("#listEtiqueta_depa").append(list);
+        }
+
+    }).fail(function(){
+        alert("Fallo la Respuesta");
     });
 }
-/*
+
+function listaproyshow(iduser)
+{
+    var t = "op=3&tab=3&idcam=3&id="+iduser;
+    var ruta ="funciones/eventos.php";
+    $("#tagselec").attr("onclick","tag_new_proy();");
+    $.post(ruta, t, function(datas){
+        var list = '<ul class="listado sinborde">';
+
+            $.each(datas, function(k,v)
+            {  
+              list+= '<li class="listadoli" ><a><p onclick="tagEditListproy('+v.id+',\''+v.nombre+'\');">'+v.nombre+'</p></a></li>'; 
+            });
+             list+="</ul>";
+        if ($("#listEtiqueta_proy ul").length) {
+            $("#listEtiqueta_proy ul").remove();
+            $("#listEtiqueta_proy").append(list);
+        }
+        else
+        {
+            $("#listEtiqueta_proy").append(list);
+        }
+
+    }).fail(function(){
+        alert("Fallo la Respuesta");
+    });
+}
+
+
+
+
+
+//guarda el departamento generado
+function savedepa()
+{
+    //$("#tag_departamentos :text").val("");
+ 
+    //e.preventDefault();
+    if($("#idus").length!==""){
+        
+            var iduser = $("#idus").val();
+            var titulo = $("#nombreDepa").val();
+            var miembros   = ""; 
+            var padre = $('#jb_lista_usuarios_click_depa div');
+            $.each(padre,function(index) {
+                 var id = $(this).attr("id").replace("user_selected_dp_","");
+                miembros+=id+',';
+            }); 
+             miembros+=0;
+
+        if(titulo !=""){
+            var txt = "selec=31&ti="+titulo+"&miembros="+miembros+"&idus="+iduser;
+            var ruta ="funciones/funciones.php"
+            $.post(ruta,txt, function(data){
+
+               if(data!="ok"){
+                    listadepashow(iduser);
+               }
+               if(data == "ok")
+               {
+                    var html ='<label class="alerta"for="">La Etiqueta  Ya Esta Registrada.</label>';
+                    $("#tag_departamentos").append(html);
+                    setTimeout(function(){
+                        $("#tag_departamentos .alerta").hide();
+                    },1500);
+               }
+            });
+        }
+        else{
+            var html ='<label class="alerta"for="">Escriba una etiqueta.</label>';
+            $("#tag_departamentos").append(html);
+            setTimeout(function(){
+                $("#tag_departamentos .alerta").hide();
+            },1500);
+        }
+    }
+
+}
+
 function saveproy()
 {
-    var titulo = $("#nombreDepa").val();
-    var miembros   = $("#miembros").val();
-    var txt = "op=&selec=&ti="+titulo+"&mimebro="+miembros;
-    var ruta ="funciones/funciones.php";
-
-    $.post(ruta, txt , function(data){
+     if($("#idus").length!==""){
         
-    });
+            var iduser = $("#idus").val();
+            var titulo = $("#nombreProy").val();
+            var miembros   = ""; 
+            var padre = $('#jb_lista_usuarios_click_proyect div');
+            $.each(padre,function(index) {
+                 var id = $(this).attr("id").replace("user_selected_proy_","");
+                miembros+=id+',';
+            }); 
+             miembros+=0;
 
-    $("#tag_proyectos :text").val("");
-}*/
+        if(titulo !=""){
+            var txt = "selec=32&ti="+titulo+"&miembros="+miembros+"&idus="+iduser;
+            var ruta ="funciones/funciones.php"
+            $.post(ruta,txt, function(data){
+
+               if(data!="ok"){
+                    listaproyshow(iduser);
+               }
+               if(data == "ok")
+               {
+                    var html ='<label class="alerta"for="">La Etiqueta  Ya Esta Registrada.</label>';
+                    $("#tag_departamentos").append(html);
+                    setTimeout(function(){
+                        $("#tag_departamentos .alerta").hide();
+                    },1500);
+               }
+            });
+        }
+        else{
+            var html ='<label class="alerta"for="">Escriba una etiqueta.</label>';
+            $("#tag_departamentos").append(html);
+            setTimeout(function(){
+                $("#tag_departamentos .alerta").hide();
+            },1500);
+        }
+    }
+}
 
 //elimina las etiquetas guardadas
 //
@@ -642,101 +856,79 @@ function jb_reunion_upop(id)
 
 
 
-            var list = v.lista;/*
-            $.each(list, function(i, t) {
-                html+='<li id="list_'+t.ids+'" class="list_meeting_active">';
-                html+='<label>'+t.texts+'</label>';
-                html+='<div id="tomas'+t.ids+'">';
-                html+='<ul class="notas">';
-                  var res = t.resoluciones;
-                   $.each(res, function(p,r){
-                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                   });
-                   var tar= t.tareas;
-                   $.each(tar, function(p,ac){
-                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                   });
+                var list = v.lista;
+                $.each(list,function(k,v){
+                    html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
+                    html+='<ul class="notas">';
+
+                        var list = v.resoluciones;
+                        $.each(list, function(i, r) {
+                                html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                        });
+                                
+                        var tar= v.tareas;
+                        $.each(tar, function(p,ac){
+                                html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                        });
+                        html+="</ul>";
+                                    
+                        var arch = v.archivos;
+                        html+="<div class='archivos'><ul>";
+                        $.each(arch, function(k,a){
+                        var img = isImage(a.tipo);
+                            if(img){
+                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                            }else{
+                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                            }
+                        });
+                        html+="</ul></div>";
 
 
-                html+="</ul>";
+                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul id='subtema_"+v.id+"'>";
+                   
 
+                    var sublis= v.sublist;
+                    $.each(sublis, function(k,l){
+                            html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span><input type='hidden' value='"+v.id+"' id='idtema'>";
+                            html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
+                            html+='<ul class="notas">';
 
-                var arch = t.archivos;
-                html+="<div class='archivos'><ul>";
-                $.each(arch, function(k,a){
-                    var img = isImage(a.tipo);
-                    if(img){
-                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                    }else{
-                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                    }
-                });
-                html+="</ul></div>";
-
-                            */
-        $.each(list,function(k,v){
-            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
-            html+='<ul class="notas">';
-
-                var list = v.resoluciones;
-                $.each(list, function(i, r) {
-                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                });
-                        
-                var tar= v.tareas;
-                $.each(tar, function(p,ac){
-                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                });
-                html+="</ul>";
+                            var list = l.subresoluciones;
+                            $.each(list, function(i, r) {
+                                    html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                            });
                             
-                var arch = v.archivos;
-                html+="<div class='archivos'><ul>";
-                $.each(arch, function(k,a){
-                var img = isImage(a.tipo);
-                    if(img){
-                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                    }else{
-                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                    }
-                });
-                html+="</ul></div>";
-                html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
-
-            var sublis= v.sublist;
-            $.each(sublis, function(k,l){
-                html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-
-                html+='<ul class="notas">';
-                var subnot= l.subresoluciones;
-                $.each(subnot, function(ls, sb) {
-                         html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                });
-                html+="</ul>";
-                html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
-            });
-            html+='</ul></li>';
-    
+                            var tar= l.subtareas;
+                               $.each(tar, function(p,ac){
+                                    html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                               });
+                             html+="</ul>";
+                                
+                            var arch = l.subarchivos;
+                            html+="<div class='archivos'><ul>";
+                                $.each(arch, function(k,a){
+                                   var img = isImage(a.tipo);
+                                    if(img){
+                                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        }else{
+                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        }
+                                });
+                            html+="</ul></div>";
 
 
 
+                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                    });
+                    html+='</ul></li>';
 
 
 
-
-
-/*
-                html+='</div>';
-                html+='<div id="txt_'+t.ids+'" class="menu_list_active">';
-                html+='<textarea id="textolist_activ_'+t.ids+'" onclick="block_oplits('+t.ids+')" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
-                html+='<div id="text_check_visible_'+t.ids+'" class="opciones_list_activ_'+t.ids+'" style="display:none"><div style="border-top: 1px solid;border-bottom: 1px solid;">';
-                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                /*
+             
                 html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+t.ids+'" class="up_acrh"/></span><input type="button" id="arch_reunAct" onclick="uparchivo(1,'+t.ids+','+v.idre+');"value="Agregar" />';
-                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
-                html+='<div class="bar_menu_list"><div><label>Guardar Como: </label><input type="button" value="Nota" onclick="save_accionlist('+t.ids+',\'nota\')"/><input type="button" value="Decision" onclick="save_accionlist('+t.ids+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_display('+t.ids+',\'tarea\')" /></div></div></div>';
-                html+='</div>';
-               // html+='<ul><li>alguna nota</li></ul>';
-                html+='</li>';*/
+                */
             });
             html+='</ul>';
             html+='</form>';
@@ -747,6 +939,8 @@ function jb_reunion_upop(id)
 
 
             $("#contenUpop").append(html);
+            $("[id^=topiclist_] [id^=tema_prim_]").click();
+            $("[id^=topiclist_] [id^=subtema_]").click();
         });
 
 
@@ -754,10 +948,9 @@ function jb_reunion_upop(id)
         alert("Error En El Servidor");
     });
 
-  
-
-
 }
+
+
 //agregamos nuevos temas ala reunion activa
 function saveTemaActivre(idre)
 {
@@ -771,60 +964,84 @@ function saveTemaActivre(idre)
             
     });
 }
-
+//// genereamos la lista al momento de escribir todo
 function genListReunActv(idre)
 {
     var txt = "selec=13&id="+idre+"&idusua="+$("#idus").val();
     var ruta ="funciones/funciones.php";
-    if($("#topiclayer_"+idre).length){
-        $("#topiclayer_"+idre).remove();
-    }
     $.post(ruta, txt, function(data) {
-        $.each(data,function(k,v){
-        var html='<div id="topiclayer_'+idre+'" style="display:block">';
-            html+='<h3>Temas a tratar</h3>';
-            html+='<form action="">';
-            html+='<ul>';
-            var list = v.lista;
-            $.each(list, function(i, t) {
-                html+='<li id="list_'+t.ids+'" class="list_meeting_active">';
-                html+='<label>'+t.texts+'</label>';
-                html+='<div id="tomas'+t.ids+'">';
-                html+='<ul class="notas">';
-                  var res = t.resoluciones;
-                   $.each(res, function(p,r){
-                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                   });
-                html+="</ul>";
-                
-                    var arch = t.archivos;
-                html+="<div class='archivos'><ul>";
-                    $.each(arch, function(k,a){
-                        var img = isImage(a.tipo);
-                    if(img){
-                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                        }else{
-                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                        }
+        var html="";
+                $.each(data,function(k,v){
+                    var li=v.lista;
+                    $.each(li, function(i, va) {
+                            html+="<li id='topiclist_"+va.id+"' class='topiclist' ><span id='tema_prim_"+va.id+"'>"+va.text+"</span><div id='listanotas_"+va.id+"'><div id='notas'>";
+                            html+='<ul class="notas">';
+                         
+                            var list = va.resoluciones;
+                            $.each(list, function(i, r) {
+                                    html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                            });
+                                    
+                            var tar= va.tareas;
+                            $.each(tar, function(p,ac){
+                                    html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                            });
+                            html+="</ul>";
+
+                            var arch = va.archivos;
+                            html+="<div class='archivos'><ul>";
+                            $.each(arch, function(k,a){
+                            var img = isImage(a.tipo);
+                                if(img){
+                                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                }else{
+                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                }
+                            });
+
+                            html+="</ul></div>";
+                            html+="</div></div><div id='sublistaction_"+va.id+"'></div><ul id='subtema_"+va.id+"'>";
+
+                            var sublis= va.sublist;
+                            $.each(sublis, function(k,l){
+                                    html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span><input type='hidden' value='"+v.id+"' id='idtema'>";
+                                    html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
+                                    html+='<ul class="notas">';
+
+                                    var list = l.subresoluciones;
+                                    $.each(list, function(i, r) {
+                                            html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                                    });
+                                    
+                                    var tar= l.subtareas;
+                                       $.each(tar, function(p,ac){
+                                            html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                                       });
+                                     html+="</ul>";
+                                        
+                                    var arch = l.subarchivos;
+                                    html+="<div class='archivos'><ul>";
+                                        $.each(arch, function(k,a){
+                                           var img = isImage(a.tipo);
+                                            if(img){
+                                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                                }else{
+                                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                                }
+                                        });
+                                    html+="</ul></div>";
+                                    html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                            });
+                            html+='</ul></li>';
+                        
                     });
-                html+="</ul></div>";
-                html+='</div>';
-                html+='<div id="txt_'+t.ids+'" class="menu_list_active">';
-                html+='<textarea id="textolist_activ_'+t.ids+'" onclick="block_oplits('+t.ids+')" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
-                html+='<div class="opciones_list_activ_'+t.ids+'" style="display:none"><div style="border-top: 1px solid;border-bottom: 1px solid;">';
-                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
-                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+t.ids+'" class="up_acrh"/></span><input type="button" id="arch_reunAct" onclick="uparchivo(1,'+t.ids+','+v.idre+');"value="Agregar" />';
-                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
-                html+='<div class="bar_menu_list"><div><label>Guardar Como: </label><input type="button" value="Nota" onclick="save_accionlist('+t.ids+',\'nota\')"/><input type="button" value="Decision" onclick="save_accionlist('+t.ids+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_display('+t.ids+',\'tarea\')" /></div></div></div>';
-                html+='</div>';
-                html+='</li>';
-            });
-            html+='</ul>';
-            html+='</form>';
-            html+='</div>';
-            $("#newtopic_"+idre).append(html);
-            
-        });
+                    $("#topiclayer_"+idre+" form ul").empty();
+                    $("#topiclayer_"+idre+" form ul").append(html);
+                    $("#nue_tema_"+idre).val("");
+                    $("#topiclayer_"+idre+" [id^=topiclist_]").click();
+                    $("[id^=topiclist_] [id^=subtopiclist_]").click();    
+                });
+                    
     });
 
 }
@@ -862,12 +1079,11 @@ function save_accionlist(id,txt)
         var txto="selec=14&id="+id+"&tipo="+txt+"&text="+$("#textolist_activ_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
-            if($("#list_"+id+" #tomas"+id).length > 0){
-                $("#list_"+id+" #tomas"+id).empty();
-                $("#list_"+id+" #tomas"+id+" div").remove();
+            if($("#listanotas_"+id+" #notas").length > 0){
+                $("#listanotas_"+id+" #notas").empty();
             }
-             //var html="";
-            $.each(data, function(k,v){
+
+             $.each(data, function(k,v){
                     var html='<ul class="notas">';
 
                     var list = v.resoluciones;
@@ -892,56 +1108,58 @@ function save_accionlist(id,txt)
                                     }
                             });
                     html+="</ul></div>";
-                $("#list_"+id+" #tomas"+id).append(html);
+                $("#listanotas_"+id+" #notas").append(html);
             });
+
         }).fail(function(){ alert("Fallo Servidor");});
     }else{
         alert("No has escrito nada");
     }
 }
 
+
 //////funcion para visualisas las notas en la reunion de los temas
 function show_listreunion(id)
 {
+    //console.log(id);
     var idre= $("#idReunAct").val();
     var txto="selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val()+"&op=1";      
-    //var txto="op=1&selec=21&id="+id+"&idre="+$("#idReunAct").val();
     var ruta = "funciones/funciones.php";
-    $.post(ruta, txto, function(data){
-            if($("#list_"+id+" #tomas"+id).length > 0){
-                $("#list_"+id+" #tomas"+id).empty();
-                $("#list_"+id+" #tomas"+id+" div").remove();
-            }
-             //var html="";
-            $.each(data, function(k,v){
-                    var html='<ul class="notas">';
 
-                    var list = v.resoluciones;
-                        $.each(list, function(i, r) {
-                                html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                        });
+    $.post(ruta, txto, function(data){
+            if($("#listanotas_"+id+" #notas").length > 0){
+                $("#listanotas_"+id+" #notas").empty();
+            }
+        $.each(data, function(k,v){
+            var html='<ul class="notas">';
+            var list = v.resoluciones;
+                    $.each(list, function(i, r) {
+                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                    });
                         
-                    var tar= v.tareas;
-                           $.each(tar, function(p,ac){
-                                html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                           });
-                         html+="</ul>";
+            var tar= v.tareas;
+                    $.each(tar, function(p,ac){
+                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                   });
+            html+="</ul>";
                             
-                    var arch = v.archivos;
-                    html+="<div class='archivos'><ul>";
-                            $.each(arch, function(k,a){
-                               var img = isImage(a.tipo);
-                                if(img){
-                                        html+="<li style='list-style: outside none none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                                    }else{
-                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                                    }
-                            });
-                    html+="</ul></div>";
-                $("#list_"+id+" #tomas"+id).append(html);
-            });
+            var arch = v.archivos;
+            html+="<div class='archivos'><ul>";
+                    $.each(arch, function(k,a){
+                        var img = isImage(a.tipo);
+                        if(img){
+                                html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                        }else{
+                                html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                        }
+                    });
+            html+="</ul></div>";
+            $("#listanotas_"+id+" #notas").append(html);
+        });
+        
     }).fail(function(){ alert("Fallo Servidor");});
 }
+
 
 //////funcion para visualisas las notas en la reunion de los temas
 function show_listreunion_new(id)
@@ -985,10 +1203,18 @@ function show_listreunion_new(id)
     }).fail(function(){ alert("Fallo Servidor");});
 }
 
+
 //////funcion para visualisas las notas en la reunion de los temas
-function show_listreunion_newsubtema(id)
+function show_listreunion_newsubtema(id,op)
 {
+    if(op ==1){
     var idre= $("#idreunion").val();
+    }
+
+    if(op ==2){
+    var idre= $("#idReunAct").val();
+    }
+
     var txto="selec=21&id="+id+"&idre="+idre+"&idus="+$("#idus").val()+"&op=2";      
     var ruta = "funciones/funciones.php";
     $.post(ruta, txto, function(data){
@@ -1044,6 +1270,7 @@ function list_tareasAct(id)
     }).fail(function(){ alert("Fallo Servidor");});
 }
 
+/*
 //funcionas para asignar la tarea en la lista de la reunion activa
 function save_tarea_display(id,txt){
     var txto = $("#textolist_activ_"+id).val();
@@ -1057,7 +1284,7 @@ function save_tarea_display(id,txt){
     $("#txt_"+id).append(htmlp);
     $("body #datepicker4").click();
 }
-
+*/
 
 //hacemos visible los temas a tratar de lareuniones
 
@@ -1100,7 +1327,7 @@ function genlistactv()
                 html+='</div>';
                html+='</div>';
                html+='<div class="btn_down"  onclick="showtarw('+v.idactw+',0);"><span class="icon" >:</span></div>';
-               html+='<div class="btn_del" onclick="w_fin('+v.idactw+','+idus+')"><span class="icon">Â</span></div>';
+               html+='<div class="btn_del" onclick="w_fin('+v.idactw+','+idus+',1)"><span class="icon">Â</span></div>';
                html+='<div id="segmain_'+v.idactw+'" class="w-segundo-main">';
                html+='<div id="comn_tareas_'+v.idactw+'" class="coment_w"><label for="">Comentario:</label><input type="text" placeholder="escribe algun comentario" />';
                html+='<div class="mensaje" id="mensaje_'+v.idactw+'" style="margin-top: 1em;font-size: 0.81em; width: 31%; overflow: hidden; position: relative; float: right; right: 1.7em;"></div>';
@@ -1175,7 +1402,7 @@ function genlistfull()
                html+='</div>';
                html+='<div class="btn_down" onclick="showtarw('+v.idw+',1);"><span class="icon">:</span></div>';
                if(idus==v.idprop){
-                    html+='<div class="btn_del"><span class="icon">Â</span></div>';
+                    html+='<div class="btn_del" onclick="w_fin('+v.idw+','+idus+',2)""><span class="icon">Â</span></div>';
                }
                html+='<div id="seg_main_'+v.idw+'" class="w-segundo-main">';
                html+='<div id="comn_actividad_'+v.idw+'" class="coment_w"><label for="">Comentario:</label><input type="text" placeholder="escribe algun comentario" />';
@@ -1325,15 +1552,23 @@ function save_w_form()
          });
 }
 
-function w_fin(idw,idus)
+function w_fin(idw,idus,op)
 {
   var txt = "selec=16&idw="+idw+"&id="+idus;
   var ruta = "funciones/funciones.php"
   $.post(ruta, txt, function(data) {
     if(data==1){
-        $("#incl_list_tareas #"+idw).remove();
-        $("#incl_list_act #"+idw).remove();
-        genlistend();
+        if (op ==1) {
+            $("#incl_list_tareas #"+idw).remove();
+            $("#incl_list_act #"+idw).remove();
+            genlistend();
+        }
+        if (op ==2) 
+        {
+            $("#incl_list_tareas #"+idw).remove();
+            $("#incl_list_act #"+idw).remove();
+            genlistend();
+        }
     }
 
   }).fail(function(){
@@ -1344,42 +1579,98 @@ function w_fin(idw,idus)
 
 
 
-
-
-
 ///guardamos la tarea asiganda de una reunion
-function save_asing_wActv(idtop)
+function save_asing_subactw(idsubtop,op)
 {
     //jalamos los ids de los usuarios participantes
-    var padreUsr = $("#form_tarea_tema #jb_lista_usuarios_click_re div");
+    var padreUsr = $("#jb_lista_usuarios_click_tema div");
     var usrid="";
     $.each(padreUsr, function() {
-        var idusr= $(this).attr("id").replace("user_selected_","");
+        var idusr= $(this).attr("id").replace("user_selected_tm_","");
         usrid += idusr+',';
     });
     usrid+=0;
    // usrid = usrid.substring(0, usrid.length-1);
+    var idtop = $("#subtopiclist_"+idsubtop+" #idtema").val();
+            if(op==1){
+                var idre=$("#idreunion").val();    
+                var detectShow = $("[id^=txts_]");
+                var camp = "#txts_"+idtop;
+            }
+            if(op==2){
+                 var idre=$("#idReunAct").val();   
+                 var detectShow = $("[id^=txt_]"); 
+                 var camp = "#txt_"+idsubtop;
+            }
+        var form = $("#form_tarea_tema_"+idsubtop+" form").serialize();
+        var id = $("#idus").val();
+        var txt= form+"&selec=8&id="+id+"&idp="+usrid+"&idtop="+idtop+"&idre="+idre+"&idsubtop="+idsubtop;
+        var ruta="funciones/funciones.php";
+        $.post(ruta,txt, function(data){
+               if(data!=''){
 
-        var idre=$("#idReunAct").val();
-        var form = $("#form_tarea_tema form").serialize();
+                    if($("#form_tarea_tema_"+idsubtop).length > 0)
+                    {
+                        $("#form_tarea_tema_"+idsubtop).remove();
+                        $(camp+" div").show();
+                        $(camp+" #textoreunion_"+idsubtop).show();
+                        $("#textoreunion_"+idsubtop).val("");
+                    }
+                    if (op==1) {
+                    show_listreunion_newsubtema(idsubtop,op);
+                    }
+                    if (op==2) {
+                     show_listreunion_newsubtema(idsubtop,op);
+                    }
+               }
+         });
+
+}
+
+
+
+///guardamos la tarea asiganda de una reunion
+function save_asing_wActv(idtop,op)
+{
+    //jalamos los ids de los usuarios participantes
+    var padreUsr = $("#jb_lista_usuarios_click_tema div");
+    var usrid="";
+    $.each(padreUsr, function() {
+        var idusr= $(this).attr("id").replace("user_selected_tm_","");
+        usrid += idusr+',';
+    });
+    usrid+=0;
+   // usrid = usrid.substring(0, usrid.length-1);
+            if(op==1){
+                 var idre=$("#idreunion").val();    
+                var detectShow = $("[id^=txts_]");
+                var camp = "#txts_"+idtop;
+            }
+            if(op==2){
+                 var idre=$("#idReunAct").val();   
+                 var detectShow = $("[id^=txt_]"); 
+                 var camp = "#txt_"+idtop;
+            }
+        var form = $("#form_tarea_tema_"+idtop+" form").serialize();
         var id = $("#idus").val();
         var txt= form+"&selec=23&id="+id+"&idp="+usrid+"&idtop="+idtop+"&idre="+idre;
          var ruta="funciones/funciones.php";
         $.post(ruta,txt, function(data){
                if(data!=''){
 
-                var detectShow = $("[id^=txt_]")
-                $.each(detectShow, function(k,v){
-                    if($('#'+v.id + " #form_tarea_tema").length > 0)
+                    if($("#form_tarea_tema_"+idtop).length > 0)
                     {
-                        $("#form_tarea_tema").remove();
-                        var id_txt = v.id.replace("txt_","");
-                        $("#txt_"+id_txt+" div").show();
-                        $("#txt_"+id_txt+" #textolist_activ_"+id_txt).show();
-                        $("#textolist_activ_"+id_txt).val("");
+                        $("#form_tarea_tema_"+idtop).remove();
+                        $(camp+" div").show();
+                        $(camp+" #textoreunion_"+idtop).show();
+                        $("#textoreunion_"+idtop).val("");
                     }
-               });
-
+                    if (op==1) {
+                        show_listreunion_new(idtop);   
+                    }
+                    if (op==2) {
+                        show_listreunion(idtop);
+                    }
                }
          });
 
@@ -1581,8 +1872,6 @@ function SaveTopicNew(){
   var ruta = "funciones/funciones.php";
   if(titulo != "")
   {
-
-
           $.post(ruta,txt,function(data){
                 //console.log(data);
                 var html="";
@@ -1614,48 +1903,49 @@ function SaveTopicNew(){
                         html+="</ul></div>";
 
 
-                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
+                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul id='subtema_"+v.id+"'>";
                    
 
                     var sublis= v.sublist;
                     $.each(sublis, function(k,l){
-                        html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                        html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-                        
-                        html+='<ul class="notas">';
-                        var subnot= l.subresoluciones;
-                        $.each(subnot, function(ls, sb) {
-                                 html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                        });
+                            html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span><input type='hidden' value='"+v.id+"' id='idtema'>";
+                            html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
+                            html+='<ul class="notas">';
 
-                        var subtar= v.subtareas;
-                        $.each(subtar, function(p,st){
-                                html+='<li class="list_tarea"><span>'+st.actividad+'</span><label for=""> '+st.nombreus+'</label><span> '+st.fecha+'</span></li>';
-                        });
-                        html+="</ul>";
-                                    
-                      /*  var subarch = v.subarchivos;
-                        html+="<div class='subarchivos'><ul>";
-                        $.each(subarch, function(k,sa){
-                        var img = isImage(sa.tipo);
-                            if(img){
-                                    html+="<li style='list-style: none; display: inline;' ><img src='"+sa.liga+"' alt='70' width='80' /></li>";    
-                            }else{
-                                    html+="<li style='list-style: none; display: inline;'><a href='"+sa.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                            }
-                        });
-                        html+="</ul></div>";
-                    */
-
+                            var list = l.subresoluciones;
+                            $.each(list, function(i, r) {
+                                    html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
+                            });
+                            
+                            var tar= l.subtareas;
+                               $.each(tar, function(p,ac){
+                                    html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
+                               });
+                             html+="</ul>";
+                                
+                            var arch = l.subarchivos;
+                            html+="<div class='archivos'><ul>";
+                                $.each(arch, function(k,a){
+                                   var img = isImage(a.tipo);
+                                    if(img){
+                                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        }else{
+                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        }
+                                });
+                            html+="</ul></div>";
 
 
-                        html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+
+                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
                     });
                     html+='</ul></li>';
                 });
                     $("#topiclayer [id^=topiclist_]").remove();
                     $("#topiclayer form ul").prepend(html);
                     $("#topiclayer #tiTuloTopic").val("");
+                    $("#topiclayer [id^=topiclist_]").click();
+                    $("[id^=topiclist_] [id^=subtopiclist_]").click();
                 
           }).fail(function(){ alert("Error servidor. 02");});
     }else
@@ -1665,13 +1955,13 @@ function SaveTopicNew(){
 }
 
 ////mostramos el sub menu en la reunion al momento de generarlad
-
 $(document).on("ready",function(){
     $("#topiclayer").on('click','[id^=topiclist_]', function(){
         var id = $(this).attr("id").replace("topiclist_",'');
-        
+        $("#form_reunion_new #jb_list_user").empty();
         $("#topiclist_"+id+" #tema_prim_"+id).click(function() {
             //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
+            $('body #jb_result_users').empty();
             if (!$("#topiclist_"+id+" #txts_"+id).is(":visible")) {
                 $("[id^=topiclist_] [id^=sublistaction_]").empty();
                 $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
@@ -1682,10 +1972,10 @@ $(document).on("ready",function(){
                 html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
                 html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
                 html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
-                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+id+');"value="Agregar" />';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+',1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+id+');"value="Agregar" />';
                 html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
                 html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_listreunion('+id+',\'nota\')"/>';
-                html+='<input type="button" value="Decision" onclick="save_listreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+id+',\'tarea\')" />';
+                html+='<input type="button" value="Decision" onclick="save_listreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+id+',\'tarea\',1)" />';
                 html+='</div></div>';
                 html+='</div></div>';
                 html+='</div>';
@@ -1695,6 +1985,109 @@ $(document).on("ready",function(){
         });
     });
 });
+
+////mostramos las opciones para sub menus en la reunion nueva 
+////mostramos el sub menu en la reunion al momento de generarlad
+$(document).on("ready",function(){
+    $("#topiclayer").on('click','[id^=subtopiclist_]', function(){
+        var id = $(this).attr("id").replace("subtopiclist_",'');
+        $("body #jb_list_user").empty();
+        $('body #jb_result_users').empty();
+        $("#subtopiclist_"+id+" #tema_sub_"+id).click(function() {
+            
+            //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
+            if ($("#sub_listaction_"+id).length) {
+               
+                $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
+                $("[id^=topiclist_] [id^=sublistaction_]").empty();
+                html="";
+                html+='<div id="seccion_'+id+'">';
+                html+='<div id="txts_'+id+'" class="menu_list_active">';
+                html+='<textarea id="textoreunion_'+id+'" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
+                html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+',1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+id+');"value="Agregar" />';
+                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
+                html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+id+',\'nota\',1)"/>';
+                html+='<input type="button" value="Decision" onclick="save_sublistreunion('+id+',\'decision\',1)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+id+',\'tarea\',1);"/>';
+                html+='</div></div>';
+                html+='</div></div>';
+                html+='</div>';
+                
+                $("#subtopiclist_"+id+" #sub_listaction_"+id).append(html);
+            }
+        });
+    });
+});
+
+
+
+////mostramos el sub menu en la reunion al momento de generarlad
+
+$(document).on("ready",function(){
+    $("#contenUpop").on('click','[id^=topiclist_]', function(){
+        var id = $(this).attr("id").replace("topiclist_",'');
+        var idre = $("#idReunAct").val();
+        $("#topiclist_"+id+" #tema_prim_"+id).click(function() {
+            if (!$("#topiclist_"+id+" #txts_"+id).is(":visible")) {
+                $("[id^=topiclist_] [id^=sublistaction_]").empty();
+                $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
+                html="";
+                html+='<div id="seccion_'+id+'">';
+                html+='<div id="txt_'+id+'" class="menu_list_active">';
+                html+='<textarea id="textolist_activ_'+id+'" onclick="block_oplits('+id+');" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                html+='<div id="text_check_visible_'+id+'" class="opciones_list_activ_'+id+'" style="display:none">';
+                html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+id+'" onclick="selecarchreunew('+id+',2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo(1,'+id+','+idre+');"value="Agregar" />';
+                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
+                html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_accionlist('+id+',\'nota\')"/>';
+                html+='<input type="button" value="Decision" onclick="save_accionlist('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+id+',\'tarea\',2)" />';
+                html+='</div></div>';
+                html+='</div></div>';
+                html+='</div>';
+                html+='<div><label for="" onclick="subtopicact('+id+');">Agregar sub tema</label></div>';
+                $("#sublistaction_"+id).append(html);
+            }
+        });
+    });
+});
+
+
+
+////mostramos el sub menu en la reunion al momento de generarlad
+$(document).on("ready",function(){
+     $("#contenUpop").on('click','[id^=subtopiclist_]', function(){
+        var id = $(this).attr("id").replace("subtopiclist_",'');
+        $("#subtopiclist_"+id+" #tema_sub_"+id).click(function() {
+            //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
+            if ($("#sub_listaction_"+id).length) {
+               
+                $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
+                $("[id^=topiclist_] [id^=sublistaction_]").empty();
+                html="";
+                html+='<div id="seccion_'+id+'">';
+                html+='<div id="txt_'+id+'" class="menu_list_active">';
+                html+='<textarea id="textoreunion_'+id+'" onclick="block_oplits('+id+');"  name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                html+='<div id="text_check_visible_'+id+'" class="opciones_list_activ_'+id+'" style="display:none">';
+                html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+id+'" onclick="selecarchreunew('+id+',2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(3,'+id+');"value="Agregar" />';
+                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
+                html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+id+',\'nota\',2)"/>';
+                html+='<input type="button" value="Decision" onclick="save_sublistreunion('+id+',\'decision\',2)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+id+',\'tarea\',2)" />';
+                html+='</div></div>';
+                html+='</div></div>';
+                html+='</div>';
+                
+                $("#subtopiclist_"+id+" #sub_listaction_"+id).append(html);
+            }
+        });
+    });
+});
+
+
 
 //function guardamos la accion de la lista 
 function save_listreunion(id,txt)
@@ -1742,14 +2135,25 @@ function save_listreunion(id,txt)
     }
 }
 
+//////agregamos  la opsion para los sub menus en la reunion creada
 function subtopic(id)
 {
-    $("#topiclist_"+id+" #sublistaction_"+id+" #seccion_"+id).remove();
+    $("#topiclist_"+id+" #sublistaction_"+id).empty();
     var html="";
     html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtop('+id+');" style="display: block;"/></div>';
     $("#topiclist_"+id+" #sublistaction_"+id).append(html);
 }
 
+///////////////////////////////////agregamos le capara la reunion activa
+function subtopicact(id)
+{
+    $("#topiclist_"+id+" #sublistaction_"+id).empty();
+    var html="";
+    html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtopact('+id+');" style="display: block;"/></div>';
+    $("#topiclist_"+id+" #sublistaction_"+id).append(html);
+}
+
+//////////////////guardamos los sub temas en la reunion recien creadad
 function savesubtop(id)
 {
     var txt = "selec=28&tes="+$("#texto_"+id).val()+"&topic="+id+"&idre="+$("#idreunion").val()+"&idus="+$("#idus").val();
@@ -1759,97 +2163,74 @@ function savesubtop(id)
          var html="";
          //console.log(data);
         $.each(data,function(k,v){
-            html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
+            html+="<li id='subtopiclist_"+v.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+v.idsub+"'>"+v.subtema+"</span><input type='hidden' value='"+id+"' id='idtema'>";
+            html+="<div id='sublistanotas_"+v.idsub+"'><div id='notas'>";
+
             html+='<ul class="notas">';
-
-                var list = v.resoluciones;
-                $.each(list, function(i, r) {
-                        html+='<li class="list_'+r.tipo+'">'+r.texto+'</li>';
-                });
-                        
-                var tar= v.tareas;
-                $.each(tar, function(p,ac){
-                        html+='<li class="list_tarea"><span>'+ac.actividad+'</span><label for=""> '+ac.nombreus+'</label><span> '+ac.fecha+'</span></li>';
-                });
-                html+="</ul>";
-                            
-                var arch = v.archivos;
-                html+="<div class='archivos'><ul>";
-                $.each(arch, function(k,a){
-                var img = isImage(a.tipo);
-                    if(img){
-                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
-                    }else{
-                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
-                    }
-                });
-                html+="</ul></div>";
-                html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul>";
-
-            var sublis= v.sublist;
-            $.each(sublis, function(k,l){
-                html+="<li id='subtopiclist_"+l.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+l.idsub+"'>"+l.subtema+"</span>";
-                html+="<div id='sublistanotas_"+l.idsub+"'><div id='notas'>";
-
-                html+='<ul class="notas">';
-                var subnot= l.subresoluciones;
-                $.each(subnot, function(ls, sb) {
-                         html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
-                });
-                html+="</ul>";
-                html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+            var subnot= v.subresoluciones;
+            $.each(subnot, function(ls, sb) {
+                     html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
             });
-            html+='</ul></li>';
+    
+            html+="</ul>";
+            html+="</div></div><div id='sub_listaction_"+v.idsub+"'></div></li>";
+        
         });
-            $("#topiclayer [id^=topiclist_]").remove();
-            $("#topiclayer form ul").prepend(html);
+            $("#topiclist_"+id+" #subtema_"+id).empty();
+            $("#topiclist_"+id+" #subtema_"+id).append(html);
             $("#tiTuloTopic").val("");
+            $("#topiclist_"+id+" #subtema_"+id+" [id^=subtopiclist_]").click();
 
     }).fail(function(){ alert("Error conexion servidor.");});
 }
 
-////mostramos las opciones para sub menus en la reunion nueva 
-////mostramos el sub menu en la reunion al momento de generarlad
+////guardamos los subtemas en la reunion activa
+function savesubtopact(id)
+{   
+    var idre = $("#idReunAct").val();
+    var txt = "selec=28&tes="+$("#texto_"+id).val()+"&topic="+id+"&idre="+idre+"&idus="+$("#idus").val();
+    var ruta = "funciones/funciones.php";
 
-$(document).on("ready",function(){
-    $("#topiclayer").on('click','[id^=subtopiclist_]', function(){
-        var id = $(this).attr("id").replace("subtopiclist_",'');
-      
-        $("#subtopiclist_"+id+" #tema_sub_"+id).click(function() {
-            
-            //!$("#topiclist_"+id+" #sublistaction_"+id).empty();
-            if ($("#sub_listaction_"+id).length) {
-               
-                $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
-                $("[id^=topiclist_] [id^=sublistaction_]").empty();
-                html="";
-                html+='<div id="seccion_'+id+'">';
-                html+='<div id="txts_'+id+'" class="menu_list_active">';
-                html+='<textarea id="textoreunion_'+id+'" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
-                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
-                html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
-                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
-                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+');" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+id+');"value="Agregar" />';
-                html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
-                html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+id+',\'nota\')"/>';
-                html+='<input type="button" value="Decision" onclick="save_sublistreunion('+id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+id+',\'tarea\')" />';
-                html+='</div></div>';
-                html+='</div></div>';
-                html+='</div>';
-                
-                $("#subtopiclist_"+id+" #sub_listaction_"+id).append(html);
-            }
+    $.post(ruta, txt, function(data) {
+         var html="";
+         //console.log(data);
+        $.each(data,function(k,v){
+            //html+="<li id='topiclist_"+v.id+"' class='topiclist' ><span id='tema_prim_"+v.id+"'>"+v.text+"</span><div id='listanotas_"+v.id+"'><div id='notas'>";
+        
+            html+="<li id='subtopiclist_"+v.idsub+"' class='subtopiclist' style='color: green; text-shadow: none;' ><span id='tema_sub_"+v.idsub+"'>"+v.subtema+"</span><input type='hidden' value='"+id+"' id='idtema'>";
+            html+="<div id='sublistanotas_"+v.idsub+"'><div id='notas'>";
+
+            html+='<ul class="notas">';
+            var subnot= v.subresoluciones;
+            $.each(subnot, function(ls, sb) {
+                     html+='<li class="list_'+sb.tipo+'">'+sb.texto+'</li>';
+            });
+    
+            html+="</ul>";
+            html+="</div></div><div id='sub_listaction_"+v.idsub+"'></div></li>";
+        
         });
-    });
-});
+            $("#topiclist_"+id+" #subtema_"+id).empty();
+            $("#topiclist_"+id+" #subtema_"+id).append(html);
+            $("#tiTuloTopic").val("");
+            $("#topiclist_"+id+" #subtema_"+id+" [id^=subtopiclist_]").click();
+
+    }).fail(function(){ alert("Error conexion servidor.");});
+}
+
 
 
 //function guardamos la accion de la lista 
-function save_sublistreunion(id,txt)
+function save_sublistreunion(id,txt,op)
 {
     if($("#sub_listaction_"+id+" #textoreunion_"+id).val()!=""){
         var texto= $("#sub_listaction_"+id+" #textoreunion_"+id).val();
+        if (op==1) {
         var idre= $("#idreunion").val();
+        }
+        if (op==2) {
+        var idre= $("#form_reunion_act #idReunAct").val();
+        }
         var txto="selec=29&id="+id+"&tipo="+txt+"&text="+texto+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
@@ -1893,52 +2274,93 @@ function save_sublistreunion(id,txt)
 
 
 //funcionas para asignar la tarea en la lista de la reunion recien generadad
-function save_tarea_tema(id,txt){
-    var txto = $("#textoreunion_"+id).val();
-    $("#txts_"+id+" div").hide();
-    $("#txts_"+id+" textarea").hide();
+function save_tarea_tema(id,txt,op){
+    if (op==1) {
+        var camp = "#txts_"+id;
+        var txto = $("#textoreunion_"+id).val();
+    }
+    if (op==2) {
+        var camp = "#txt_"+id;
+        var txto = $("#textolist_activ_"+id).val();
+    }
+    $(camp+" div").hide();
+    $(camp+" textarea").hide();
         var htmlp='<div id="form_tarea_tema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
-            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_tema" onkeyup="share_usuarios(this.value);" />';
-            htmlp+='<div id="jb_list_user_tema" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
-            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div><input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_tema();" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
+            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_listact" onkeyup="share_usuarios(this.value,1);" />';
+            htmlp+='<div id="jb_lista_usuarios" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
+            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div>';
+            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_tema('+op+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
             
-    $("#txts_"+id).append(htmlp);
+    $(camp).append(htmlp);
     $("body #datepicker4").click();
 }
 
 
 
-function cancel_w_tema(){
-
-                var id = $("[id^=txts_]").attr('id').replace("txts_","");
-                $("#form_tarea_tema_"+id).remove();
-                $("#txts_"+id+" div").show();
-                $("#txts_"+id+" textarea").show();
+function cancel_w_tema(op){
+    if (op==1) {
+        var id = $("[id^=txts_]").attr('id').replace("txts_","");
+        var camp = "#txts_"+id;
+    }
+    if (op==2) {
+        var id = $("[id^=txt_]").attr('id').replace("txt_","");
+        var camp = "#txt_"+id;
+    }
+    $("#form_tarea_tema_"+id).remove();
+    $(camp+" div").show();
+    $(camp+" textarea").show();
+    $("#jb_lista_usuarios").empty();
+    $("#jb_lista_usuarios_click_tema").empty();
 
 }
 
-//funcionas para asignar la tarea en la lista de la reunion nueva
-function save_tarea_subtema(id,txt){
-    var txto = $("#textoreunion_"+id).val();
-    $("#txts_"+id+" div").hide();
-    $("#txts_"+id+" textarea").hide();
-        var htmlp='<div id="form_tarea_subtema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
-            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_tema" onkeyup="share_usuarios(this.value);" />';
-            htmlp+='<div id="jb_list_user_tema" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
-            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div><input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_subtema();" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
-            
-    $("#txts_"+id).append(htmlp);
+//funcionas para asignar la tarea en la lista de la reunion nueva y activa
+function save_tarea_subtema(id,txt,op){
+    var  camp= "";
+    var camp2 ="";
+    var camp3 ="";
+    if (op ==1) {
+        var txto = $("#textoreunion_"+id).val();
+        camp ="#txts_"+id+" div";
+        camp2="#txts_"+id+" textarea";
+        camp3="#txts_"+id;
+    }
+    if (op ==2) {
+        var txto = $("#sub_listaction_"+id+" #textoreunion_"+id).val();
+        camp ="#txt_"+id+" div";
+        camp2="#txt_"+id+" textarea";
+        camp3="#txt_"+id;
+    }
+    $(camp).hide();
+    $(camp2).hide();
+         var htmlp='<div id="form_tarea_tema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
+            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_listact" onkeyup="share_usuarios(this.value,1);" />';
+            htmlp+='<div id="jb_lista_usuarios" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
+            htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div>';
+            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_subactw('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_subtema('+op+','+id+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
+  
+    $(camp3).append(htmlp);
     $("body #datepicker4").click();
 }
 
 
+/////canselamos la asigancion de tareas en las reuniones
+function cancel_w_subtema(op,id){
 
-function cancel_w_subtema(){
+        var  camp= "";
+        if (op ==1) {
+            camp ="#txts_"+id;
+        }
+        if (op ==2) {
+            camp="#txt_"+id;
+        }
+                
+        $(camp+" #form_tarea_tema_"+id).remove();
+        $(camp+" div").show();
+        $(camp+" textarea").show();
 
-                var id = $("[id^=txts_]").attr('id').replace("txts_","");
-                $("#txts_"+id+" #form_tarea_subtema_"+id).remove();
-                $("#txts_"+id+" div").show();
-                $("#txts_"+id+" textarea").show();
+    $("#jb_lista_usuarios").empty();
+    $("#jb_lista_usuarios_click_subtema").empty();
 
 }
 
@@ -2080,7 +2502,7 @@ function busquedaSimpleUsers(search,section)
 
     if($.trim(search) == '')
     {
-        $("#jb_etiquetas").hide();
+        $("#form_reunion_new #jb_etiquetas").hide();
         $("#jb_ul_data").remove();
     }
 
@@ -2135,7 +2557,9 @@ function busquedaSimpleUsers(search,section)
     //si la caja de texto esta vacia eliminamos la lista
     if($.trim(search) == '')
     {
-        $("#adduser-w").hide();
+        //$("#adduser-w").hide();
+        $("#form_reunion_new #jb_list_user").hide();
+        $("#jb_ul_data_user").remove();
     }
 
 
@@ -2212,7 +2636,7 @@ $(document).on('ready', function(){
 
     $('body').on('click', '.click', function(){  
         var id = $(this).attr('id');
-        alert(id);
+        //alert(id);
         if($("#selected_"+id).length == 0)
             $("#jb_lista_usuarios_click_re").append("<div id='selected_"+id+"'>"+$("#"+id).text()+"</div>");
 
@@ -2241,6 +2665,9 @@ $(document).on('ready', function(){
                     //escribismos las etiqeutas en un div 
                     $.each(server,function(i,t){
                             $("#jb_result_tags").append('<div id="jb_id_tag_'+t.idTag+'">'+t.nombre+'</div>');
+                           // $("#jb_result_tags").append('<div id="jb_id_tag_'+t.idproy+'">'+t.nombre+'</div>');
+                           
+                          
                     });
                 }
             });
@@ -2282,7 +2709,8 @@ $(document).on('ready', function(){
         
         //console.log($(this).text() + " -> " + id);
         if($("#tag_selected_"+id).length == 0)
-        {
+        {   
+            $("#jb_lista_tag_click_re").show();
             $("#jb_lista_tag_click_re").append("<div id='tag_selected_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='tag_remove_"+id+"'>X</span></div>");
             $("#id_tag_is_"+id).slideUp();
             $("#jb_etiqueta_reun").val('');
@@ -2582,29 +3010,36 @@ $(document).on("ready",function(){
 });
 
 
-
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // seccion de busqueda de usuarios en las reuniones activas 
-
-function share_usuarios(search){
+function share_usuarios(search,op){
    //si la caja de texto esta vacia eliminamos la lista
+   //
+  
+   var camp ="";
+            if (op ==1) {
+                camp="#jb_lista_usuarios";
+            }
+            if (op ==2) {
+                camp ="#jb_lista_user_subtema";
+            }
+
         if($.trim(search) == '')
         {
-            $("#form_tarea_tema #jb_list_user").hide();
+            $(camp).hide();
         }
 
         //si la caja de texto contiene algo 
         if($.trim(search) !== '')
         {
-           
-            $("#form_tarea_tema #jb_list_user").show();
-            if($("#form_tarea_tema #jb_list_user ul").length == 0)
+            $("body "+camp).show();
+
+            if($("body "+camp+" ul").length == 0)
             {
                 var htmlUl='<ul id="jb_ul_data_user"><ul>';
-                $("#form_tarea_tema #jb_list_user").append(htmlUl);
-                $("#form_tarea_tema #jb_list_user #jb_ul_data_user ul").remove();
+                $("body "+camp).append(htmlUl);
+                $("body "+camp+" #jb_ul_data_user ul").remove();
             }
               var elementopadre = $('[id^=jb_id_user_]');
               //recorremos el each buscando todos los id que inicien jb_id_user_
@@ -2624,15 +3059,216 @@ function share_usuarios(search){
                         //nos escribe todo lo que sea diferente de undefined
                         if(typeof id !== "undefined")
                         {
-                            var htmlLi = '<li id="id_user_is_'+id+'">'+nombre+'</li>';
-                            if($("#id_user_is_"+id).length == 0 && $("#user_selected_"+id).length == 0)
+                            var htmlLi = '<li id="id_user_tm_'+id+'">'+nombre+'</li>';
+                            if($("#id_user_tm_"+id).length == 0 && $("#user_selected_tm_"+id).length == 0)
                                 $("#jb_ul_data_user").prepend(htmlLi);
                         }
                     }
                     else
                     {
-                        if($("#id_user_is_"+id).length)
-                                $("#id_user_is_"+id).remove();
+                        if($("#id_user_tm_"+id).length)
+                                $("#id_user_tm_"+id).remove();
+                    }
+
+              });
+        }
+        
+}
+
+//////para los temas principales
+$(document).on("ready",function()
+{
+    ///al ace el click en el campo nos egenera el listado en el div jb_lista_usuarios_click
+    $('body').on('click', '.click', function(){  
+            var id = $(this).attr('id');
+            //alert(id);
+         if($("#selected_"+id).length == 0)
+            $("#form_tarea_tema_"+id+" #jb_lista_usuarios_click_tema").append("<div id='selected_tm_"+id+"' class='list_asociada'>"+$("#"+id).text()+"</div>");
+    });
+
+    ///hacemos le post para usuarios
+    $("body").on('click', '#adduser_listact', function(){
+
+        if($("#jb_result_users").text() == "")
+        {
+
+            $.ajax({
+                type: "POST",
+                dataType : "json",
+                url: "funciones/funciones.php",
+                data:"selec=6",
+                beforeSend: function()
+                {
+                    $("[id^=form_tarea_tema_] #jb_lista_usuarios").css({"display":"block"});
+                },
+                success: function(server)
+                {
+                    /// escribimos las etiqeutas 
+                    $.each(server,function(i,t){
+                            $("#jb_result_users").append('<div id="jb_id_user_'+t.id+'">'+t.nombre+'</div>');
+                    });
+                }
+            });
+
+        }
+    });
+
+       /// seccion para la lista de usuarios 
+    $("body").on('click', '[id^=id_user_tm_]', function(){
+        var id = $(this).attr("id").replace("id_user_tm_","");
+        
+
+        if($("#jb_lista_usuarios_click_tema #user_selected_tm_"+id).length == 0)
+        {
+            $("#jb_lista_usuarios_click_tema").append("<div id='user_selected_tm_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='user_remove_tm_"+id+"'>X</span></div>");
+            $("#id_user_tm_"+id).slideUp();
+            $("#adduser_listact").val('');
+            $("#jb_lista_usuarios").hide();
+        }
+
+    });
+    //removemos los usuarios registrados 
+    $("body").on('click', '[id^=user_remove_tm_]', function(){
+        var id = $(this).attr("id").replace("user_remove_tm_","");
+        if($("#user_selected_tm_"+id).length)
+            $("#user_selected_tm_"+id).remove();
+            $("#jb_ul_data_user #id_user_tm_"+id).slideDown();
+
+    });
+});
+
+
+////////////////////////////para los subtemas
+$(document).on("ready",function()
+{
+    ///al ace el click en el campo nos egenera el listado en el div jb_lista_usuarios_click
+    $('body').on('click', '.click', function(){  
+            var id = $(this).attr('id');
+            alert(id);
+         if($("#selected_"+id).length == 0)
+            $("#form_tarea_subtema_"+id+" #jb_lista_usuarios_click_subtema").append("<div id='selected_sbtm_"+id+"' class='list_asociada'>"+$("#"+id).text()+"</div>");
+    });
+
+    ///hacemos le post para usuarios
+    $("body").on('click', '#adduser_tema', function(){
+
+        if($("#jb_result_users").text() == "")
+        {
+
+            $.ajax({
+                type: "POST",
+                dataType : "json",
+                url: "funciones/funciones.php",
+                data:"selec=6",
+                beforeSend: function()
+                {
+                    $("#form_tarea_subtema_"+id+" #jb_list_user_subtema").css({"display":"block"});
+                },
+                success: function(server)
+                {
+                    /// escribimos las etiqeutas 
+                    $.each(server,function(i,t){
+                            $("#jb_result_users").append('<div id="jb_id_user_'+t.id+'">'+t.nombre+'</div>');
+                    });
+                }
+            });
+
+        }
+    });
+
+       /// seccion para la lista de usuarios 
+    $("body").on('click', '[id^=id_user_tm_]', function(){
+        var id = $(this).attr("id").replace("id_user_tm_","");
+        
+
+        if($("#jb_lista_usuarios_click_subtema #user_selected_"+id).length == 0)
+        {
+            $("#jb_lista_usuarios_click_subtema").append("<div id='user_selected_tm_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='user_remove_tm_"+id+"'>X</span></div>");
+            $("#id_user_tm_"+id).slideUp();
+            $("#adduser_listact").val('');
+            $("#jb_lista_usuarios").hide();
+        }
+
+    });
+    //removemos los usuarios registrados 
+    $("body").on('click', '[id^=user_remove_tm_]', function(){
+        var id = $(this).attr("id").replace("user_remove_tm_","");
+        if($("#user_selected_tm_"+id).length)
+            $("#user_selected_tm_"+id).remove();
+            $("#jb_ul_data_user #id_user_tm_"+id).slideDown();
+
+    });
+});
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///buscamos usuarios para los departamentos  y proyectos
+//
+//
+// seccion de busqueda
+function busqueda_usuarios_depyproy(search,op){
+   //si la caja de texto esta vacia eliminamos la lista
+      var camp = "";
+    var ides = "";
+    var idcmp = "";
+    if(op==1)
+    {
+        camp = "#tag_departamentos #jb_list_user_departamentos";
+        ides = "user_selected_dp_";
+        idcmp = "id_user_dp_";
+    }
+    if(op ==2)
+    {
+        camp ="#tag_proyectos #jb_list_user_proyect";
+        ides = "user_selected_proy_";
+        idcmp = "id_user_proy_";
+    }
+        if($.trim(search) == '')
+        {
+            $(camp).hide();
+        }
+
+        //si la caja de texto contiene algo 
+        if($.trim(search) !== '')
+        {
+           
+            $(camp).show();
+            if($(camp+" ul").length == 0)
+            {
+                var htmlUl='<ul id="jb_ul_data_user"><ul>';
+                $(camp).append(htmlUl);
+                $(camp+" #jb_ul_data_user ul").remove();
+            }
+              var elementopadre = $('[id^=jb_id_user_]');
+              //recorremos el each buscando todos los id que inicien jb_id_user_
+              $.each(elementopadre,function(i,t)
+              {
+                    search=search.toLowerCase();
+                    search= sustituirAcentos(search);
+                    var id = t.id;
+
+                    var nombre = $("#"+t.id).text();
+                    var strSearched=$(this).text();
+                    strSearched = strSearched.toLowerCase();
+                    strSearched = sustituirAcentos(strSearched);
+                    id = id.replace('jb_id_user_','');
+                    if(strSearched.indexOf(search.trim()) !== -1)
+                    {
+                        //nos escribe todo lo que sea diferente de undefined
+                        if(typeof id !== "undefined")
+                        {
+                            var htmlLi = '<li id="'+idcmp+id+'">'+nombre+'</li>';
+                            if($("#"+idcmp+id).length == 0 && $("#"+ides+id).length == 0)
+                                $("#jb_ul_data_user").prepend(htmlLi);
+                        }
+                    }
+                    else
+                    {
+                        if($("#"+idcmp+id).length)
+                                $("#"+idcmp+id).remove();
                     }
 
               });
@@ -2641,18 +3277,19 @@ function share_usuarios(search){
 }
 
 
+////////ready para la seccicon de departamentos
 $(document).on("ready",function()
 {
     ///al ace el click en el campo nos egenera el listado en el div jb_lista_usuarios_click
-    $('body').on('click', '.click', function(){  
+    $('#contenUpop').on('click', '.click', function(){  
             var id = $(this).attr('id');
 
          if($("#selected_"+id).length == 0)
-            $("#form_tarea_tema #jb_lista_usuarios_click_re").append("<div id='selected_"+id+"' class='list_asociada'>"+$("#"+id).text()+"</div>");
+            $("#tag_departamentos #jb_list_user_click_depa").append("<div id='selected_dp_"+id+"' class='list_asociada'>"+$("#"+id).text()+"</div>");
     });
 
     ///hacemos le post para usuarios
-    $("body").on('click', '#adduser_listact', function(){
+    $("body").on('click', '#miembros', function(){
 
         if($("#jb_result_users").text() == "")
         {
@@ -2679,85 +3316,101 @@ $(document).on("ready",function()
     });
 
        /// seccion para la lista de usuarios 
-    $("body").on('click', '[id^=id_user_is_]', function(){
-        var id = $(this).attr("id").replace("id_user_is_","");
+    $("body").on('click', '[id^=id_user_dp_]', function(){
+        var id = $(this).attr("id").replace("id_user_dp_","");
         
 
-        if($("#form_tarea_tema #jb_lista_usuarios_click #user_selected_"+id).length == 0)
+        if($("#tag_departamentos #jb_lista_usuarios_click_depa #user_selected_"+id).length == 0)
         {
-            $("#form_tarea_tema #jb_lista_usuarios_click_re").append("<div id='user_selected_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='user_remove_"+id+"'>X</span></div>");
-            $("#id_user_is_"+id).slideUp();
-            $("#form_tarea_tema  #adduser-w").val('');
-            $("#form_tarea_tema #jb_list_user").hide();
+            $("#tag_departamentos #jb_lista_usuarios_click_depa").append("<div id='user_selected_dp_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='user_remove_"+id+"'>X</span></div>");
+            $("#id_user_dp_"+id).slideUp();
+            $("#tag_departamentos #miembros").val('');
+            $("#tag_departamentos #formdepa #jb_list_user_departamentos").hide();
         }
 
     });
     //removemos los usuarios registrados 
     $("body").on('click', '[id^=user_remove_]', function(){
         var id = $(this).attr("id").replace("user_remove_","");
-        if($("#user_selected_"+id).length)
-            $("#user_selected_"+id).remove();
-            $("#jb_ul_data_user #id_user_is_"+id).slideDown();
+        if($("#user_selected_dp_"+id).length)
+            $("#user_selected_dp_"+id).remove();
+            $("#jb_ul_data_user #id_user_dp_"+id).slideDown();
 
     });
 });
 
 
-//cargamos los archivos y mostramos si son imagenes en la opcion de reuniones
-$(document).on("ready", function(){
+////ready ara la seccion de proyectos
+///
+$(document).on("ready",function()
+{
+    ///al ace el click en el campo nos egenera el listado en el div jb_lista_usuarios_click
+    $('body').on('click', '.click', function(){  
+            var id = $(this).attr('id');
 
-    $("body").on("click","[id^=txt_]",function(){
+         if($("#selected_"+id).length == 0)
+            $("#tag_proyectos #jb_lista_usuarios_click_proyect").append("<div id='selected_proy_"+id+"' class='list_asociada'>"+$("#"+id).text()+"</div>");
+    });
 
-        var id = $(this).attr('id').replace("txt_","");
-        //$(".mensaje").hide();
-         //queremos que esta variable sea global
-        var fileExtension = "";
-        $('#txt_'+id+' :file').change(function (event)
+    ///hacemos le post para usuarios
+    $("body").on('click', '#miembrosproy', function(){
+
+        if($("#jb_result_users").text() == "")
         {
-            //obtenemos un array con los datos del archivo
-            var file = $("#txt_"+id+" #archivo_meeting_act_"+id)[0].files[0];
-            var fileName = file.name;
-            //obtenemos la extensión del archivo
-            fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-            var fileSize = file.size;
-            var fileType = file.type;
-            fileSize =(fileSize / (1024*1024)).toFixed(2);
 
-                  if(fileSize > 4){
-                        var inpu= $('#archivo_meeting_act');
-                        inpu.replaceWith(inpu.val('').clone(true));
-                        showMessage("<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>");
-                  }else{
-                     showMessage("<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>");
-                     //$("#arch_reunAct").attr("style","color:#1A72D4;");
-                     //$("#arch_reunAct").fadeOut(100);
-                     //$("#arch_reunAct").fadeIn(100);
-                  }
-            var files = event.target.files; // FileList object
-             
-            for (var i = 0, f; f = files[i]; i++) {
-                    //Solo admitimos imágenes.
-                    if (!f.type.match('image.*')) {
-                        continue;
-                    }
-                    var reader = new FileReader();
-                    reader.onload = (function(theFile) {
-                        return function(e) {
-                          // Insertamos la imagen
-                         $(".showImage").html(['<img class="thumb" src="', e.target.result,'" title="', escape(theFile.name), '" alt="90" width="100"/>'].join(''));
-                        };
-                    })(f);
-                    reader.readAsDataURL(f);
-                  }
+            $.ajax({
+                type: "POST",
+                dataType : "json",
+                url: "funciones/funciones.php",
+                data:"selec=6",
+                beforeSend: function()
+                {
+                    $("#jb_list_user").css({"display":"block"});
+                },
+                success: function(server)
+                {
+                    /// escribimos las etiqeutas 
+                    $.each(server,function(i,t){
+                            $("#jb_result_users").append('<div id="jb_id_user_'+t.id+'">'+t.nombre+'</div>');
+                    });
+                }
+            });
 
-           
-        });
-
+        }
     });
 
+       /// seccion para la lista de usuarios 
+    $("body").on('click', '[id^=id_user_proy_]', function(){
+        var id = $(this).attr("id").replace("id_user_proy_","");
+        
+
+        if($("#tag_proyectos #jb_lista_usuarios_click_proyect #user_selected_proy_"+id).length == 0)
+        {
+            $("#tag_proyectos #jb_lista_usuarios_click_proyect").append("<div id='user_selected_proy_"+id+"' class='list_asociada'>"+$(this).text()+" <span id='user_remove_"+id+"'>X</span></div>");
+            $("#id_user_dp_"+id).slideUp();
+            $("#tag_proyectos #miembrosproy").val('');
+            $("#tag_proyectos #formproy #jb_list_user_proyect").hide();
+        }
+
+    });
+    //removemos los usuarios registrados 
+    $("body").on('click', '[id^=user_remove_]', function(){
+        var id = $(this).attr("id").replace("user_remove_","");
+        if($("#user_selected_proy_"+id).length)
+            $("#user_selected_proy_"+id).remove();
+            $("#jb_ul_data_user #id_user_proy_"+id).slideDown();
+
+    });
 });
 
-//cargamos el archivo para la opcion de tareas
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+//cargamos el archivo para la opcion de tareas y actividades //////////////////////////////////////////////
 $(document).on("ready", function(){
 
      $("#archivo_meeting_act").on("click",function(){
@@ -2776,9 +3429,9 @@ $(document).on("ready", function(){
                   if(fileSize > 4){
                         var inpu= $('#archivo_meeting_act');
                         inpu.replaceWith(inpu.val('').clone(true));
-                        showMessage("<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>");
+                        $("#form-w .mensaje").append("<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>");
                   }else{
-                     showMessage("<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>");
+                     $("#form-w .mensaje").append("<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>");
                      $("#arch_reunAct").css({"color":"#1A72D4;"});
                      $("#arch_reunAct").addClass('resaltado');
 
@@ -2816,14 +3469,26 @@ $(document).on("ready", function(){
 });
 
 //cargamos los archivos para la reunion recien creda
-function selecarchreunew(idw){
-
-     $("#txts_"+idw).on("click","#archivo_reunion_"+idw,function(){
+function selecarchreunew(idw,op){
+        var camp = "";
+        var camp2 ="";
+        var camp3 ="";
+        if (op == 1) {
+            camp="#txts_"+idw;
+            camp2="#check_visible_"+idw;
+            camp3="#archivo_reunion_"+idw;
+        }
+        if (op ==2 ) {
+            camp="#txt_"+idw
+            camp2="#text_check_visible_"+idw;
+            camp3="#archivo_meeting_act_"+idw;
+        }
+     $(camp).on("click",camp2,function(){
         var fileExtension = "";
         $(':file').change(function (event)
         {
             //obtenemos un array con los datos del archivo
-            var file = $("#check_visible_"+idw+" #archivo_reunion_"+idw)[0].files[0];
+            var file = $(camp2+" "+camp3)[0].files[0];
             var fileName = file.name;
             //obtenemos la extensión del archivo
             fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
@@ -2833,13 +3498,13 @@ function selecarchreunew(idw){
             fileSize =(fileSize / (1024*1024)).toFixed(2);
 
                   if(fileSize > 4){
-                        var inpu= $('#archivo_reunion_'+idw);
+                        var inpu= $(camp3);
                         inpu.replaceWith(inpu.val('').clone(true));
                        msg="<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>";
-                       $("#check_visible_"+idw+" .mensaje").append(msg);
+                       $(camp2+" .mensaje").append(msg);
                   }else{
                      msg="<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>";
-                     $("#check_visible_"+idw+" .mensaje").append(msg);
+                     $(camp2+" .mensaje").append(msg);
                   }
             var files = event.target.files; // FileList object
              
@@ -2852,12 +3517,11 @@ function selecarchreunew(idw){
                     reader.onload = (function(theFile) {
                         return function(e) {
                           // Insertamos la imagen
-                         $("check_visible_"+idw+" .showImage").html(['<img class="thumb" src="', e.target.result,'" title="', escape(theFile.name), '" alt="90" width="100"/>'].join(''));
+                         $(camp2+" .showImage").html(['<img class="thumb" src="', e.target.result,'" title="', escape(theFile.name), '" alt="90" width="100"/>'].join(''));
                         };
                     })(f);
                     reader.readAsDataURL(f);
                   }
-
            
         });
 
@@ -2971,15 +3635,20 @@ function selectarchwact(idw){
 function uparchivo_reunion(op,id){
  //al enviar el formulario
         //información del formulario
-        var idre = $("#idreunion").val();
        var camp="";
     if (op ==1) {
         camp = "archivo_reunion_"+id;
+        var idre = $("#idreunion").val();
      }
     if(op == 2)
-     {
+     {  
+        var idre = $("#idreunion").val();
         camp = "archivo_reunion_"+id;
      }  
+     if (op == 3) {
+        camp = "archivo_meeting_act_"+id
+        var idre = $("#idReunAct").val();
+     }
         var inputFile = document.getElementById(camp);
         if(inputFile !=="")
         {
@@ -3014,6 +3683,11 @@ function uparchivo_reunion(op,id){
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
                         }
+                        if(op==3)
+                        {
+                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
+                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                        }
                         // $("#save-w").val("")       
                     },
                     //una vez finalizado correctamente
@@ -3023,12 +3697,28 @@ function uparchivo_reunion(op,id){
                             savedbarch(id,idre,data,fileExtension,op);
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                           
+                                timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
+                                timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
                         }
                         if( op == 2 ){
-                            //console.log(op);
-                           savedbarch_subtema(id,idre,data,fileExtension);
+                           op =1;
+                           savedbarch_subtema(id,idre,data,fileExtension,op);
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
                             $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                            timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
+                            timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
+                          
+                        }
+                        if( op == 3 ){
+                            op=2;
+                           savedbarch_subtema(id,idre,data,fileExtension,op);
+                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
+                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                            
+                                timeout("#txt_"+id+" #text_check_visible_"+id+" .mensaje");
+                                timeout("#txt_"+id+" #text_check_visible_"+id+" .showImage");
+                            
                         }
                     },
                     //si ha ocurrido un error
@@ -3042,17 +3732,34 @@ function uparchivo_reunion(op,id){
             if (op==1) {
                 $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
                 $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-
+                timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
+                timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
             }
             if (op==2) {
                 showMessage(mensaje);
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                $("#txts_"+id+" #text_check_visible_"+id+" .mensaje").empty();
+                $("#txts_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                timeout("#txts_"+id+" #text_check_visible_"+id+" .mensaje");
+                timeout("#txts_"+id+" #text_check_visible_"+id+" .showImage");
+           }
+            if (op==3) {
+                showMessage(mensaje);
+                $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
+                $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                timeout("#txt_"+id+" #text_check_visible_"+id+" .mensaje");
+                timeout("#txt_"+id+" #text_check_visible_"+id+" .showImage");
            }
             
         }
 }
 
+function timeout(param)
+{
+    setTimeout(function(){
+        $(param).empty();
+    });
+    return true;
+}
 
 /////opcion de subida de archivos  barias secciones
 function uparchivo(op,id,idre){
@@ -3099,6 +3806,7 @@ function uparchivo(op,id,idre){
                         if (op==1) {
                             showMessage(mensaje);
                             $("#save-w").css('opacity','0.2');
+
                         }
                         if (op==2) {
                             showMessage(mensaje);
@@ -3121,8 +3829,12 @@ function uparchivo(op,id,idre){
                     success: function(data){
                         mensaje = $("<span class='success'>El archivo se ha subido correctamente.</span>");
                         if(op==1){
-                            savedbarch(id,idre,data,fileExtension);
-                            $("#comn_tareas_2").append(mensaje);
+                            var sec="";
+                            savedbarch(id,idre,data,fileExtension,sec);
+                            $(".mensaje").append(mensaje);
+                            timeout(".showImage");
+                            timeout(".mensaje");
+
                         }
                         if(op==2){
                             $("#arch_reunAct").removeClass('resaltado');
@@ -3134,17 +3846,22 @@ function uparchivo(op,id,idre){
                             $(".mensaje").prepend("Ya puedes guardar la tarea.");
                             preparesave(data,fileExtension);
                             showMessage(mensaje);
+                            timeout(".showImage");
+                            timeout(".mensaje");
                         }
                         if(op == 3){
                             savearchw(data,id,idre,fileExtension);
                             $(".tareasIdeas #"+id+" #mensaje_"+id).empty();
                             $(".tareasIdeas #"+id+" #mensaje_"+id).append(mensaje);
+                            timeout(".tareasIdeas #"+id+" #mensaje_"+id);
+                            timeout(".tareasIdeas #"+id+" .showImage");
                         }
                         if (op==4) {
                             savearchw(data,id,idre,fileExtension);
                             $("#comn_actividad_"+id+" #mensaje_"+id).empty();
                             $("#comn_actividad_"+id+"#arch_upw_tar_"+id+" #arch_reunAct").removeClass('resaltado');
                             $("#comn_actividad_"+id+" #mensaje_"+id).append(mensaje);
+                            timeout("#comn_actividad_"+id+" .showImage");
                         }
                         setTimeout(function(){
                             $("#text_check_visible_"+id+" .showImage").hide();
@@ -3162,6 +3879,7 @@ function uparchivo(op,id,idre){
             if (op==1) {
                 showMessage(mensaje);
                 $("#save-w").css('opacity','0.2');
+
             }
             if (op==2) {
                 showMessage(mensaje);
@@ -3171,6 +3889,11 @@ function uparchivo(op,id,idre){
                 $(".tareasIdeas #"+id+" #mensaje_"+id).append(mensaje);
               $("#save-w").css('opacity','0.2');
             }
+             setTimeout(function(){
+                            $("#save-w .showImage").empty();
+                            $("#save-w .mensaje").empty();
+                            $(".tareasIdeas #"+id+" #mensaje_"+id).empty();
+                        },1500);
         }
 }
 //como la utilizamos demasiadas veces, creamos una función para
@@ -3207,17 +3930,16 @@ function savedbarch(id,idre,data,tipo,op)
     liga=liga.substring(0, liga.length-1);
     liga=liga.substring(3, liga.length);
     var txt = "selec=20&id="+id+"&idre="+idre+"&dir="+liga+"&tipo="+tipo+"&idus="+$("#idus").val();
-   // console.log(txt);
     var ruta= "funciones/funciones.php";
     $.post(ruta,txt,function(data){
+
        if (data!="") {
+        //console.log(op);
             if(op == 1){
                 show_listreunion_new(id);
-                
             }
             if(op ==""){
                 show_listreunion(id);
-                
             }
         }
     });
@@ -3225,7 +3947,7 @@ function savedbarch(id,idre,data,tipo,op)
 
 
 //guardamos el arch en la bd del subtema
-function savedbarch_subtema(id,idre,data,tipo)
+function savedbarch_subtema(id,idre,data,tipo,op)
 {
     var liga="";
     $.each(data,function(k,v){
@@ -3237,7 +3959,7 @@ function savedbarch_subtema(id,idre,data,tipo)
     var ruta= "funciones/funciones.php";
     $.post(ruta,txt,function(data){
        if (data!="") {
-          show_listreunion_newsubtema(id);
+          show_listreunion_newsubtema(id,op);
          // console.log(data);
        };
     });

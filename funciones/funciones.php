@@ -5,11 +5,11 @@ include 'acciones.php';
 $selec = $_POST['selec'];
 ///guardamos la primer reunnion
 if ($selec == 1){
-     $id_reun    = $_POST['idre'];
-     $tituloRe   = stripslashes($_POST['nom_reunion']);
+     $id_reun    = trim($_POST['idre']);
+     $tituloRe   = trim(stripslashes($_POST['nom_reunion']));
      $etiqeuta   = $_POST['etiquetas'];
-     $lugar      = stripslashes($_POST['lugar']);
-     $iduser     = $_POST['iduser'];
+     $lugar      = trim(stripslashes($_POST['lugar']));
+     $iduser     = trim($_POST['iduser']);
      $fechain    = str_replace("%2F","-" , $_POST['fecha_in']);  
      $dia1       = substr($fechain, 0, 2);  
      $mes1       = substr($fechain, 3,2);
@@ -22,8 +22,8 @@ if ($selec == 1){
      $fechaout    = $year2.'-'.$mes2.'-'.$dia2;
      $horain     = str_replace("%3A",":" , $_POST['horaint']);    
      $horaout    = str_replace("%3A",":" , $_POST['horaout']); 
-     $idetag =$_POST['idt'];
-     $ideusuarios = $_POST['usrdi'];
+     $idetag    = trim($_POST['idt']);
+     $ideusuarios = trim($_POST['usrdi']);
 
         $dbreg = new Registros;
 
@@ -44,7 +44,7 @@ if ($selec == 1){
             
             $numtag = explode(",",$idetag);
             for ($i=0; $i < count($numtag) ; $i++) { 
-                if ($numtag[$i]!=0) {
+                if ($numtag[$i]!=0 ) {
                 $dbreg->re_etiquetasRe($idreunion,$numtag[$i]);
                 }
             }
@@ -52,7 +52,7 @@ if ($selec == 1){
 
             $numuser = explode(",",$ideusuarios);
             for ($i=0; $i < count($numuser) ; $i++) { 
-                if ($numuser[$i]!=0) {
+                if ($numuser[$i]!=0 && $numuser[$i]!=$iduser ) {
                   $dbreg->re_participantesRe($idreunion,$numuser[$i]);
                 }
             }
@@ -66,14 +66,14 @@ if ($selec == 2) {
     header('Content-type: application/json harset=utf-8');
     $server = array();
 
-    $idusuario = $_POST['idusua'];
+    $idusuario = trim($_POST['idusua']);
     $val = 1;
     $dbchk = new Reunioneschk;
     $server = $dbchk->chkreunion($idusuario,$val);
 
    
     $myjson =json_encode($server);
-    $myjson = stripslashes($myjson);
+    //$myjson = stripslashes($myjson);
     echo $myjson;
     //echo json_decode($myjson,true);
     //echo json_last_error_msg();
@@ -86,7 +86,7 @@ if ($selec == 12)
     header('Content-type: application/json');
     $server = array();
 
-    $idusuario = $_POST['idusua'];
+    $idusuario = trim($_POST['idusua']);
     $val = 0;
     $dbchk = new Reunioneschk;
     $server = $dbchk->chkreunion($idusuario,$val);
@@ -101,27 +101,29 @@ if ($selec == 12)
 //registramos las etiquetas
 if ($selec == 3) {
     
-    $idusua = $_POST['idus'];
-    $nombre = $_POST['ti'];
-    $tipo   = $_POST['tipo'];
+    $idusua = trim($_POST['idus']);
+    $nombre = trim($_POST['ti']);
+    $tipo   = trim($_POST['tipo']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chketiqueta_espe($nombre,$idusua,$tipo);
-    if($datos == 1 ){
+
+    if($datos == 1 )
+    {
         echo "ok";
     }else
     {
-    $dbreg = new Registros;
-    $dato  = $dbreg->regetiqueta($nombre,$tipo,$idusua);
-    echo $dato;    
+      $dbreg = new Registros;
+      $dato  = $dbreg->regetiqueta($nombre,$tipo,$idusua);
+      echo $dato;    
     }
 }
 ///se mueve la reunion a la seccion de finalizadas
 if ($selec == 4) {
     
-    $idusua = $_POST['idus'];
-    $idreunion = $_POST['id'];
-    $valor = $_POST['val'];
+    $idusua = trim($_POST['idus']);
+    $idreunion = trim($_POST['id']);
+    $valor = trim($_POST['val']);
 
     $dbupReunion = new Registros;
     $result = $dbupReunion->upReunionFinalizada($valor,$idreunion,$idusua);
@@ -132,9 +134,9 @@ if ($selec == 4) {
 //registramos los topicos de la reunion
 if ($selec == 5) {
     header('Content-type: application/json charset=utf-8');
-    $id = $_POST['id'];
+    $id = trim($_POST['id']);
     $nombre = trim($_POST['ti']);
-    $idus = $_POST['idus'];
+    $idus = trim($_POST['idus']);
 
     $dbreg = new Registros;
     $dato  = $dbreg->regtopico($nombre,$id);
@@ -157,31 +159,26 @@ if($selec == 6)
 
      $server = $dbsha->usuariobusqueda();
      echo json_encode($server);
-    //$json = json_encode($server,JSON_UNESCAPED_UNICODE);
-
 }
-//$selec = $_POST['selec'];
+
 //registro de tareas
 if($selec == 7)
 {
-    $titulo = $_POST['titulo-w'];
-    //$propietario = $_POST['propietario'];
-    $mail   = $_POST['mailsend'];
+    $titulo = trim($_POST['titulo-w']);
+    $mail   = trim($_POST['mailsend']);
     if($mail != 1){$mail = 0;}
     $fecha    = str_replace("%2F","-" , $_POST['fecha_limite']);  
      $dia1       = substr($fecha, 0, 2);  
      $mes1       = substr($fecha, 3,2);
      $year1      = substr($fecha,-4);
      $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
-    $etiquetas = $_POST['idt'];
-    $participant = $_POST['idp'];
-    $notas = $_POST['notas'];
-    $iduser = $_POST['id'];
-    $files = $_POST['files'];
-    $extension = $_POST['extension'];
+    $etiquetas = trim($_POST['idt']);
+    $participant = trim($_POST['idp']);
+    $notas = trim($_POST['notas']);
+    $iduser = trim($_POST['id']);
+    $files = trim($_POST['files']);
+    $extension = trim($_POST['extension']);
     $idcom = 0;
-
-
     $addusertarea = $_POST['tareausuarios'];
 
     $regW= new Registros;
@@ -212,15 +209,47 @@ if($selec == 7)
 //registro de comentarios en las tareas
 if($selec == 8)
 {
+//registramos tareas asignadas por medio de reuniones
+    $titulo = trim($_POST['titulo-w']);
+   
+    $mail   = trim($_POST['mailsend']);
+    if($mail != 1){$mail = 0;}
+   
+    $fecha    = trim($_POST['fecha']);  
+     $dia1       = substr($fecha, 0, 2);  
+     $mes1       = substr($fecha, 3,2);
+     $year1      = substr($fecha,-4);
+     $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
 
+    $participant = trim($_POST['idp']);
+    $notas = trim($_POST['notas']);
+    $iduser = trim($_POST['id']);
+    $idtop = trim($_POST['idtop']);
+    $idsubtop = trim($_POST['idsubtop']);
+    $idre = trim($_POST['idre']);
+
+    $regW= new Registros;
+    $reg1= $regW->regtareasActv($titulo,$fechafin,$notas,$mail,$iduser);///registramos los datos de la actividad
+    $regW->reg_usrasing($reg1,$iduser);//registramos los usuarios asignados
+    
+      $numuser = explode(",",$participant);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+               echo $s= $regW->reg_usrasing($reg1,$numuser[$i]);
+                }
+            }
+     $relas = $regW->regreltareasreunionsub($idre,$idtop,$reg1,$idsubtop);
+
+    echo $relas;
 }
+
 
 //generamos la lista de tareas
 if($selec == 9 )
 {
     header('Content-type: application/json charset=utf-8');
     //$server = array();
-    $idusuario = $_POST['idusua'];
+    $idusuario = trim($_POST['idusua']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistarea($idusuario);
@@ -233,7 +262,7 @@ if($selec == 10)
 {
     header('Content-type: application/json charset=utf-8');
     //$server = array();
-    $idusuario = $_POST['idusua'];
+    $idusuario = trim($_POST['idusua']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistactividades($idusuario);
@@ -246,7 +275,7 @@ if($selec == 11)
 {
    header('Content-type: application/json charset=utf-8');
     //$server = array();
-    $idusuario = $_POST['idusua'];
+    $idusuario = trim($_POST['idusua']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistend($idusuario);
@@ -262,8 +291,8 @@ if($selec == 13)
     header('Content-type: application/json charset=utf-8');
     $server = array();
 
-    $idusuario = $_POST['idusua'];
-    $idre = $_POST['id'];
+    $idusuario = trim($_POST['idusua']);
+    $idre = trim($_POST['id']);
     $val = 1;
     $dbchk = new Reunioneschk;
     $server = $dbchk->chkreunionactiva($idusuario,$val,$idre);
@@ -279,11 +308,11 @@ if($selec == 13)
 if($selec == 14)
 {
 
-     $id=$_POST['id'];
-     $idre=$_POST['idre'];
-     $idus=$_POST['idus'];
-     $tipo=utf8_encode($_POST['tipo']);
-     $texto=utf8_encode($_POST['text']);
+     $id= trim($_POST['id']);
+     $idre= trim($_POST['idre']);
+     $idus= trim($_POST['idus']);
+     $tipo= trim($_POST['tipo']);
+     $texto= trim($_POST['text']);
 
     $dbreg = new Registros;
     $dato  = $dbreg->regNotasLitsReuniones($id,$texto,$tipo);
@@ -304,10 +333,15 @@ if($selec == 14)
 if ($selec == 15) {
     header('Content-type: application/json charset=utf-8');
     $server = array();
-    
-    $idus= $_POST['id'];
+    $flag= 1;    
+    $idus= trim($_POST['id']);
+
     $dbshar= new Busquedasdb;
     $server = $dbshar->busEtique($idus);
+    $server2 = $dbshar->busqdepa($idus,$flag);
+    $server3 = $dbshar->busqproy($idus,$flag);
+    //array_push($server,$server2);
+    //array_push($server,$server3);
     echo json_encode($server);
     
 }
@@ -315,8 +349,8 @@ if ($selec == 15) {
 
 if($selec == 16)
 {
-  $idactv   = $_POST['idw'];
-  $idusr    = $_POST['id'];
+  $idactv   = trim($_POST['idw']);
+  $idusr    = trim($_POST['id']);
   $valor    = 0;
 
     $dbreg = new Registros;
@@ -327,8 +361,8 @@ if($selec == 16)
 ///eliminamos los participantes de la reunion guardada
 if ($selec == 17) 
 {
-  $idre = $_POST['idre'];
-  $idpart = $_POST['idp'];
+  $idre = trim($_POST['idre']);
+  $idpart = trim($_POST['idp']);
 
   $dbDell = new Jbdelldb;
   $res = $dbDell->eliminaparticipante($idpart,$idre);
@@ -337,8 +371,8 @@ if ($selec == 17)
 ///eliminamos las etiqeutas de la reunion guardada
 if ($selec == 18) 
 {
-  $idre = $_POST['idre'];
-  $idtag = $_POST['idt'];
+  $idre = trim($_POST['idre']);
+  $idtag = trim($_POST['idt']);
 
   $dbDell = new Jbdelldb;
   $res = $dbDell->eliminatagreun($idtag,$idre);
@@ -348,23 +382,27 @@ if ($selec == 18)
 
 if($selec == 19)
 {
-   header('Content-type: application/json charset=utf-8');
-    $server = array();
-  $id= $_POST['id'];
+  header('Content-type: application/json charset=utf-8');
+  $server = array();
+
+  $id= trim($_POST['id']);
+
   $dbchk= new Reunioneschk;
   $server=$dbchk->chklistactividades($id);
   echo json_encode($server);
 }
+
+
 //guardamos la ruata del archivo en la base dedatos
 if ($selec == 20) {
   header('Content-type: application/json charset=utf-8');
   $server = array();
   
-  $idtop= $_POST['id'];
-  $idre= $_POST['idre'];
-  $idus= $_POST['idus'];
-  $dir= $_POST['dir'];
-  $tipo= $_POST['tipo'];
+  $idtop= trim($_POST['id']);
+  $idre= trim($_POST['idre']);
+  $idus= trim($_POST['idus']);
+  $dir= trim($_POST['dir']);
+  $tipo= trim($_POST['tipo']);
 
   $dbregarch= new Registros;
   $server=$dbregarch->regArchReuniones($idtop,$idre,$idus,$dir,$tipo);
@@ -375,11 +413,12 @@ if ($selec == 20) {
 if ($selec == 21) {
   header('Content-type: application/json charset=utf-8');
       $server = array();
-     $id=$_POST['id'];
-     $idre=$_POST['idre'];
-     $idus=$_POST['idus'];
-     $op=$_POST['op'];
-     $idsub=$_POST['idsub'];
+     
+     $id= trim($_POST['id']);
+     $idre= trim($_POST['idre']);
+     $idus= trim($_POST['idus']);
+     $op= trim($_POST['op']);
+     $idsub= trim($_POST['idsub']);
 
     $dbchk = new Reunioneschk;      
     $server = array();
@@ -398,10 +437,10 @@ if ($selec == 21) {
 
 if($selec == 22)
 {
-  $comen = $_POST['comen'];
-  $mail = $_POST['mail'];
-  $idus = $_POST['idus'];
-  $idw = $_POST['idw'];
+  $comen = trim($_POST['comen']);
+  $mail = trim($_POST['mail']);
+  $idus = trim($_POST['idus']);
+  $idw = trim($_POST['idw']);
 
   if ($mail =="") {
     $mail=0;
@@ -418,27 +457,27 @@ if($selec == 22)
 //registramos tareas asignadas por medio de reuniones
 if ($selec == 23) {
 
-    $titulo = $_POST['titulo-w'];
-    //$propietario = $_POST['propietario'];
-    $mail   = $_POST['mailsend'];
+    $titulo = trim($_POST['titulo-w']);
+   
+    $mail   = trim($_POST['mailsend']);
     if($mail != 1){$mail = 0;}
-    //$fecha    = str_replace("%2F","-" , $_POST['fecha_limite']);  
-    $fecha    = $_POST['fecha'];  
+   
+    $fecha    = trim($_POST['fecha']);  
      $dia1       = substr($fecha, 0, 2);  
      $mes1       = substr($fecha, 3,2);
      $year1      = substr($fecha,-4);
      $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
-    // $etiquetas = $_POST['idt'];
-    $participant = $_POST['idp'];
-    $notas = $_POST['notas'];
-    $iduser = $_POST['id'];
-    $idtop = $_POST['idtop'];
-    $idre = $_POST['idre'];
+
+    $participant = trim($_POST['idp']);
+    $notas = trim($_POST['notas']);
+    $iduser = trim($_POST['id']);
+    $idtop = trim($_POST['idtop']);
+    $idre = trim($_POST['idre']);
 
     $regW= new Registros;
     $reg1= $regW->regtareasActv($titulo,$fechafin,$notas,$mail,$iduser);///registramos los datos de la actividad
     $regW->reg_usrasing($reg1,$iduser);//registramos los usuarios asignados
-    // $arch= $regW->regarch_actividares($extension,$files,$iduser,$reg1,$idcom);
+    
       $numuser = explode(",",$participant);
             for ($i=0; $i < count($numuser) ; $i++) { 
                 if ($numuser[$i]!=0) {
@@ -455,8 +494,8 @@ if($selec == 24 )
 {
     header('Content-type: application/json charset=utf-8');
     //$server = array();
-    $idusuario = $_POST['idusua'];
-    $idw= $_POST['idw'];
+    $idusuario = trim($_POST['idusua']);
+    $idw= trim($_POST['idw']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistareaesp($idusuario,$idw);
@@ -469,8 +508,8 @@ if($selec == 25)
 {
     header('Content-type: application/json charset=utf-8');
     //$server = array();
-    $idusuario = $_POST['idusua'];
-    $idw = $_POST['idw'];
+    $idusuario = trim($_POST['idusua']);
+    $idw = trim($_POST['idw']);
 
     $dbchk = new Reunioneschk;
     $datos = $dbchk->chklistactividadesp($idusuario,$idw);
@@ -480,10 +519,10 @@ if($selec == 25)
 
 if($selec == 26)
 {
-    $iduser = $_POST['id'];
-    $idw = $_POST['idw'];
-    $files = $_POST['file'];
-    $extension = $_POST['extension'];
+    $iduser = trim($_POST['id']);
+    $idw = trim($_POST['idw']);
+    $files = trim($_POST['file']);
+    $extension = trim($_POST['extension']);
     $idcom = 0;
   $regW= new Registros;
   $arch= $regW->regarch_actividares($extension,$files,$iduser,$idw,$idcom);
@@ -494,8 +533,8 @@ if($selec == 26)
 //registramos los topicos de la reunion
 if ($selec == 27) {
 
-    $id = $_POST['id'];
-    $nombre = $_POST['ti'];
+    $id = trim($_POST['id']);
+    $nombre = trim($_POST['ti']);
 
     $dbreg = new Registros;
     echo $dato  = $dbreg->regtopico($nombre,$id);
@@ -506,10 +545,10 @@ if ($selec == 27) {
 //registramos los sub temas de la  reunion 
 if($selec == 28)
 {
-$texto = $_POST['tes'];
-$idtopic = $_POST['topic'];
-$idre = $_POST['idre'];
-$idus = $_POST['idus'];
+$texto = trim($_POST['tes']);
+$idtopic = trim($_POST['topic']);
+$idre = trim($_POST['idre']);
+$idus = trim($_POST['idus']);
 
 $dbreg = new Registros;
 $datos= $dbreg->regsubtopico($texto,$idre,$idtopic);
@@ -518,7 +557,7 @@ $datos= $dbreg->regsubtopico($texto,$idre,$idtopic);
   {
      header('Content-type: application/json charset=utf-8');
      $dbchk = new Reunioneschk;
-     $valor = $dbchk->listadotopic($idre,$idtopic);
+     $valor = $dbchk->sublistadotopic($idre,$idtopic);
      //chktopic($idre,$idus,$id);
       echo json_encode($valor);
   }
@@ -527,9 +566,9 @@ $datos= $dbreg->regsubtopico($texto,$idre,$idtopic);
 
 if($selec == 29)
 {
-     $id=$_POST['id'];
-     $idre=$_POST['idre'];
-     $idus=$_POST['idus'];
+     $id=trim($_POST['id']);
+     $idre=trim($_POST['idre']);
+     $idus=trim($_POST['idus']);
      $tipo=trim($_POST['tipo']);
      $texto=trim($_POST['text']);
 
@@ -558,15 +597,106 @@ if ($selec == 30)
   header('Content-type: application/json charset=utf-8');
   $server = array();
   
-  $idtop= $_POST['id'];
+  $idtop= trim($_POST['id']);
   //$idsubtop= $_POST['idsub'];
-  $idre= $_POST['idre'];
-  $idus= $_POST['idus'];
-  $dir= $_POST['dir'];
-  $tipo= $_POST['tipo'];
+  $idre= trim($_POST['idre']);
+  $idus= trim($_POST['idus']);
+  $dir= trim($_POST['dir']);
+  $tipo= trim($_POST['tipo']);
 
   $dbregarch= new Registros;
   $server=$dbregarch->regArchReunionessub($idtop,$idre,$idus,$dir,$tipo);
   echo json_encode($server);
 
+}
+
+
+////registramos los usuarios del departamento 
+
+if ($selec == 31) {
+
+  header('Content-type: application/json charset=utf-8');
+  $server = array();
+  
+  $miembros= trim($_POST['miembros']);
+  $idus= trim($_POST['idus']);
+  $titulo= trim($_POST['ti']);
+  $flag=1;
+
+  $dbchk = new Reunioneschk;
+  $rev = $dbchk->chkdepa($titulo,$idus,$flag);
+
+  if($rev == 1)
+  {
+    echo "ok";
+  }
+  if($rev != 1)
+  {
+        $dbregarch= new Registros;
+        $dato=$dbregarch->regdepartamento($idus,$titulo);
+        if($dato !=""){
+          $num_mien = explode(",",$miembros);
+                  for ($i=0; $i < count($num_mien) ; $i++) { 
+                      if ($num_mien[$i]!=0) {
+                      $server=$dbregarch->regdepa_miembros($dato,$num_mien[$i]);
+                      }
+                  }
+        }
+        echo $dato;
+  }
+  
+}
+
+
+/////registramos los usuarios del proyecto
+
+if ($selec == 32) {
+
+header('Content-type: application/json charset=utf-8');
+  $server = array();
+  
+  $miembros= trim($_POST['miembros']);
+  $idus= trim($_POST['idus']);
+  $titulo= trim($_POST['ti']);
+  //$tipo= $_POST['tipo'];
+  $flag=1;
+  $dbchk = new Reunioneschk;
+  $rev = $dbchk->chkproy($titulo,$idus,$flag);
+
+  if($rev == 1)
+  {
+    echo "ok";
+  }
+  if($rev != 1)
+  {
+      $dbregarch= new Registros;
+      $dato=$dbregarch->regproyecto($idus,$titulo);
+      if($dato !=""){
+        $num_mien = explode(",",$miembros);
+                for ($i=0; $i < count($num_mien) ; $i++) { 
+                    if ($num_mien[$i]!=0) {
+                    $server=$dbregarch->regproy_miembros($dato,$num_mien[$i]);
+                    }
+                }
+      }
+      echo $dato;
+  }
+  
+}
+
+if ($selec == 33) {
+
+  header('Content-type: application/json charset=utf-8');
+  $server = array();
+
+
+  $iddep = $_POST['dep'];
+  $idus = $_POST['us'];
+  $flag = 1;
+  $dbchk = new Reunioneschk;
+  $server = $dbchk->busqdepaesp($idus,$flag,$iddep);
+
+  echo json_encode($server);
+
+  
 }

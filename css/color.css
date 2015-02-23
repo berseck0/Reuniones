@@ -391,6 +391,7 @@ text-shadow: 2px 1px rgba(63, 56, 17, 0.66);
     border-radius: 5px;
     padding-left: 5px;
 }
+
 #meetingShow span
 {
     background-color: rgba(241, 246, 26, 0.57);
@@ -412,7 +413,13 @@ text-shadow: 2px 1px rgba(63, 56, 17, 0.66);
     margin: 0.7em auto 0px;
     height: 420px;
 }
-
+.alerta
+{
+    padding: 5px;
+    border-color: red;
+    display: inline-block;
+    color:red;
+}
 .head_etique
 {
     background-color: rgba(54,150,145,0.9);
@@ -600,6 +607,7 @@ a {
     margin: 0px;
     font-size: 13px;
 }
+
 
 .capaover
 {
@@ -1094,6 +1102,17 @@ a {
     left: 3.5em;
 }
 
+.list-usr-depa
+{
+    float: right;
+    right: 21%;
+    display: block;
+    background-color: #FFF;
+    border-radius: 0px 0px 5px 5px;
+    width: 253px;
+    margin-top: -0.1em;
+}
+
 .list-share
 {
     display:inline-table;
@@ -1195,7 +1214,7 @@ a {
     display: block;
     border: 0px solid gray;
     position: absolute;
-    width: 30%;
+  
 }
 
 .listusract
