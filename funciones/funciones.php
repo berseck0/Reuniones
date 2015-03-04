@@ -75,9 +75,6 @@ if ($selec == 2) {
     $myjson =json_encode($server);
     //$myjson = stripslashes($myjson);
     echo $myjson;
-    //echo json_decode($myjson,true);
-    //echo json_last_error_msg();
-
 }
 
 //visualisamos lista de reuniones pasadas o terminadas
@@ -168,10 +165,10 @@ if($selec == 7)
     $mail   = trim($_POST['mailsend']);
     if($mail != 1){$mail = 0;}
     $fecha    = str_replace("%2F","-" , $_POST['fecha_limite']);  
-     $dia1       = substr($fecha, 0, 2);  
-     $mes1       = substr($fecha, 3,2);
-     $year1      = substr($fecha,-4);
-     $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
+    $dia1       = substr($fecha, 0, 2);  
+    $mes1       = substr($fecha, 3,2);
+    $year1      = substr($fecha,-4);
+    $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
     $etiquetas = trim($_POST['idt']);
     $participant = trim($_POST['idp']);
     $notas = trim($_POST['notas']);
@@ -204,22 +201,49 @@ if($selec == 7)
 
     echo $arch;
 
+
+////////////////////////////////////////////////////////////////////////
+///seccion para mail
+///cuando mail su valor sea 1 se le envia al correo del que creo la actividad
+//titulo de mail $titulo
+//
+//$dbshar = new Busquedasdb;
+//$datos=$dbshar->busmail_usuarios($iduser);
+//
+//$nombre_full= $datos['NOMBRES'].$datos['A_PATERNO'].$datos['A_MATERNO'];
+//$mail_send = $datos['EMAIL'];
+////el cuerpo  puede ser la nota que agrego y los usuarios que se anexaron a la activiad
+//igual en esta parte podemos mandar la liga del archivo ?? como parte del cuerpo si es que se subio un archivo al crear la actividad 
+//$files;
+//$notas; 
+//$fechafin limite para hacer la actividad 
+/*    $numuser = explode(",",$participant);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+                $participan=$dbshar->busmail_usuarios($numuser[$i]);
+                echo $nombre_full = $participan['NOMBRES'].$participan['A_PATERNO'].$participan['A_MATERNO'];
+                }
+            }
+*/
+
+
+
 }
 
-//registro de comentarios en las tareas
+//registro de comentarios en las tareas como subtemas 
 if($selec == 8)
 {
 //registramos tareas asignadas por medio de reuniones
     $titulo = trim($_POST['titulo-w']);
    
     $mail   = trim($_POST['mailsend']);
-    if($mail != 1){$mail = 0;}
+    if($mail != 1){ $mail = 0;}
    
     $fecha    = trim($_POST['fecha']);  
-     $dia1       = substr($fecha, 0, 2);  
-     $mes1       = substr($fecha, 3,2);
-     $year1      = substr($fecha,-4);
-     $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
+    $dia1       = substr($fecha, 0, 2);  
+    $mes1       = substr($fecha, 3,2);
+    $year1      = substr($fecha,-4);
+    $fechafin    = $year1.'-'.$mes1.'-'.$dia1;
 
     $participant = trim($_POST['idp']);
     $notas = trim($_POST['notas']);
@@ -231,16 +255,50 @@ if($selec == 8)
     $regW= new Registros;
     $reg1= $regW->regtareasActv($titulo,$fechafin,$notas,$mail,$iduser);///registramos los datos de la actividad
     $regW->reg_usrasing($reg1,$iduser);//registramos los usuarios asignados
-    
+ 
+     $chkus= new Reunioneschk;
       $numuser = explode(",",$participant);
             for ($i=0; $i < count($numuser) ; $i++) { 
                 if ($numuser[$i]!=0) {
-               echo $s= $regW->reg_usrasing($reg1,$numuser[$i]);
+                  $cou=$chkus->chk_usrasing_tareas($reg1,$numuser[$i]);
+                  if($cou==0){
+                    echo $s= $regW->reg_usrasing($reg1,$numuser[$i]);
+                  }
                 }
             }
+
+
+
      $relas = $regW->regreltareasreunionsub($idre,$idtop,$reg1,$idsubtop);
 
     echo $relas;
+
+
+////////////////////////////////////////////////////////////////////////
+///seccion para mail
+///cuando mail su valor sea 1 se le envia al correo del que creo la actividad
+//titulo de mail $titulo
+//
+//$dbshar = new Busquedasdb;
+//$datos=$dbshar->busmail_usuarios($iduser);
+//
+//$nombre_full= $datos['NOMBRES'].$datos['A_PATERNO'].$datos['A_MATERNO'];
+//$mail_send = $datos['EMAIL'];
+////el cuerpo  puede ser la nota que agrego y los usuarios que se anexaron a la activiad
+///en esta parte igual nota no existe porque es actividad asignada por medio de una reunion donde nomas se 
+///asigna al usuario le nombre de la tarea  y fecha
+//$notas; 
+//$fechafin limite para hacer la actividad 
+/*    $numuser = explode(",",$participant);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+                $participan=$dbshar->busmail_usuarios($numuser[$i]);
+                echo $nombre_full = $participan['NOMBRES'].$participan['A_PATERNO'].$participan['A_MATERNO'];
+                }
+            }
+*/
+
+
 }
 
 
@@ -451,10 +509,30 @@ if($selec == 22)
   $res=$dbregcomen->regcoment_w($comen,$mail,$idus,$idw);
   echo $res;
 
+////////////////////////////////////////////////////////////////////////
+///seccion para mail
+///cuando mail su valor sea 1 se le envia al correo del que creo la actividad
+//titulo de mail $titulo
+//
+//$dbshar = new Busquedasdb;
+//$datos=$dbshar->bustareaesp($idw);
+//
+//$nombre_full= $datos['NOMBRES'].$datos['A_PATERNO'].$datos['A_MATERNO'];
+//$mail_send = $datos['EMAIL'];
+//$titulo= $datos['titulo'];
+//como cuerpo seria el comentario del usuario 
+//$comen; 
+//
+/*   
+     $participan=$dbshar->busmail_usuarios($idus);
+     echo $nombre_full = $participan['NOMBRES'].$participan['A_PATERNO'].$participan['A_MATERNO'];
+                  $participan['EMAIL'];
+*/
+
   
 }
 
-//registramos tareas asignadas por medio de reuniones
+//registramos tareas asignadas por medio de reuniones como tema principal 
 if ($selec == 23) {
 
     $titulo = trim($_POST['titulo-w']);
@@ -477,16 +555,48 @@ if ($selec == 23) {
     $regW= new Registros;
     $reg1= $regW->regtareasActv($titulo,$fechafin,$notas,$mail,$iduser);///registramos los datos de la actividad
     $regW->reg_usrasing($reg1,$iduser);//registramos los usuarios asignados
-    
+    $chkus= new Reunioneschk;
       $numuser = explode(",",$participant);
             for ($i=0; $i < count($numuser) ; $i++) { 
                 if ($numuser[$i]!=0) {
-               echo $s= $regW->reg_usrasing($reg1,$numuser[$i]);
+                  $cou=$chkus->chk_usrasing_tareas($reg1,$numuser[$i]);
+                  if($cou==0){
+                    echo $s= $regW->reg_usrasing($reg1,$numuser[$i]);
+                  }
                 }
             }
      $relas = $regW->regreltareasreunion($idre,$idtop,$reg1);
 
     echo $relas;
+
+////////////////////////////////////////////////////////////////////////
+///seccion para mail
+///cuando mail su valor sea 1 se le envia al correo del que creo la actividad
+//titulo de mail $titulo
+//
+//$dbshar = new Busquedasdb;
+//$datos=$dbshar->busmail_usuarios($iduser);
+//
+//$nombre_full= $datos['NOMBRES'].$datos['A_PATERNO'].$datos['A_MATERNO'];
+//$mail_send = $datos['EMAIL'];
+////el cuerpo  puede ser la nota que agrego y los usuarios que se anexaron a la activiad
+///en esta parte igual nota no existe porque es actividad asignada por medio de una reunion donde nomas se asigna al usuario le nombre de la tarea  y fecha
+//$notas; 
+//$fechafin limite para hacer la actividad 
+/*    $numuser = explode(",",$participant);
+            for ($i=0; $i < count($numuser) ; $i++) { 
+                if ($numuser[$i]!=0) {
+                $participan=$dbshar->busmail_usuarios($numuser[$i]);
+                echo $nombre_full = $participan['NOMBRES'].$participan['A_PATERNO'].$participan['A_MATERNO'];
+                }
+            }
+*/
+
+
+
+
+
+
 
 }
 //generamos la lista de comentarios o etiquetas para  actividades especifica para  cara actividad
@@ -531,7 +641,8 @@ if($selec == 26)
 
 
 //registramos los topicos de la reunion
-if ($selec == 27) {
+if ($selec == 27) 
+{
 
     $id = trim($_POST['id']);
     $nombre = trim($_POST['ti']);
@@ -695,6 +806,23 @@ if ($selec == 33) {
   $flag = 1;
   $dbchk = new Reunioneschk;
   $server = $dbchk->busqdepaesp($idus,$flag,$iddep);
+
+  echo json_encode($server);
+
+  
+}
+
+if ($selec == 34) {
+
+  header('Content-type: application/json charset=utf-8');
+  $server = array();
+
+  $texto = $_POST['t'];
+  $idus = $_POST['us'];
+  $idw = $_POST['w'];
+  $flag = 1;
+  $dbreg = new Registros;
+  $server = $dbreg->estatus_Wupdate($idus,$flag,$texto,$idw);
 
   echo json_encode($server);
 

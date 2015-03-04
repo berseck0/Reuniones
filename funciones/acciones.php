@@ -291,7 +291,7 @@ $server = array();
         function chkasingactividad($idtop,$idre)
         {
             $mysqli=$this->conexion();
-            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.idtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario";
+            $sql = "SELECT act.nombre AS actv, emp.NOMBRES, act.fecha FROM jb_empleado emp, jb_tareas_actividades act, jb_rel_reun_tarea rt, jb_user_asignadosw usa WHERE rt.idtopic =? and rt.idreun=? AND rt.id_tarea = usa.id_tarea AND emp.ID_EMPLEADO = usa.id_useradd AND act.id_actividades = rt.id_tarea AND usa.id_useradd !=act.id_propietario and rt.id_subtopic=0";
             $lista=array();
             if($data=$mysqli->prepare($sql))
             {
@@ -602,14 +602,14 @@ $server = array();
         {
             $mysqli=$this->conexion();
 
-                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES, tarActv.id_actividades FROM jb_tareas_actividades tarActv, jb_empleado jbemp WHERE tarActv.id_propietario =?  AND tarActv.flag=1   AND jbemp.ID_EMPLEADO = tarActv.id_propietario ORDER BY tarActv.fecha ASC";
+                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES, tarActv.id_actividades,tarActv.estatus FROM jb_tareas_actividades tarActv, jb_empleado jbemp WHERE tarActv.id_propietario =?  AND tarActv.flag=1   AND jbemp.ID_EMPLEADO = tarActv.id_propietario ORDER BY tarActv.fecha ASC";
                 $lista=array();
               
                 if ($data=$mysqli->prepare($sql)) {
                      $data->bind_param("i",$iduser);
                      if($data->execute())
                      {
-                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6);
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
 
                         while ($data->fetch()) {
                             $registro['titulo']=$col1;
@@ -618,6 +618,7 @@ $server = array();
                             $registro['mail']=$col4;
                             $registro['usuario']=$col5;
                             $registro['idactw']=$col6;
+                            $registro['estatus']=$col7;
                             $registro['tagW']=$this->rel_tag_tareas($registro['idactw'],$iduser);
                             $registro['usrAsing']=$this->rel_usr_tarea($registro['idactw']);
                             $registro['archivos']=$this->chkarchivos_tareas($registro['idactw']);
@@ -637,14 +638,14 @@ $server = array();
         {
             $mysqli=$this->conexion();
 
-                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES ,tarActv.id_actividades,tarActv.id_propietario  FROM jb_tareas_actividades tarActv, jb_empleado jbemp, jb_user_asignadosw userasign WHERE userasign.id_useradd =? AND userasign.id_tarea = tarActv.id_actividades AND tarActv.flag =1 AND jbemp.ID_EMPLEADO = tarActv.id_propietario ORDER BY tarActv.fecha ASC";
+                $sql = "SELECT tarActv.nombre, tarActv.fecha, tarActv.nota, tarActv.mail, jbemp.NOMBRES ,tarActv.id_actividades,tarActv.id_propietario,tarActv.estatus  FROM jb_tareas_actividades tarActv, jb_empleado jbemp, jb_user_asignadosw userasign WHERE userasign.id_useradd =? AND userasign.id_tarea = tarActv.id_actividades AND tarActv.flag =1 AND jbemp.ID_EMPLEADO = tarActv.id_propietario ORDER BY tarActv.fecha ASC";
                 $lista=array();
               
                 if ($data=$mysqli->prepare($sql)) {
                      $data->bind_param("i",$iduser);
                      if($data->execute())
                      {
-                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7);
+                        $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6,$col7,$col8);
 
                         while ($data->fetch()) {
                             $registro['titulo']=$col1;
@@ -654,6 +655,7 @@ $server = array();
                             $registro['usuario']=$col5;
                             $registro['idw']=$col6;
                             $registro['idprop']=$col7;
+                            $registro['estatus']=$col8;
                             $registro['tagW']=$this->rel_tag_tareas($registro['idw'],$iduser);
                             $registro['usrAsing']=$this->rel_usr_tarea($registro['idw']);
                             $registro['archivos']=$this->chkarchivos_tareas($registro['idw']);
@@ -1040,6 +1042,36 @@ $server = array();
                      }
              }
         }    
+
+
+        /// registramos  los uusarioas asigandos 
+        function chk_usrasing_tareas($idtarea,$iduse)
+        {
+            $mysqli = $this->conexion();
+            $sql = "SELECT count(id_asig) from jb_user_asignadosw where id_tarea=? and id_useradd=?";
+
+            if($data = $mysqli->prepare($sql))
+            {
+                $data->bind_param("ii",$idtarea,$iduse);
+                if($data->execute())
+                {
+                    $data->bind_result($col1);
+
+                    if($data->fetch())
+                     {
+                        $registro=$col1;
+                    }
+                    $data->free_result();
+                    $data->close();
+                    return $registro;
+                }
+                else
+                {
+                    $data->close();
+                    return false;
+                }
+            }
+        }
               
 
     }
@@ -1653,7 +1685,27 @@ $server = array();
             }  
         }  
 
-        
+        function estatus_Wupdate($idus,$flag,$texto,$idw)
+        {
+            $mysqli= $this->conexion();
+            $sql="UPDATE jb_tareas_actividades set estatus=? where flag=? and id_actividades=?";
+
+            if($datos = $mysqli->prepare($sql))
+            {
+                $datos->bind_param("sii",$texto,$flag,$idw);
+                 if($datos->execute())
+                {
+                    if($datos->affected_rows)
+                    {
+                        return true;
+                    }
+                    $datos->close();              
+                }
+                $datos->free_result();
+                $datos->close();
+
+            }  
+        }
 
 
 
@@ -1840,6 +1892,58 @@ $server = array();
                     while ($data->fetch()){
                         $registro['idproy']=$col1;
                         $registro['nombre']=$col2;
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+        function busmail_usuarios($idus)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT EMAIL,NOMBRES, A_MATERNO, A_PATERNO FROM jb_empleado WHERE ID_EMPLEADO=?";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("i",$idus);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2,$col3,$col4);
+
+                    while ($data->fetch()){
+                        $registro['EMAIL']=$col1;
+                        $registro['NOMBRES']=$col2;
+                        $registro['A_MATERNO']=$col3;
+                        $registro['A_PATERNO']=$col4;
+                        $listado[]=$registro;
+                    }
+                $data->free_result();
+                $data->close();
+                return $listado;
+            }
+            return $listado;
+        }
+
+        function bustareaesp($idwork)
+        {
+            $mysqli=$this->conexion();
+            $sql="SELECT emp.EMAIL,emp.NOMBRES, emp.A_MATERNO, emp.A_PATERNO,tar.nombre as titulo,tar.id_propietario  FROM jb_empleado emp,jb_tareas_actividades tar WHERE tar.id_actividades=? and  tar.id_propietario=emp.ID_EMPLEADO";
+            $listado = array();
+            if ($data = $mysqli->prepare($sql)) {
+                $data->bind_param("i",$idwork);
+
+                if($data->execute())
+                    $data->bind_result($col1,$col2,$col3,$col4,$col5,$col6);
+
+                    while ($data->fetch()){
+                        $registro['EMAIL']=$col1;
+                        $registro['NOMBRES']=$col2;
+                        $registro['A_MATERNO']=$col3;
+                        $registro['A_PATERNO']=$col4;
+                        $registro['titulo']=$col5;
+                        $registro['propietario']=$col6;
                         $listado[]=$registro;
                     }
                 $data->free_result();

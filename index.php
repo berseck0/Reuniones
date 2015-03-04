@@ -27,7 +27,7 @@
                 <a href=""><span class="icon">K</span>Reunion</a>
             </div>
              <div id="show_act" class="btn-Ac">
-                 <a><span class="icon">Ñ</span>Actividades</a>
+                 <a href="#"><span class="icon">Ñ</span>Actividades</a>
             </div>
          </div>
         <div class="loger">
@@ -276,7 +276,7 @@
 </div>
 <div id="jb_result_tags" style="display:none;"></div>
 <div id="jb_result_users" style="display:none;"></div>
-
+<div id="jb_desplega_info"></div>
     
 <?php } ?>
 </div>

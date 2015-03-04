@@ -819,7 +819,16 @@ a {
     margin: 0 auto;
     height: 450px;
 }
-
+.terminado 
+{
+    background-color: rgba(16, 127, 146, 0.71);
+}
+.post-w-head span
+{
+    font-size: 0.7em;
+    background-color: #E65656;
+    padding: 1px;
+}
  .tareasIdeas #incl_list_tareas,.tareasPend #incl_list_act,.tareasCompletas #incl_list_Wcomplet
  {
     overflow-x: hidden;
@@ -1194,10 +1203,6 @@ a {
     top: -0.1em;
 }
 
-.alertDia .normal
-{
-    color: rgba(219, 219, 219, 0.53);
-}
 
 .list_asociada
 {

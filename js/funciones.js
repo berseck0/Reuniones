@@ -68,17 +68,25 @@ function funciones()
 }
 
 /*
+
 $(document).on("ready",funkey);
 //atajo para llamar una nueva reunion rapido
 function funkey()
 {
-    $(document).keyup(function(event){
-        var letra = event.keyCode;//84->t
-        if(letra == 82)
-        {
-            new_meeting();
-        }
-    });
+    if ($("body #reunionesOK").length >0 && $("body #reunionespas").length>0 ){
+        console.log("es caja de texto");
+    }
+    else
+    {
+
+        $(document).keyup(function(event){
+            var letra = event.keyCode;//84->t
+            if(letra == 82)
+            {
+                new_meeting();
+            }
+        });
+    }
 }
 */
 function logOn(event)
@@ -101,8 +109,9 @@ function loger()
     }else
     {
         $.post(ruta,txt, function(data){
-            if (data === "1") {
+            if (data == "1") {
                 location.reload();
+               
             }
             else
             {
@@ -768,9 +777,9 @@ function reunionespasadas(){
         $.each(data,function(k,v){
 
             var datahtml='<div id="'+v.idre+'" class="meeting_end jb_antiguas_reuniones">';
-                datahtml+='<img src="img/avatar_2x.png" alt="imagen_user" height="50" width="80">';
+                
                 datahtml+='<div  class="meeting_head">';
-                datahtml+='<h4>'+v.nombre+'</h4><span class="alertDia">Reunion Terminada<span class="icon normal">Ë</span></span>';
+                datahtml+='<h4>'+v.nombre+'</h4><span class="alertDia">Reunion Terminada</span>';
                 datahtml+='<div class="meeting_date">'+v.fecha+'  '+v.hora+'</div>';
                 datahtml+='<div class="meeting_user">'+v.usuario+'</div>';
                 datahtml+='</div>';
@@ -877,16 +886,30 @@ function jb_reunion_upop(id)
                         $.each(arch, function(k,a){
                         var img = isImage(a.tipo);
                             if(img){
-                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>"; 
                             }else{
-                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem' download ><span class='icon'>m</span></a></li>";
                             }
                         });
                         html+="</ul></div>";
 
 
-                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul id='subtema_"+v.id+"'>";
-                   
+                        html+="</div></div><div id='sublistaction_"+v.id+"'>";
+                        html+='<div id="seccion_'+v.id+'">';
+                        html+='<div id="txt_'+v.id+'" class="menu_list_active">';
+                        html+='<textarea id="textolist_activ_'+v.id+'" onclick="block_oplitsact('+v.id+');" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                        html+='<div id="text_check_visible_'+v.id+'" class="opciones_list_activ_'+v.id+'" style="display:none">';
+                        html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                        html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                        html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+v.id+'" onclick="selecarchreunew('+v.id+',2,1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo(1,'+v.id+','+id+');"value="Agregar" />';
+                        html+='</form><div class="mensaje" id="mensaje_'+v.id+'"></div><div class="showImage" id="showImage_'+v.id+'"></div></div>';
+                        html+='<div class="bar_menu_list_'+v.id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_accionlist('+v.id+',\'nota\')"/>';
+                        html+='<input type="button" value="Decision" onclick="save_accionlist('+v.id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+v.id+',\'tarea\',2,1)" />';
+                        html+='</div></div>';
+                        html+='</div></div>';
+                        html+='</div>';
+                        html+='<div><label for="" onclick="subtopicact('+v.id+');">Agregar sub tema</label></div>';
+                        html+="</div><ul id='subtema_"+v.id+"'>";
 
                     var sublis= v.sublist;
                     $.each(sublis, function(k,l){
@@ -910,16 +933,30 @@ function jb_reunion_upop(id)
                                 $.each(arch, function(k,a){
                                    var img = isImage(a.tipo);
                                     if(img){
-                                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                            html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                         }else{
-                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                         }
                                 });
                             html+="</ul></div>";
 
 
 
-                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'>";
+                            html+='<div id="seccion_'+l.idsub+'">';
+                            html+='<div id="txt_'+l.idsub+'" class="menu_list_active">';
+                            html+='<textarea id="textoreunion_'+l.idsub+'" onclick="block_opsublitsact('+l.idsub+');"  name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                            html+='<div id="text_check_visible_'+l.idsub+'" class="opciones_list_activ_'+l.idsub+'" style="display:none">';
+                            html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                            html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                            html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_sub_'+l.idsub+'" onclick="selecarchreunew('+l.idsub+',2,2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(4,'+l.idsub+',2);"value="Agregar" />';
+                            html+='</form><div class="mensaje" id="mensaje_'+l.idsub+'"></div><div class="showImage" id="showImage_'+l.idsub+'"></div></div>';
+                            html+='<div class="bar_menu_list_'+l.idsub+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+l.idsub+',\'nota\',2)"/>';
+                            html+='<input type="button" value="Decision" onclick="save_sublistreunion('+l.idsub+',\'decision\',2)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+l.idsub+',\'tarea\',2,2)" />';
+                            html+='</div></div>';
+                            html+='</div></div>';
+                            html+='</div>';
+                            html+="</div> </li>";
                     });
                     html+='</ul></li>';
 
@@ -971,8 +1008,11 @@ function genListReunActv(idre)
     var ruta ="funciones/funciones.php";
     $.post(ruta, txt, function(data) {
         var html="";
+
                 $.each(data,function(k,v){
                     var li=v.lista;
+                    var id_re=v.idre;
+                    console.log(v.idre);
                     $.each(li, function(i, va) {
                             html+="<li id='topiclist_"+va.id+"' class='topiclist' ><span id='tema_prim_"+va.id+"'>"+va.text+"</span><div id='listanotas_"+va.id+"'><div id='notas'>";
                             html+='<ul class="notas">';
@@ -993,14 +1033,29 @@ function genListReunActv(idre)
                             $.each(arch, function(k,a){
                             var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: none; display: inline;' ><a href='' download> <img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                 }else{
-                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                 }
                             });
 
                             html+="</ul></div>";
-                            html+="</div></div><div id='sublistaction_"+va.id+"'></div><ul id='subtema_"+va.id+"'>";
+                            html+="</div></div><div id='sublistaction_"+va.id+"'>";
+                            html+='<div id="seccion_'+va.id+'">';
+                            html+='<div id="txt_'+va.id+'" class="menu_list_active">';
+                            html+='<textarea id="textolist_activ_'+va.id+'" onclick="block_oplitsact('+va.id+');" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                            html+='<div id="text_check_visible_'+va.id+'" class="opciones_list_activ_'+va.id+'" style="display:none">';
+                            html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                            html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                            html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_'+va.id+'" onclick="selecarchreunew('+va.id+',2,1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo(1,'+va.id+','+id_re+');"value="Agregar" />';
+                            html+='</form><div class="mensaje" id="mensaje_'+va.id+'"></div><div class="showImage" id="showImage_'+va.id+'"></div></div>';
+                            html+='<div class="bar_menu_list_'+va.id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_accionlist('+va.id+',\'nota\')"/>';
+                            html+='<input type="button" value="Decision" onclick="save_accionlist('+va.id+',\'decision\')"/><input type="button" value="Tarea" onclick="save_tarea_tema('+va.id+',\'tarea\',2,1)" />';
+                            html+='</div></div>';
+                            html+='</div></div>';
+                            html+='</div>';
+                            html+='<div><label for="" onclick="subtopicact('+va.id+');">Agregar sub tema</label></div>';
+                            html+="</div><ul id='subtema_"+va.id+"'>";
 
                             var sublis= va.sublist;
                             $.each(sublis, function(k,l){
@@ -1024,13 +1079,27 @@ function genListReunActv(idre)
                                         $.each(arch, function(k,a){
                                            var img = isImage(a.tipo);
                                             if(img){
-                                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                                    html+="<li style='list-style: none; display: inline;' ><a href='' download> <img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                                 }else{
-                                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                                 }
                                         });
                                     html+="</ul></div>";
-                                    html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                                    html+="</div></div><div id='sub_listaction_"+l.idsub+"'>";
+                                    html+='<div id="seccion_'+l.idsub+'">';
+                                    html+='<div id="txt_'+l.idsub+'" class="menu_list_active">';
+                                    html+='<textarea id="textoreunion_'+l.idsub+'" onclick="block_opsublitsact('+l.idsub+');"  name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                                    html+='<div id="text_check_visible_'+l.idsub+'" class="opciones_list_activ_'+l.idsub+'" style="display:none">';
+                                    html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                                    html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                                    html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_meeting_act_sub_'+l.idsub+'" onclick="selecarchreunew('+l.idsub+',2,2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(3,'+l.idsub+',2);"value="Agregar" />';
+                                    html+='</form><div class="mensaje" id="mensaje_'+l.idsub+'"></div><div class="showImage" id="showImage_'+l.idsub+'"></div></div>';
+                                    html+='<div class="bar_menu_list_'+l.idsub+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+l.idsub+',\'nota\',2)"/>';
+                                    html+='<input type="button" value="Decision" onclick="save_sublistreunion('+l.idsub+',\'decision\',2)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+l.idsub+',\'tarea\',2)" />';
+                                    html+='</div></div>';
+                                    html+='</div></div>';
+                                    html+='</div>';
+                                    html+="</div> </li>";
                             });
                             html+='</ul></li>';
                         
@@ -1048,28 +1117,51 @@ function genListReunActv(idre)
 ///mostramos las opciones de los elementos de laslistas activas
 function block_oplits(id)
 {
-    var detectShow = $("[id^=text_check_visible_]")
-    $.each(detectShow, function(k,v){
-        if($('#'+v.id).is(":visible"))
-        {
-            $('#'+v.id).hide();
-            $(".mensaje span").remove();
-            $(".showImage img").remove();
-        }
-        var id_txt = v.id.replace("text_check_visible_","");
-        if($('#txt_'+id_txt+' #form_tarea_tema').length > 0)
-        {
 
-            $(".mensaje span").remove();
-            $(".showImage img").remove();
-            $('#txt_'+id_txt+' #form_tarea_tema').remove();
-            $("#txt_"+id_txt+" div").show();
-            $("#txt_"+id_txt+" textarea").show();
-        }
-   });
-    $(".opciones_list_activ_"+id).css({"display":"block"});
+    if(!$("#sublistaction_"+id+" #check_visible_"+id).is(":visible"))
+    {
+        $("[id^=sublistaction_] [id^=check_visible_]").hide(100);
+        $("[id^=sub_listaction_] [id^=check_visible_]").hide(100);
+        $("#sublistaction_"+id+" #check_visible_"+id).show(1000);
+    }
+
 }
 
+function block_opsublits(id)
+{
+
+    if(!$("#sub_listaction_"+id+" #check_visible_"+id).is(":visible"))
+    {
+        $("[id^=sublistaction_] [id^=check_visible_]").hide(100);
+        $("[id^=sub_listaction_] [id^=check_visible_]").hide(100);
+        $("#sub_listaction_"+id+" #check_visible_"+id).show(1000);
+    }
+
+}
+
+function block_oplitsact(id)
+{
+
+    if(!$("#sublistaction_"+id+" #text_check_visible_"+id).is(":visible"))
+    {
+        $("[id^=sublistaction_] [id^=text_check_visible_]").hide(100);
+        $("[id^=sub_listaction_] [id^=text_check_visible_]").hide(100);
+        $("#sublistaction_"+id+" #text_check_visible_"+id).show(1000);
+    }
+
+}
+
+function block_opsublitsact(id)
+{
+
+    if(!$("#sub_listaction_"+id+" #text_check_visible_"+id).is(":visible"))
+    {
+        $("[id^=sublistaction_] [id^=text_check_visible_]").hide(100);
+        $("[id^=sub_listaction_] [id^=text_check_visible_]").hide(100);
+        $("#sub_listaction_"+id+" #text_check_visible_"+id).show(1000);
+    }
+
+}
 
 //function guardamos la accion de la lista 
 function save_accionlist(id,txt)
@@ -1102,9 +1194,9 @@ function save_accionlist(id,txt)
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                     }else{
-                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                     }
                             });
                     html+="</ul></div>";
@@ -1148,9 +1240,9 @@ function show_listreunion(id)
                     $.each(arch, function(k,a){
                         var img = isImage(a.tipo);
                         if(img){
-                                html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                         }else{
-                                html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                         }
                     });
             html+="</ul></div>";
@@ -1192,9 +1284,9 @@ function show_listreunion_new(id)
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: outside none none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: outside none none; display: inline;' ><a href='' download> <img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                     }else{
-                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                     }
                             });
                     html+="</ul></div>";
@@ -1243,13 +1335,16 @@ function show_listreunion_newsubtema(id,op)
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: outside none none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: outside none none; display: inline;' > <a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                     }else{
-                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: outside none none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                     }
                             });
                     html+="</ul></div>";
                 $("#subtopiclist_"+id+" #sublistanotas_"+id+" #notas").append(html);
+                $("#subtopiclist_"+id+" #sub_listaction_"+id+" #txts_"+id+" #form_tarea_tema_"+id).remove();
+                $("#subtopiclist_"+id+" #sub_listaction_"+id+" #txts_"+id+" div").show();
+                $("#subtopiclist_"+id+" #sub_listaction_"+id+" #txts_"+id+" textarea").show();
             });
     }).fail(function(){ alert("Fallo Servidor");});
 }
@@ -1314,10 +1409,17 @@ function genlistactv()
                  $("#incl_list_tareas .post-w").remove();
        }
         $.each(data,function(k,v){
-           var html='<div id="'+v.idactw+'"class="post-w list_primero_tareas">';
+                var estatus ="";
+            if (v.estatus != "undefined" ||  v.estatus != "null") {
+                 estatus = v.estatus;
+                }
+                else 
+                { estatus ="No Esta definido";}
+
+           var html='<div id="'+v.idactw+'"class="post-w list_primero_tareas '+estatus+'">';
                html+='<img src="" alt="una imagen" height="50" width="80">';
                html+='<div class="post-w-head">';
-               html+='<h4>'+v.titulo+'</h4>';
+               html+='<h4>'+v.titulo+'</h4><span>'+estatus+'</span>';
                html+='<div class="post-w-date">'+v.fecha+'</div>';
                html+='<div class="post-w-user">'+v.usuario+'</div>';
                html+='<div class="notas-w">Nota: ';
@@ -1328,6 +1430,8 @@ function genlistactv()
                html+='</div>';
                html+='<div class="btn_down"  onclick="showtarw('+v.idactw+',0);"><span class="icon" >:</span></div>';
                html+='<div class="btn_del" onclick="w_fin('+v.idactw+','+idus+',1)"><span class="icon">Â</span></div>';
+               html+='<div style="float: right; margin-bottom: -10px;" id="progreso_'+v.idactw+'"><span class="icon" title="Califica Tu Progreso" style="top: -0.15em; font-size: 2.5em; cursor:pointer;">o</span>';
+               html+='<div style="float: right; position: relative; font-size: 0.8em;"><select name="estatus" id="estatus_act_'+v.idactw+'"><option value=""></option><option value="proceso">En proceso</option><option value="pendiente">Pendiente</option><option value="terminado">Terminado</option></select></div></div>'
                html+='<div id="segmain_'+v.idactw+'" class="w-segundo-main">';
                html+='<div id="comn_tareas_'+v.idactw+'" class="coment_w"><label for="">Comentario:</label><input type="text" placeholder="escribe algun comentario" />';
                html+='<div class="mensaje" id="mensaje_'+v.idactw+'" style="margin-top: 1em;font-size: 0.81em; width: 31%; overflow: hidden; position: relative; float: right; right: 1.7em;"></div>';
@@ -1354,9 +1458,9 @@ function genlistactv()
                     if (typeof a !== "undefined" || a !== "null") {
                         var img = isImage(a.tipo);
                         if(img){
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"" ><img src="'+a.liga+'" alt="50" width="50" /></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"" > <a href="" download><img src="'+a.liga+'" alt="50" width="50" /></a></li>';
                         }else{
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'"><span class="icon">Ø</span></a></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'" download><span class="icon">Ø</span></a></li>';
                         }
                     }
                 });
@@ -1431,10 +1535,10 @@ function genlistfull()
                     if (typeof a !== "undefined" || a !== "null") {
                         var img = isImage(a.tipo);
                         if(img){
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><img src="'+a.liga+'" alt="50" width="50" /></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="" download><img src="'+a.liga+'" alt="50" width="50" /></a></li>';
                         }
                         else{
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'"><span class="icon">Ø</span></a></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'" download><span class="icon">Ø</span></a></li>';
                         }
                     }
                 });
@@ -1464,7 +1568,7 @@ function genlistend()
             }
 
             $.each(data3,function(k,v){
-            var html='<div class="post-w jb_tareas_terminadas">';
+            var html='<div id="'+v.idw+'" class="post-w jb_tareas_terminadas">';
                html+='<img src="" alt="una imagen" height="50" width="80">';
                html+='<div class="post-w-head">';
                html+='<h4>'+v.titulo+'</h4>';
@@ -1495,9 +1599,9 @@ function genlistend()
                 $.each(arch,function(k,a){
                     var img = isImage(a.tipo);
                     if(img){
-                        html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><img src="'+a.liga+'" alt="50" width="50" /></li>';
+                        html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="" download><img src="'+a.liga+'" alt="50" width="50" /></a></li>';
                     }else{
-                        html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'"><span class="icon">Ø</span></a></li>';
+                        html+='<li style="list-style: none; margin-right: 15px; display: inline;" ><a href="'+a.liga+'" download><span class="icon">Ø</span></a></li>';
                     }
                 });
                html+='</ul></div>';
@@ -1513,6 +1617,26 @@ function genlistend()
             });
         });
 }
+
+
+
+$(document).on("ready", function(){
+
+    $("#incl_list_tareas").on("change","[id^=estatus_act_]",function(){
+        var id = $(this).attr("id").replace("estatus_act_","");
+       
+           var tsxt= $("#estatus_act_"+id).val();
+           var txt="t="+tsxt+"&w="+id+"&selec=34&us="+$("#idus").val();
+          var liga="funciones/funciones.php";
+          $.post(liga,txt,function(data){
+            if(data==="true"){
+                genlistactv();
+                genlistfull();
+            }
+          });
+    });
+
+});
 
 ///funcion guardar actividad
 ///
@@ -1595,12 +1719,12 @@ function save_asing_subactw(idsubtop,op)
             if(op==1){
                 var idre=$("#idreunion").val();    
                 var detectShow = $("[id^=txts_]");
-                var camp = "#txts_"+idtop;
+                var camp = "#sub_listaction_"+idtop+" #txts_"+idtop;
             }
             if(op==2){
                  var idre=$("#idReunAct").val();   
                  var detectShow = $("[id^=txt_]"); 
-                 var camp = "#txt_"+idsubtop;
+                 var camp = "#subtopiclist_"+idsubtop+" #sub_listaction_"+idsubtop+" #txt_"+idsubtop;
             }
         var form = $("#form_tarea_tema_"+idsubtop+" form").serialize();
         var id = $("#idus").val();
@@ -1611,10 +1735,10 @@ function save_asing_subactw(idsubtop,op)
 
                     if($("#form_tarea_tema_"+idsubtop).length > 0)
                     {
-                        $("#form_tarea_tema_"+idsubtop).remove();
+                        $(camp+" #form_tarea_tema_"+idsubtop).remove();
                         $(camp+" div").show();
-                        $(camp+" #textoreunion_"+idsubtop).show();
-                        $("#textoreunion_"+idsubtop).val("");
+                        $(camp+" textarea").show();
+                        $("#sub_listaction_"+idtop+" #textoreunion_"+idsubtop).val("");
                     }
                     if (op==1) {
                     show_listreunion_newsubtema(idsubtop,op);
@@ -1644,12 +1768,12 @@ function save_asing_wActv(idtop,op)
             if(op==1){
                  var idre=$("#idreunion").val();    
                 var detectShow = $("[id^=txts_]");
-                var camp = "#txts_"+idtop;
+                var camp = "#sublistaction_"+idtop+" #txts_"+idtop;
             }
             if(op==2){
                  var idre=$("#idReunAct").val();   
                  var detectShow = $("[id^=txt_]"); 
-                 var camp = "#txt_"+idtop;
+                 var camp = "#sublistaction_"+idtop+" #txt_"+idtop;
             }
         var form = $("#form_tarea_tema_"+idtop+" form").serialize();
         var id = $("#idus").val();
@@ -1662,8 +1786,8 @@ function save_asing_wActv(idtop,op)
                     {
                         $("#form_tarea_tema_"+idtop).remove();
                         $(camp+" div").show();
-                        $(camp+" #textoreunion_"+idtop).show();
-                        $("#textoreunion_"+idtop).val("");
+                        $(camp+" textarea").show();
+                        $("#textolist_activ_"+idtop).val("");
                     }
                     if (op==1) {
                         show_listreunion_new(idtop);   
@@ -1753,7 +1877,7 @@ function genLisTarea(idw)
 
         $.each(data,function(k,v){
                 var html='<div id="comn_tareas_'+v.idactw+'" class="coment_w"><label for="">Comentario:</label><input type="text" placeholder="escribe algun comentario" />';
-               html+='<div class="mensaje" style="margin-top: 2em;font-size: 0.81em; width: 31%; overflow: hidden; position: relative; float: right;"></div>';
+               html+='<div class="mensaje" id="mensaje_'+v.idactw+'" style="margin-top: 2em;font-size: 0.81em; width: 31%; overflow: hidden; position: relative; float: right;"></div>';
                html+='<div style="width: 25%; display: inline-block;"><label for="">mail:</label><input type="checkbox" id="mail-w" name="mailsend" value="1" />';
                html+='</div>';
                html+='<div class="uparch_w"><form  enctype="multipart/form-data" id="arch_upw_tar_'+v.idactw+'" action="" method="post" accept-charset="utf-8">';
@@ -1777,9 +1901,9 @@ function genLisTarea(idw)
                     if (typeof a !== "undefined" || a !== "null") {
                         var img = isImage(a.tipo);
                         if(img){
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><img src="'+a.liga+'" alt="50" width="50" /></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"> <a href="" download><img src="'+a.liga+'" alt="50" width="50" /></a></li>';
                         }else{
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><a href="'+a.liga+'"><span class="icon">Ø</span></a></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><a href="'+a.liga+'" download><span class="icon">Ø</span></a></li>';
                         }
                     }
                 });
@@ -1837,9 +1961,9 @@ function genLitsAct(idw)
                      if (typeof a !== "undefined" || a !== "null") {
                         var img = isImage(a.tipo);
                         if(img){
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><img src="'+a.liga+'" alt="50" width="50" /></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><a href="" download><img src="'+a.liga+'" alt="50" width="50" /></a></li>';
                         }else{
-                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><a href="'+a.liga+'"><span class="icon">Ø</span></a></li>';
+                            html+='<li style="list-style: none; margin-right: 15px; display: inline;"><a href="'+a.liga+'" download><span class="icon">Ø</span></a></li>';
                         }
                     }
                 });
@@ -1895,15 +2019,31 @@ function SaveTopicNew(){
                         $.each(arch, function(k,a){
                         var img = isImage(a.tipo);
                             if(img){
-                                    html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                    html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                             }else{
-                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                    html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                             }
                         });
                         html+="</ul></div>";
 
 
-                        html+="</div></div><div id='sublistaction_"+v.id+"'></div><ul id='subtema_"+v.id+"'>";
+                        html+="</div></div><div id='sublistaction_"+v.id+"'>";
+                        html+='<div id="seccion_'+v.id+'">';
+                        html+='<div id="txts_'+v.id+'" class="menu_list_active">';
+                        html+='<textarea id="textoreunion_'+v.id+'" name="textolist_activ" onclick="block_oplits('+v.id+');" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                        html+='<div id="check_visible_'+v.id+'" class="opciones_list_activ_'+v.id+'" style="display:none;">';
+                        html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                        html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                        html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+v.id+'" onclick="selecarchreunew('+v.id+',1,1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+v.id+',1);"value="Agregar" />';
+                        html+='</form><div class="mensaje" id="mensaje_'+v.id+'"></div><div class="showImage" id="showImage_'+v.id+'"></div></div>';
+                        html+='<div class="bar_menu_list_'+v.id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_listreunion('+v.id+',\'nota\',1)"/>';
+                        html+='<input type="button" value="Decision" onclick="save_listreunion('+v.id+',\'decision\',1)"/><input type="button" value="Tarea" onclick="save_tarea_tema('+v.id+',\'tarea\',1,1)" />';
+                        html+='</div></div>';
+                        html+='</div></div>';
+                        html+='</div>';
+                        html+='<div><label for="" onclick="subtopic('+v.id+');">Agregar sub tema</label></div>';
+
+                        html+="</div><ul id='subtema_"+v.id+"'>";
                    
 
                     var sublis= v.sublist;
@@ -1928,16 +2068,30 @@ function SaveTopicNew(){
                                 $.each(arch, function(k,a){
                                    var img = isImage(a.tipo);
                                     if(img){
-                                            html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                            html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                         }else{
-                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                            html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                         }
                                 });
                             html+="</ul></div>";
 
 
 
-                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'></div> </li>";
+                            html+="</div></div><div id='sub_listaction_"+l.idsub+"'>";
+                            html+='<div id="seccion_'+l.idsub+'">';
+                            html+='<div id="txts_'+l.idsub+'" class="menu_list_active">';
+                            html+='<textarea id="textoreunion_'+l.idsub+'" name="textolist_activ" onclick="block_opsublits('+l.idsub+');"class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                            html+='<div id="check_visible_'+l.idsub+'" class="opciones_list_activ_'+l.idsub+'" style="display:none;">';
+                            html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                            html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                            html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_sub_'+l.idsub+'" onclick="selecarchreunew('+l.idsub+',1,2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+l.idsub+',2);"value="Agregar" />';
+                            html+='</form><div class="mensaje"></div><div class="showImage"></div></div>';
+                            html+='<div class="bar_menu_list_'+l.idsub+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+l.idsub+',\'nota\',1)"/>';
+                            html+='<input type="button" value="Decision" onclick="save_sublistreunion('+l.idsub+',\'decision\',1)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+l.idsub+',\'tarea\',1,2);"/>';
+                            html+='</div></div>';
+                            html+='</div></div>';
+                            html+='</div>';
+                            html+="</div> </li>";
                     });
                     html+='</ul></li>';
                 });
@@ -1954,6 +2108,34 @@ function SaveTopicNew(){
     }
 }
 
+function cancel_subtem(id,sec)
+{
+    $('body #jb_result_users').empty();
+    $("#sublistaction_"+id).empty();
+            
+                //$("[id^=topiclist_] [id^=sublistaction_]").empty();
+               // $("[id^=subtopiclist_] [id^=sub_listaction_]").empty();
+                html="";
+                html+='<div id="seccion_'+id+'">';
+                html+='<div id="txts_'+id+'" class="menu_list_active">';
+                html+='<textarea id="textoreunion_'+id+'" name="textolist_activ" onclick="block_oplits('+id+');"class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" style="display:none;">';
+                html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+                html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+                html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+',1,1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+id+',1);"value="Agregar" />';
+                html+='</form><div class="mensaje" id="mensaje_'+id+'"></div><div class="showImage" id="showImage_'+id+'"></div></div>';
+                html+='<div class="bar_menu_list_'+id+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_listreunion('+id+',\'nota\',1)"/>';
+                html+='<input type="button" value="Decision" onclick="save_listreunion('+id+',\'decision\',1)"/><input type="button" value="Tarea" onclick="save_tarea_tema('+id+',\'tarea\',1,1)" />';
+                html+='</div></div>';
+                html+='</div></div>';
+                html+='</div>';
+                html+='<div><label for="" onclick="subtopic('+id+');">Agregar sub tema</label></div>';
+                $("#sublistaction_"+id).append(html);
+            
+}
+
+
+/*
 ////mostramos el sub menu en la reunion al momento de generarlad
 $(document).on("ready",function(){
     $("#topiclayer").on('click','[id^=topiclist_]', function(){
@@ -1969,7 +2151,7 @@ $(document).on("ready",function(){
                 html+='<div id="seccion_'+id+'">';
                 html+='<div id="txts_'+id+'" class="menu_list_active">';
                 html+='<textarea id="textoreunion_'+id+'" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
-                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
+                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" style="display:none;">';
                 html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
                 html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
                 html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+',1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(1,'+id+');"value="Agregar" />';
@@ -2004,7 +2186,7 @@ $(document).on("ready",function(){
                 html+='<div id="seccion_'+id+'">';
                 html+='<div id="txts_'+id+'" class="menu_list_active">';
                 html+='<textarea id="textoreunion_'+id+'" name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
-                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" ">';
+                html+='<div id="check_visible_'+id+'" class="opciones_list_activ_'+id+'" style="display:none;" >';
                 html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
                 html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
                 html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_'+id+'" onclick="selecarchreunew('+id+',1);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+id+');"value="Agregar" />';
@@ -2020,11 +2202,11 @@ $(document).on("ready",function(){
         });
     });
 });
-
+*/
 
 
 ////mostramos el sub menu en la reunion al momento de generarlad
-
+/*
 $(document).on("ready",function(){
     $("#contenUpop").on('click','[id^=topiclist_]', function(){
         var id = $(this).attr("id").replace("topiclist_",'');
@@ -2053,8 +2235,6 @@ $(document).on("ready",function(){
         });
     });
 });
-
-
 
 ////mostramos el sub menu en la reunion al momento de generarlad
 $(document).on("ready",function(){
@@ -2086,15 +2266,55 @@ $(document).on("ready",function(){
         });
     });
 });
+*/
 
+/*
 
+$(document).on("ready",function(){
+    $("body").on("click","[id^=textoreunion_]",function(){
+        var id=$(this).attr("id").replace("textoreunion_","");
+        
+        if($("#sublistaction_"+id+" #check_visible_"+id).is(":visible"))
+        {  
+            $("#sublistaction_"+id+" #check_visible_"+id).show(1000);
+        }
+        else
+        {
+         $("[id^=topiclist_] [id^=check_visible_]").hide(500);  
+         $("#sublistaction_"+id+" #check_visible_"+id).show(1000);   
+        }
+    });
+});
 
+$(document).on("ready",function(){
+    $("body").on("click","[id^=textoreunion_]",function(){
+        var id=$(this).attr("id").replace("textoreunion_","");
+        
+        if($("#sub_listaction_"+id+" #check_visible_"+id).is(":visible"))
+        {
+            $("#sub_listaction_"+id+" #check_visible_"+id).show(1000);
+        }
+        else
+        {
+         $("[id^=sublistaction_] [id^=sublistaction_]").hide(500);  
+         $("#sub_listaction_"+id+" #check_visible_"+id).show(1000);   
+        }
+    });
+});
+*/
 //function guardamos la accion de la lista 
-function save_listreunion(id,txt)
+function save_listreunion(id,txt,sec)
 {
-    if($("#textoreunion_"+id).val()!=""){
+    var camp="";
+    if (sec==1) {
+        camp = "#sublistaction_"+id+" #textoreunion_"+id;
+    }
+    if (sec==2) {
+        camp = "#sub_listaction_"+id+" #textoreunion_"+id;
+    }
+    if($(camp).val()!=""){
         var idre= $("#idreunion").val();
-        var txto="selec=14&id="+id+"&tipo="+txt+"&text="+$("#textoreunion_"+id).val()+"&idre="+idre+"&idus="+$("#idus").val();
+        var txto="selec=14&id="+id+"&tipo="+txt+"&text="+$(camp).val()+"&idre="+idre+"&idus="+$("#idus").val();
         var ruta = "funciones/funciones.php";
         $.post(ruta, txto, function(data){
             if($("#listanotas_"+id+" #notas").length > 0){
@@ -2121,9 +2341,9 @@ function save_listreunion(id,txt)
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                     }else{
-                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                     }
                             });
                     html+="</ul></div>";
@@ -2140,7 +2360,7 @@ function subtopic(id)
 {
     $("#topiclist_"+id+" #sublistaction_"+id).empty();
     var html="";
-    html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtop('+id+');" style="display: block;"/></div>';
+    html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtop('+id+');" style="display: block;"/><input type="button" value="Cancelar" onclick="cancel_subtem('+id+');" style="display: block;"/></div>';
     $("#topiclist_"+id+" #sublistaction_"+id).append(html);
 }
 
@@ -2149,7 +2369,7 @@ function subtopicact(id)
 {
     $("#topiclist_"+id+" #sublistaction_"+id).empty();
     var html="";
-    html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtopact('+id+');" style="display: block;"/></div>';
+    html+='<div style="overflow: hidden; width: 75%; padding: 0px;"><textarea  name="" id="texto_'+id+'" class="Titulo-topic subtopic" cols="30" rows="10" style="display: block;"></textarea><input type="button" value="Agregar" onclick="savesubtopact('+id+');" style="display: block;"/><input type="button" value="Cancelar" onclick="cancel_subtem('+id+');" style="display: block;"/></div>';
     $("#topiclist_"+id+" #sublistaction_"+id).append(html);
 }
 
@@ -2173,7 +2393,21 @@ function savesubtop(id)
             });
     
             html+="</ul>";
-            html+="</div></div><div id='sub_listaction_"+v.idsub+"'></div></li>";
+            html+="</div></div><div id='sub_listaction_"+v.idsub+"'>";
+            html+='<div id="seccion_'+v.idsub+'">';
+            html+='<div id="txts_'+v.idsub+'" class="menu_list_active">';
+            html+='<textarea id="textoreunion_'+v.idsub+'" onclick="block_opsublits('+v.idsub+');"name="textolist_activ" class="Titulo-topic txtlist_activ" placeholder="Escribe Una Nota, Decicion O Actividad" rows="1"></textarea>';
+            html+='<div id="check_visible_'+v.idsub+'" class="opciones_list_activ_'+v.idsub+'" style="display:none;">';
+            html+='<div style="border-top: 1px solid;border-bottom: 1px solid;">';
+            html+='<form enctype="multipart/form-data" action="" method="post" class="formulario_meetin_act"><label style="font-size: 0.6em;">Agregar Archivo: </label>';
+            html+='<span class="icon" style="font-size: 2em; margin: 7px;cursor: pointer;overflow: hidden;width: 10px;">Ø<input name="archivo" type="file" id="archivo_reunion_sub_'+v.idsub+'" onclick="selecarchreunew('+v.idsub+',1,2);" class="up_acrh"/></span><input type="button" id="arch_reunnew" onclick="uparchivo_reunion(2,'+v.idsub+',2);"value="Agregar" />';
+            html+='</form><div class="mensaje" id="mensaje_'+v.idsub+'"></div><div class="showImage" id="showImage_'+v.idsub+'"></div></div>';
+            html+='<div class="bar_menu_list_'+v.idsub+'"><div><label>Guardar Como: </label><input type="button" value="nota" onclick="save_sublistreunion('+v.idsub+',\'nota\',1)"/>';
+            html+='<input type="button" value="Decision" onclick="save_sublistreunion('+v.idsub+',\'decision\',1)"/><input type="button" value="Tarea" onclick="save_tarea_subtema('+v.idsub+',\'tarea\',1,1);"/>';
+            html+='</div></div>';
+            html+='</div></div>';
+            html+='</div>';
+            html+="</div></li>";
         
         });
             $("#topiclist_"+id+" #subtema_"+id).empty();
@@ -2258,9 +2492,9 @@ function save_sublistreunion(id,txt,op)
                             $.each(arch, function(k,a){
                                var img = isImage(a.tipo);
                                 if(img){
-                                        html+="<li style='list-style: none; display: inline;' ><img src='"+a.liga+"' alt='70' width='80' /></li>";    
+                                        html+="<li style='list-style: none; display: inline;' ><a href='' download><img src='"+a.liga+"' alt='70' width='80' /></a></li>";    
                                     }else{
-                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
+                                        html+="<li style='list-style: none; display: inline;'><a href='"+a.liga+"' download rel='ignore' role='menuitem'><span class='icon'>m</span></a></li>";
                                     }
                             });
                     html+="</ul></div>";
@@ -2274,22 +2508,22 @@ function save_sublistreunion(id,txt,op)
 
 
 //funcionas para asignar la tarea en la lista de la reunion recien generadad
-function save_tarea_tema(id,txt,op){
+function save_tarea_tema(id,txt,op,sec){
     if (op==1) {
-        var camp = "#txts_"+id;
+        var camp = "#sublistaction_"+id+" #txts_"+id;
         var txto = $("#textoreunion_"+id).val();
     }
     if (op==2) {
-        var camp = "#txt_"+id;
+        var camp = "#sublistaction_"+id+" #txt_"+id;
         var txto = $("#textolist_activ_"+id).val();
     }
     $(camp+" div").hide();
     $(camp+" textarea").hide();
         var htmlp='<div id="form_tarea_tema_'+id+'" class="form_usr_w_asing"><form action="#" method="post"><label for="">nombre de la tarea</label><input type="text"  name="titulo-w" value="'+txto+'"/>';
-            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_listact" onkeyup="share_usuarios(this.value,1);" />';
+            htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_listact" onkeyup="share_usuarios(this.value,1,'+id+');" />';
             htmlp+='<div id="jb_lista_usuarios" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
             htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div>';
-            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_tema('+op+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
+            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_wActv('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_tema('+op+','+id+','+sec+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
             
     $(camp).append(htmlp);
     $("body #datepicker4").click();
@@ -2297,16 +2531,21 @@ function save_tarea_tema(id,txt,op){
 
 
 
-function cancel_w_tema(op){
+function cancel_w_tema(op,id,sec){
     if (op==1) {
-        var id = $("[id^=txts_]").attr('id').replace("txts_","");
-        var camp = "#txts_"+id;
+        if(sec==1)
+            var camp = "#sublistaction_"+id+" #txts_"+id;
+        if(sec==2)
+            var camp = "#sub_listaction_"+id+" #txts_"+id;
     }
     if (op==2) {
-        var id = $("[id^=txt_]").attr('id').replace("txt_","");
-        var camp = "#txt_"+id;
+     
+        if(sec==1)
+            var camp = "#sublistaction_"+id+" #txt_"+id;
+        if(sec==2)
+            var camp = "#sub_listaction_"+id+" #txt_"+id;
     }
-    $("#form_tarea_tema_"+id).remove();
+    $(camp+" #form_tarea_tema_"+id).remove();
     $(camp+" div").show();
     $(camp+" textarea").show();
     $("#jb_lista_usuarios").empty();
@@ -2315,21 +2554,21 @@ function cancel_w_tema(op){
 }
 
 //funcionas para asignar la tarea en la lista de la reunion nueva y activa
-function save_tarea_subtema(id,txt,op){
+function save_tarea_subtema(id,txt,op,sec){
     var  camp= "";
     var camp2 ="";
     var camp3 ="";
     if (op ==1) {
-        var txto = $("#textoreunion_"+id).val();
-        camp ="#txts_"+id+" div";
-        camp2="#txts_"+id+" textarea";
-        camp3="#txts_"+id;
+        var txto = $("#sub_listaction_"+id+" #textoreunion_"+id).val();
+        camp ="#sub_listaction_"+id+" #txts_"+id+" div";
+        camp2="#sub_listaction_"+id+" #txts_"+id+" textarea";
+        camp3="#sub_listaction_"+id+" #txts_"+id;
     }
     if (op ==2) {
         var txto = $("#sub_listaction_"+id+" #textoreunion_"+id).val();
-        camp ="#txt_"+id+" div";
-        camp2="#txt_"+id+" textarea";
-        camp3="#txt_"+id;
+        camp ="#sub_listaction_"+id+" #txt_"+id+" div";
+        camp2="#sub_listaction_"+id+" #txt_"+id+" textarea";
+        camp3="#sub_listaction_"+id+" #txt_"+id;
     }
     $(camp).hide();
     $(camp2).hide();
@@ -2337,7 +2576,7 @@ function save_tarea_subtema(id,txt,op){
             htmlp+='<label for="">fecha</label><input type="text" id="datepicker4" name="fecha" placeholder="fecha limite" ><label for="">usuario</label><input type="text" id="adduser_listact" onkeyup="share_usuarios(this.value,1);" />';
             htmlp+='<div id="jb_lista_usuarios" class="list-share list-meeting" style="display:none;z-index: 2;"></div><div class="listaUsuarios listusract" id="jb_lista_usuarios_click_tema" style="display: block;"></div>';
             htmlp+='<div class="chkmail-w"><label for="">Mail:</label><div class="slideThree"><input type="checkbox" id="slideThree" name="mailsend" value="1" /><label for="slideThree"></label></div> </div>';
-            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_subactw('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_subtema('+op+','+id+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
+            htmlp+='<input type="button" id="sav_asing_w" value="Asignar Tarea" onclick="save_asing_subactw('+id+','+op+');" style="display:inline;margin-left: 1em;width: 20%;" /><input type="button" value="Cancelar" onclick="cancel_w_subtema('+op+','+id+','+sec+');" style="display:inline;margin-left: 1em;width: 20%;"/></form></div>';
   
     $(camp3).append(htmlp);
     $("body #datepicker4").click();
@@ -2345,14 +2584,14 @@ function save_tarea_subtema(id,txt,op){
 
 
 /////canselamos la asigancion de tareas en las reuniones
-function cancel_w_subtema(op,id){
+function cancel_w_subtema(op,id,sec){
 
         var  camp= "";
         if (op ==1) {
-            camp ="#txts_"+id;
+            camp ="#sub_listaction_"+id+" #txts_"+id;
         }
         if (op ==2) {
-            camp="#txt_"+id;
+            camp="#sub_listaction_"+id+" #txt_"+id;
         }
                 
         $(camp+" #form_tarea_tema_"+id).remove();
@@ -3013,7 +3252,7 @@ $(document).on("ready",function(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // seccion de busqueda de usuarios en las reuniones activas 
-function share_usuarios(search,op){
+function share_usuarios(search,op,id){
    //si la caja de texto esta vacia eliminamos la lista
    //
   
@@ -3033,13 +3272,13 @@ function share_usuarios(search,op){
         //si la caja de texto contiene algo 
         if($.trim(search) !== '')
         {
-            $("body "+camp).show();
+            $(camp).show();
 
-            if($("body "+camp+" ul").length == 0)
+            if($(camp+" ul").length == 0)
             {
-                var htmlUl='<ul id="jb_ul_data_user"><ul>';
-                $("body "+camp).append(htmlUl);
-                $("body "+camp+" #jb_ul_data_user ul").remove();
+                var htmlUl='<ul id="jb_ul_data_user_tm"><ul>';
+                $(camp).append(htmlUl);
+                $(camp+" #jb_ul_data_user_tm ul").remove();
             }
               var elementopadre = $('[id^=jb_id_user_]');
               //recorremos el each buscando todos los id que inicien jb_id_user_
@@ -3061,7 +3300,7 @@ function share_usuarios(search,op){
                         {
                             var htmlLi = '<li id="id_user_tm_'+id+'">'+nombre+'</li>';
                             if($("#id_user_tm_"+id).length == 0 && $("#user_selected_tm_"+id).length == 0)
-                                $("#jb_ul_data_user").prepend(htmlLi);
+                                $("#jb_ul_data_user_tm").prepend(htmlLi);
                         }
                     }
                     else
@@ -3405,8 +3644,27 @@ $(document).on("ready",function()
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+////para descargar los archivos al clickear
+$(document).on("ready",function(){
+    $("body").on('click','img', function(){
+       // $(this).preventDefault;
+        var img = $(this).attr("src");
+        var txt ="file="+img;
+        var liga = "descargas/descargaArchivos.php?";
+       window.location.href=liga+txt;
+    });
+   $("body").on('click','a', function(){
+       // $(this).preventDefault;
+        var fila = $(this).attr("href");
+        arch = fila.substring(fila.lastIndexOf('.') + 1);
+        if(arch == "pdf" || arch == "docx" ||arch == "doc" ||arch == "xls" ||arch == "txt" ||arch == "rar" || arch == "zip" || arch == "xlsx" || arch == "ppt" ||arch == "pptx" ||arch == "jpg" ||arch == "png" ||arch == "jpeg" )
+        {       var txt ="file="+fila;
+                var liga = "descargas/descargaArchivos.php?";
+                window.location.href=liga+txt;
+        }
+    });
+     
+});
 
 
 
@@ -3419,9 +3677,8 @@ $(document).on("ready", function(){
         {
             //obtenemos un array con los datos del archivo
             var file = $("#archivo_meeting_act")[0].files[0];
-            var fileName = file.name;
-            //obtenemos la extensión del archivo
-            fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+             var fileName = file.type;
+            fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
             var fileSize = file.size;
             var fileType = file.type;
             fileSize =(fileSize / (1024*1024)).toFixed(2);
@@ -3429,15 +3686,26 @@ $(document).on("ready", function(){
                   if(fileSize > 4){
                         var inpu= $('#archivo_meeting_act');
                         inpu.replaceWith(inpu.val('').clone(true));
+                        $("#form-w .mensaje").empty();
                         $("#form-w .mensaje").append("<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>");
                   }else{
+                    $("#form-w .mensaje").empty();
                      $("#form-w .mensaje").append("<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>");
                      $("#arch_reunAct").css({"color":"#1A72D4;"});
-                     $("#arch_reunAct").addClass('resaltado');
-
-                        parpareout();
+                     $("#arch_reunAct").addClass('resaltado');           
                     
                   }
+                  var arch = fileExtension;
+                  if (arch == "pdf" || arch == "docx" ||arch == "doc" ||arch == "xls" ||arch == "txt" ||arch == "rar" || arch == "zip" || arch == "xlsx" || arch == "ppt" ||arch == "pptx" ||arch == "jpg" ||arch == "png" ||arch == "jpeg"){
+                    $("#arch_reunAct").show();
+                    parpareout();
+                   }
+                   else{
+                        $("#arch_reunAct").hide();
+                        msg="<span class='info'>Archivo para subir: No esta permitido solo \" pdf, doc, rar, zip, txt, xls, ppt,\"</span>";
+                        $("#form-w .mensaje").empty();
+                        $("#form-w .mensaje").append(msg);
+                   }
             var files = event.target.files; // FileList object
              
             for (var i = 0, f; f = files[i]; i++) {
@@ -3469,19 +3737,36 @@ $(document).on("ready", function(){
 });
 
 //cargamos los archivos para la reunion recien creda
-function selecarchreunew(idw,op){
+function selecarchreunew(idw,op,sec){
         var camp = "";
         var camp2 ="";
         var camp3 ="";
         if (op == 1) {
-            camp="#txts_"+idw;
-            camp2="#check_visible_"+idw;
-            camp3="#archivo_reunion_"+idw;
+            if (sec==1) {
+                camp="#txts_"+idw;
+                camp2="#txts_"+idw+" #sublistaction_"+idw+" #check_visible_"+idw;
+                camp3="#archivo_reunion_"+idw;
+            }
+            if (sec==2) {
+                camp="#txts_"+idw;
+                camp2="#txts_"+idw+" #sub_listaction_"+idw+" #check_visible_"+idw;
+                camp3="#archivo_reunion_sub_"+idw;
+            
+            }
         }
         if (op ==2 ) {
-            camp="#txt_"+idw
-            camp2="#text_check_visible_"+idw;
-            camp3="#archivo_meeting_act_"+idw;
+            
+            if (sec==1) {
+                camp="#txt_"+idw
+                camp2="#sublistaction_"+idw+" #text_check_visible_"+idw;
+                camp3="#archivo_meeting_act_"+idw;
+            }
+            if (sec==2) {
+                camp="#txt_"+idw;
+                camp2="#sub_listaction_"+idw+" #text_check_visible_"+idw;
+                camp3="#archivo_meeting_act_sub_"+idw;
+            
+            }
         }
      $(camp).on("click",camp2,function(){
         var fileExtension = "";
@@ -3489,9 +3774,8 @@ function selecarchreunew(idw,op){
         {
             //obtenemos un array con los datos del archivo
             var file = $(camp2+" "+camp3)[0].files[0];
-            var fileName = file.name;
-            //obtenemos la extensión del archivo
-            fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+             var fileName = file.type;
+            fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
             var fileSize = file.size;
             var fileType = file.type;
             var msg="";
@@ -3501,11 +3785,24 @@ function selecarchreunew(idw,op){
                         var inpu= $(camp3);
                         inpu.replaceWith(inpu.val('').clone(true));
                        msg="<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>";
-                       $(camp2+" .mensaje").append(msg);
+                       $(camp2+" #mensaje_"+idw).empty();
+                       $(camp2+" #mensaje_"+idw).append(msg);
                   }else{
                      msg="<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>";
-                     $(camp2+" .mensaje").append(msg);
+                     $(camp2+" #mensaje_"+idw).empty();
+                     $(camp2+" #mensaje_"+idw).append(msg);
                   }
+                  var arch = fileExtension;
+                  if (arch == "pdf" || arch == "docx" ||arch == "doc" ||arch == "xls" ||arch == "txt" ||arch == "rar" || arch == "zip" || arch == "xlsx" || arch == "ppt" ||arch == "pptx" ||arch == "jpg" ||arch == "png" ||arch == "jpeg")
+                   {
+                    $("#arch_reunnew").show();
+                   }
+                   else{
+                        $("#arch_reunnew").hide();
+                        msg="<span class='info'>Archivo para subir: No esta permitido solo \" pdf, doc, rar, zip, txt, xls, ppt,\"</span>";
+                        $(camp2+" #mensaje_"+idw).empty();
+                        $(camp2+" #mensaje_"+idw).append(msg);
+                   }
             var files = event.target.files; // FileList object
              
             for (var i = 0, f; f = files[i]; i++) {
@@ -3517,7 +3814,7 @@ function selecarchreunew(idw,op){
                     reader.onload = (function(theFile) {
                         return function(e) {
                           // Insertamos la imagen
-                         $(camp2+" .showImage").html(['<img class="thumb" src="', e.target.result,'" title="', escape(theFile.name), '" alt="90" width="100"/>'].join(''));
+                         $(camp2+" #showImage_"+idw).html(['<img class="thumb" src="', e.target.result,'" title="', escape(theFile.name), '" alt="90" width="100"/>'].join(''));
                         };
                     })(f);
                     reader.readAsDataURL(f);
@@ -3537,10 +3834,9 @@ function selectarchwtar(idw){
         $(':file').change(function (event)
         {
             //obtenemos un array con los datos del archivo
-            var file = $("#arch_upw_tar_"+idw+" #archivo_tareasw_"+idw)[0].files[0];
-            var fileName = file.name;
-            //obtenemos la extensión del archivo
-            fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+            var file = $("#comn_tareas_"+idw+" #archivo_tareasw_"+idw)[0].files[0];
+             var fileName = file.type;
+             fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
             var fileSize = file.size;
             var fileType = file.type;
             var msg="";
@@ -3550,16 +3846,30 @@ function selectarchwtar(idw){
                         var inpu= $('#archivo_tareasw');
                         inpu.replaceWith(inpu.val('').clone(true));
                        msg="<span class='info'>Archivo para subir: Es muy grande \"limite de carga por archivo 4m.b\"</span>";
-                       $(".coment_w .mensaje").append(msg);
+                       $(".coment_w .mensaje_"+idw).append(msg);
                   }else{
                      msg="<span class='info'>Archivo para subir: "+fileName+", peso total: "+fileSize+" Mbytes.</span>";
+                     $("#comn_tareas_"+idw+" .mensaje").empty();
                      $("#comn_tareas_"+idw+" .mensaje").append(msg);
                      $("#comn_tareas_"+idw+" #arch_reunAct").css({"color":"#1A72D4;","cursor":"pointer"});
                      $("#comn_tareas_"+idw+" #arch_reunAct").addClass('resaltado');
-
-                        parpareout();
-                    
+                       
                   }
+
+                  var arch = fileExtension;
+                  if (arch == "pdf" || arch == "docx" ||arch == "doc" ||arch == "xls" ||arch == "txt" ||arch == "rar" || arch == "zip" || arch == "xlsx" || arch == "ppt" ||arch == "pptx" ||arch == "jpg" ||arch == "png" ||arch == "jpeg")
+                   {
+                    $("#arch_upw_tar_"+idw+" #arch_reunAct").show();
+                     parpareout();
+                   }
+                   else{
+                        $("#comn_tareas_"+idw+" #arch_reunAct").removeClass('resaltado');
+                        $("#comn_tareas_"+idw+" #arch_reunAct").hide();
+                        msg="<span class='info'>Archivo para subir: No esta permitido solo \" pdf, doc, rar, zip, txt, xls, ppt,\"</span>";
+                        $("#comn_tareas_"+idw+" .mensaje").empty();
+                        $("#comn_tareas_"+idw+" .mensaje").append(msg);
+                   }
+
             var files = event.target.files; // FileList object
              
             for (var i = 0, f; f = files[i]; i++) {
@@ -3598,9 +3908,8 @@ function selectarchwact(idw){
         {
             //obtenemos un array con los datos del archivo
             var file = $("#arch_upw_tar_"+idw+" #archivo_actw_"+idw)[0].files[0];
-            var fileName = file.name;
-            //obtenemos la extensión del archivo
-            fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+            var fileName = file.type;
+            fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
             var fileSize = file.size;
             var fileType = file.type;
             var msg="";
@@ -3620,6 +3929,17 @@ function selectarchwact(idw){
                         parpareout();
                     
                   }
+                  var arch = fileExtension;
+                  if (arch == "pdf" || arch == "docx" ||arch == "doc" ||arch == "xls" ||arch == "txt" ||arch == "rar" || arch == "zip" || arch == "xlsx" || arch == "ppt" ||arch == "pptx" ||arch == "jpg" ||arch == "png" ||arch == "jpeg")
+                   {
+                    $("#arch_reunnew").show();
+                   }
+                   else{
+                        $("#arch_reunnew").hide();
+                        msg="<span class='info'>Archivo para subir: No esta permitido solo \" pdf, doc, rar, zip, txt, xls, ppt,\"</span>";
+                        $("#comn_actividad_"+idw+" #mensaje_"+idw).empty();
+                        $("#comn_actividad_"+idw+" #mensaje_"+idw).append(msg);
+                   }
         });
         function parpareout()
         {
@@ -3632,7 +3952,7 @@ function selectarchwact(idw){
     });
 }
 
-function uparchivo_reunion(op,id){
+function uparchivo_reunion(op,id,sec){
  //al enviar el formulario
         //información del formulario
        var camp="";
@@ -3642,19 +3962,25 @@ function uparchivo_reunion(op,id){
      }
     if(op == 2)
      {  
+        camp = "archivo_reunion_sub_"+id;
         var idre = $("#idreunion").val();
-        camp = "archivo_reunion_"+id;
      }  
      if (op == 3) {
         camp = "archivo_meeting_act_"+id
+        var idre = $("#idReunAct").val();
+     }
+     if (op == 4) {
+        camp = "archivo_meeting_act_sub_"+id
         var idre = $("#idReunAct").val();
      }
         var inputFile = document.getElementById(camp);
         if(inputFile !=="")
         {
                 var file = inputFile.files[0];
-                var fileName = file.name;
-                fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+               // var fileName = document.location.pathname.substring(1);    //  file.name;
+                var fileName = file.type;
+                fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
+                //console.log(fileExtension);
                 var data = new FormData();
                 data.append('archivo',file);
 
@@ -3675,18 +4001,23 @@ function uparchivo_reunion(op,id){
                         mensaje = $("<span class='before'>Subiendo el archivo, por favor espere...</span>");
                     
                         if (op==1) {
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).append(mensaje);
                         }
                         if(op==2)
                         {
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).append(mensaje);
                         }
                         if(op==3)
                         {
-                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
-                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                        }
+                        if(op==4)
+                        {
+                            $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
                         }
                         // $("#save-w").val("")       
                     },
@@ -3694,30 +4025,41 @@ function uparchivo_reunion(op,id){
                     success: function(data){
                         mensaje = $("<span class='success'>El archivo se ha subido correctamente.</span>");
                         if( op == 1 ){
+                            //console.log(fileExtension);
                             savedbarch(id,idre,data,fileExtension,op);
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).append(mensaje);
                            
-                                timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
-                                timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
+                                timeout("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id);
+                                timeout("#txts_"+id+" #check_visible_"+id+" #showImage_");
                         }
                         if( op == 2 ){
                            op =1;
                            savedbarch_subtema(id,idre,data,fileExtension,op);
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                            $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                            timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
-                            timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                            timeout("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id);
+                            timeout("#txts_"+id+" #check_visible_"+id+" #showImage_"+id);
                           
                         }
                         if( op == 3 ){
                             op=2;
                            savedbarch_subtema(id,idre,data,fileExtension,op);
-                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
-                            $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
                             
-                                timeout("#txt_"+id+" #text_check_visible_"+id+" .mensaje");
-                                timeout("#txt_"+id+" #text_check_visible_"+id+" .showImage");
+                                timeout("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id);
+                                timeout("#sublistaction_"+id+" #text_check_visible_"+id+" #showImage_"+id);
+                            
+                        }
+                        if( op == 4 ){
+                            op=2;
+                           savedbarch_subtema(id,idre,data,fileExtension,op);
+                            $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                            
+                                timeout("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id);
+                                timeout("#sub_listaction_"+id+" #text_check_visible_"+id+" #showImage_"+id);
                             
                         }
                     },
@@ -3730,24 +4072,31 @@ function uparchivo_reunion(op,id){
         }else{
             mensaje = $("<span class='erro'>Seleccione un archivo</span>");
             if (op==1) {
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").empty();
-                $("#txts_"+id+" #check_visible_"+id+" .mensaje").append(mensaje);
-                timeout("#txts_"+id+" #check_visible_"+id+" .mensaje");
-                timeout("#txts_"+id+" #check_visible_"+id+" .showImage");
+                $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).empty();
+                $("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                timeout("#txts_"+id+" #check_visible_"+id+" #mensaje_"+id);
+                timeout("#txts_"+id+" #check_visible_"+id+" #showImage_"+id);
             }
             if (op==2) {
                 showMessage(mensaje);
-                $("#txts_"+id+" #text_check_visible_"+id+" .mensaje").empty();
-                $("#txts_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
-                timeout("#txts_"+id+" #text_check_visible_"+id+" .mensaje");
-                timeout("#txts_"+id+" #text_check_visible_"+id+" .showImage");
+                $("#txts_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                $("#txts_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                timeout("#txts_"+id+" #text_check_visible_"+id+" #mensaje_"+id);
+                timeout("#txts_"+id+" #text_check_visible_"+id+" #showImage_"+id);
            }
             if (op==3) {
                 showMessage(mensaje);
-                $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").empty();
-                $("#txt_"+id+" #text_check_visible_"+id+" .mensaje").append(mensaje);
-                timeout("#txt_"+id+" #text_check_visible_"+id+" .mensaje");
-                timeout("#txt_"+id+" #text_check_visible_"+id+" .showImage");
+                $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                timeout("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id);
+                timeout("#sublistaction_"+id+" #text_check_visible_"+id+" #showImage_"+id);
+           }
+            if (op==4) {
+                showMessage(mensaje);
+                $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                $("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
+                timeout("#sub_listaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id);
+                timeout("#sub_listaction_"+id+" #text_check_visible_"+id+" #showImage_"+id);
            }
             
         }
@@ -3783,8 +4132,8 @@ function uparchivo(op,id,idre){
         if(inputFile !=="")
         {
                 var file = inputFile.files[0];
-                var fileName = file.name;
-                fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+                var fileName = file.type;
+                fileExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
                 var data = new FormData();
                 data.append('archivo',file);
 
@@ -3804,7 +4153,8 @@ function uparchivo(op,id,idre){
                     beforeSend: function(){
                         mensaje = $("<span class='before'>Subiendo el archivo, por favor espere...</span>");
                         if (op==1) {
-                            showMessage(mensaje);
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
                             $("#save-w").css('opacity','0.2');
 
                         }
@@ -3830,8 +4180,10 @@ function uparchivo(op,id,idre){
                         mensaje = $("<span class='success'>El archivo se ha subido correctamente.</span>");
                         if(op==1){
                             var sec="";
+                            //console.log(fileExtension);
                             savedbarch(id,idre,data,fileExtension,sec);
-                            $(".mensaje").append(mensaje);
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).empty();
+                            $("#sublistaction_"+id+" #text_check_visible_"+id+" #mensaje_"+id).append(mensaje);
                             timeout(".showImage");
                             timeout(".mensaje");
 
@@ -3843,18 +4195,17 @@ function uparchivo(op,id,idre){
                                 color: '#135D58'
                             });
                             $("#save-w").css('opacity','1');
-                            $(".mensaje").prepend("Ya puedes guardar la tarea.");
+                            $("#form-w .mensaje").empty();
+                            $("#form-w .mensaje").prepend("<span class='success'>Puedes Guardar la actividad.</span>");
                             preparesave(data,fileExtension);
                             showMessage(mensaje);
                             timeout(".showImage");
-                            timeout(".mensaje");
                         }
                         if(op == 3){
                             savearchw(data,id,idre,fileExtension);
                             $(".tareasIdeas #"+id+" #mensaje_"+id).empty();
                             $(".tareasIdeas #"+id+" #mensaje_"+id).append(mensaje);
                             timeout(".tareasIdeas #"+id+" #mensaje_"+id);
-                            timeout(".tareasIdeas #"+id+" .showImage");
                         }
                         if (op==4) {
                             savearchw(data,id,idre,fileExtension);

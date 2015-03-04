@@ -52,14 +52,15 @@ if ($op == 1)
 
     $db = new loger;
     $res = $db->login($usuario,$pass);
-
-    if ($res != "") {
+    $cout = count($res);
+    if ($cout !== 0 ) {
         session_start();
         //echo json_encode($res);
         $_SESSION['nombre']= $res[0]['nombre'];
         $_SESSION['iduser']= $res[0]['id'];
         $_SESSION['logge']= true;    
         echo true;
+        //var_dump($res);
     }
     else
     {

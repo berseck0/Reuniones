@@ -1,11 +1,12 @@
 <?
 session_start();
-//se comprueba que una peticion ajax
+
 
        $id = $_SESSION['iduser'];
         // obtenemos los datos del archivo
-       $archivo = $_FILES["archivo"]['name'];
-       $tipo = $_FILES["archivo"]['type'];
+       $archivo = trim($_FILES["archivo"]['name']);
+       $tipo = trim($_FILES["archivo"]['type']);
+       $archivo = limpia_espacios($archivo);
         if ($archivo != "")
         {
             $ds="../archivos/".$id;
@@ -22,7 +23,13 @@ session_start();
                     header('Content-type: application/json charset=utf-8');
                     sleep(3);
                     $file= explode("/",$destino);
+                    //array_push($file,$tipo);
                     echo json_encode($file);
                 }
         }
-   
+  
+function limpia_espacios($cadena)
+{
+  $cadena = str_replace(' ','-',$cadena);
+  return $cadena;
+}
